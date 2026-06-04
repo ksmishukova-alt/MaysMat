@@ -59,6 +59,7 @@ function StatusBar({
   missionPercent,
   href,
   ctaLabel,
+  showCta,
 }: {
   branchTitle: string;
   missionCurrent: number;
@@ -66,6 +67,7 @@ function StatusBar({
   missionPercent: number;
   href: string;
   ctaLabel: string;
+  showCta: boolean;
 }) {
   return (
     <div className="pointer-events-none absolute inset-x-3 bottom-2.5 z-20 sm:inset-x-4 sm:bottom-3">
@@ -100,12 +102,14 @@ function StatusBar({
         </div>
 
         <div className="shrink-0 sm:pl-3">
-          <Link
-            href={href}
-            className="flex w-full items-center justify-center whitespace-nowrap rounded-lg bg-brand-purple px-4 py-2 text-sm font-semibold text-white shadow-sm shadow-brand-purple/20 transition hover:opacity-95 sm:w-auto"
-          >
-            {ctaLabel}
-          </Link>
+          {showCta ? (
+            <Link
+              href={href}
+              className="flex w-full items-center justify-center whitespace-nowrap rounded-lg bg-brand-purple px-4 py-2 text-sm font-semibold text-white shadow-sm shadow-brand-purple/20 transition hover:opacity-95 sm:w-auto"
+            >
+              {ctaLabel}
+            </Link>
+          ) : null}
         </div>
       </div>
     </div>
@@ -128,7 +132,7 @@ function HeroText({ title, description }: { title: string; description: string }
   );
 }
 
-export function MissionHeroBanner() {
+export function MissionHeroBanner({ showCta = true }: { showCta?: boolean }) {
   const progress = useProgress();
   const pathStore = useChildPathStore();
   const next = useMemo(() => getNextPlayableTask(progress), [progress, pathStore]);
@@ -165,6 +169,7 @@ export function MissionHeroBanner() {
             missionPercent={0}
             href="/tasks"
             ctaLabel="Задачи →"
+            showCta={showCta}
           />
         </>
       ) : (
@@ -177,6 +182,7 @@ export function MissionHeroBanner() {
             missionPercent={mission.percent}
             href={next.href}
             ctaLabel="Продолжить миссию →"
+            showCta={showCta}
           />
         </>
       )}

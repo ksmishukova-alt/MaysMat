@@ -38,7 +38,10 @@ export function ProfileHeroRow({ progress, avatarId }: ProfileHeroRowProps) {
         <div className="flex flex-wrap items-start gap-5">
           <PresetAvatar avatarId={avatarId} size={PROFILE_AVATAR_SIZE} ring />
           <div className="min-w-0 flex-1">
-            <h1 className="text-2xl font-bold">{progress.name}</h1>
+            <h1 className="text-2xl font-bold">{progress.name?.trim() || "Исследователь"}</h1>
+            {progress.child?.grade ? (
+              <p className="mt-0.5 text-sm text-gray-500">{progress.child.grade} класс</p>
+            ) : null}
             <p className="mt-1 text-sm font-medium text-brand-purple">{dailyStatus}</p>
             <p className="mt-2 text-gray-500">Уровень {progress.level}</p>
 

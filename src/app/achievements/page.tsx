@@ -1,13 +1,16 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { Header } from "@/components/Header";
 import { ARCHIPELAGO } from "@/data/archipelago";
+import { getAchievementList } from "@/lib/achievements";
+import { evaluateAchievements } from "@/lib/achievements";
 import { useProgress } from "@/lib/use-progress";
 
 function islandProgress(
   branchIds: readonly string[] | undefined,
-  branchProgress: Record<string, number>
+  branchProgress: Record<string, number>,
 ): number {
   if (!branchIds?.length) return 0;
   const sum = branchIds.reduce((acc, id) => acc + (branchProgress[id] ?? 0), 0);
@@ -16,17 +19,67 @@ function islandProgress(
 
 export default function AchievementsPage() {
   const progress = useProgress();
+  const [achievements, setAchievements] = useState(() => getAchievementList());
+
+  useEffect(() => {
+    evaluateAchievements(progress);
+    setAchievements(getAchievementList());
+  }, [progress]);
+
   const islands = ARCHIPELAGO.filter((i) => i.kind !== "pier");
+  const unlockedCount = achievements.filter((a) => a.unlocked).length;
 
   return (
     <AppShell>
-      <Header subtitle="Твои суперспособности и прогресс по архипелагу" />
+      <Header subtitle="Твои суперспособности и награды" />
 
       <section className="mb-6 rounded-card bg-white p-5 shadow-card">
-        <h2 className="text-lg font-bold">🦸 Мои суперспособности</h2>
+        <div className="mb-4 flex flex-wrap items-end justify-between gap-2">
+          <div>
+            <h2 className="text-lg font-bold">🏅 Достижения</h2>
+            <p className="mt-1 text-sm text-gray-500">
+              Разблокировано {unlockedCount} из {achievements.length}
+            </p>
+          </div>
+          <div className="h-2 w-32 overflow-hidden rounded-full bg-lavender-100">
+            <div
+              className="h-full rounded-full bg-brand-purple"
+              style={{
+                width: `${achievements.length ? (unlockedCount / achievements.length) * 100 : 0}%`,
+              }}
+            />
+          </div>
+        </div>
+
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {achievements.map((a) => (
+            <div
+              key={a.id}
+              className={`flex gap-3 rounded-xl p-4 ring-1 ${
+                a.unlocked
+                  ? "bg-emerald-50/80 ring-emerald-200"
+                  : "bg-gray-50 ring-gray-200 opacity-75"
+              }`}
+            >
+              <span className="text-3xl">{a.emoji}</span>
+              <div className="min-w-0">
+                <p className="font-bold text-gray-900">{a.title}</p>
+                <p className="mt-0.5 text-sm text-gray-600">{a.description}</p>
+                {a.unlocked && a.unlockedAt ? (
+                  <p className="mt-1 text-xs text-emerald-700">
+                    {new Date(a.unlockedAt).toLocaleDateString("ru-RU")}
+                  </p>
+                ) : null}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="mb-6 rounded-card bg-white p-5 shadow-card">
+        <h2 className="text-lg font-bold">🦸 Суперспособности архипелага</h2>
         <p className="mt-1 text-sm text-gray-500">
-          Каждый остров МышМата открывает новый способ думать. Пройди темы — и суперспособность
-          станет твоей!
+          Прогресс по островам МышМата — каждый открывает новый способ думать.
         </p>
 
         <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -63,23 +116,11 @@ export default function AchievementsPage() {
                       style={{ width: `${pct}%` }}
                     />
                   </div>
-                  {island.topics.length > 0 ? (
-                    <p className="mt-2 line-clamp-2 text-xs text-gray-400">
-                      {island.topics.slice(0, 3).join(" · ")}
-                    </p>
-                  ) : null}
                 </div>
               </div>
             );
           })}
         </div>
-      </section>
-
-      <section className="rounded-card bg-lavender-50 p-5 shadow-card">
-        <h3 className="font-bold">🏅 Награды и медали</h3>
-        <p className="mt-2 text-sm text-gray-500">
-          Раздел в разработке — здесь появятся медали за daily, олимпиадные задачи и дуэли.
-        </p>
       </section>
     </AppShell>
   );

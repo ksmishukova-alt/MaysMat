@@ -40,7 +40,7 @@ export function Header({ subtitle }: HeaderProps) {
     <header className="mb-6 flex flex-wrap items-start justify-between gap-4">
       <div className="min-w-0 flex-1">
         <h1 className="text-2xl font-bold text-gray-800">
-          Привет, {progress.name}! 👋
+          Привет, {progress.name?.trim() || "Исследователь"}! 👋
         </h1>
         <p className="mt-1 text-sm text-gray-500">{line}</p>
       </div>

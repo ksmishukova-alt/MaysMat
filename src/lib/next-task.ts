@@ -1,7 +1,7 @@
 import { getAdventureForBranch, getBranchMeta } from "@/data/branch-meta";
 import { getBranchById } from "@/data/thinking-map";
 import type { Task } from "@/data/tasks";
-import { resolveChildPath } from "@/lib/child-path";
+import { resolveChildPathForProgress } from "@/lib/child-path";
 import { isTaskCompleted, type UserProgress } from "@/lib/progress";
 import { getTasksForBranch, readTaskStore, resolveTask } from "@/lib/task-store";
 
@@ -53,7 +53,7 @@ function nextInBranch(branchId: string, progress: UserProgress): NextPlayableTas
 
 /** Первая нерешённая задача по маршруту ребёнка или в теме по умолчанию */
 export function getNextPlayableTask(progress: UserProgress): NextPlayableTask | null {
-  const path = resolveChildPath(progress.name, progress);
+  const path = resolveChildPathForProgress(progress);
 
   if (path) {
     for (const entry of path.entries) {

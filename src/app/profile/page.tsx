@@ -4,6 +4,7 @@ import { useMemo } from "react";
 import { AppShell } from "@/components/AppShell";
 import { Header } from "@/components/Header";
 import { AvatarPicker } from "@/components/avatar/AvatarPicker";
+import { ChildProfileSetup } from "@/components/profile/ChildProfileSetup";
 import { ProfileHeroRow } from "@/components/profile/ProfileHeroRow";
 import { ProfileMiddleRow } from "@/components/profile/ProfileMiddleRow";
 import { getAvatarId } from "@/lib/avatar";
@@ -18,6 +19,7 @@ export default function ProfilePage() {
       <Header subtitle="Твой профиль" />
 
       <ProfileHeroRow progress={progress} avatarId={avatarId} />
+      <ChildProfileSetup />
       <ProfileMiddleRow progress={progress} />
 
       <section>

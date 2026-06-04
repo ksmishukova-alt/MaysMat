@@ -64,19 +64,34 @@ export function writeChildPathStore(store: ChildPathStore): void {
   window.dispatchEvent(new Event(CHILD_PATH_UPDATED_EVENT));
 }
 
-export function getChildPath(childName: string): ChildPathConfig | null {
-  const cfg = readChildPathStore().byChild[childName.trim()];
+export function getChildPath(childKey: string): ChildPathConfig | null {
+  const key = childKey.trim();
+  const cfg = readChildPathStore().byChild[key];
   if (!cfg?.items?.length) return null;
   return cfg;
 }
 
-export function saveChildPath(childName: string, config: ChildPathConfig): void {
+/** @deprecated используйте getChildPath(childId) */
+export function getChildPathByName(childName: string): ChildPathConfig | null {
+  return getChildPath(childName);
+}
+
+export function saveChildPath(childKey: string, config: ChildPathConfig): void {
   const store = readChildPathStore();
-  store.byChild[childName.trim()] = {
+  store.byChild[childKey.trim()] = {
     ...config,
     updatedAt: new Date().toISOString(),
   };
   writeChildPathStore(store);
+}
+
+export function getChildPathForProgress(
+  progress: Pick<UserProgress, "child" | "name">,
+): ChildPathConfig | null {
+  const byId = progress.child?.childId ? getChildPath(progress.child.childId) : null;
+  if (byId) return byId;
+  const name = progress.child?.name || progress.name;
+  return name ? getChildPath(name) : null;
 }
 
 export interface ResolvedPathEntry {
@@ -129,10 +144,21 @@ export function resolvePathItem(
 }
 
 export function resolveChildPath(
-  childName: string,
-  progress: Pick<UserProgress, "branchProgress" | "completedTasks">
+  childKey: string,
+  progress: Pick<UserProgress, "branchProgress" | "completedTasks">,
 ): { config: ChildPathConfig; entries: ResolvedPathEntry[] } | null {
-  const config = getChildPath(childName);
+  const config = getChildPath(childKey);
+  if (!config) return null;
+  return {
+    config,
+    entries: config.items.map((item) => resolvePathItem(item, progress)),
+  };
+}
+
+export function resolveChildPathForProgress(
+  progress: Pick<UserProgress, "child" | "name" | "branchProgress" | "completedTasks">,
+): { config: ChildPathConfig; entries: ResolvedPathEntry[] } | null {
+  const config = getChildPathForProgress(progress);
   if (!config) return null;
   return {
     config,

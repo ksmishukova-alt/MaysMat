@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { ProgressBar } from "@/components/ProgressBar";
 import { TaskCompletionStampById } from "@/components/TaskCompletionStamp";
-import { resolveChildPath } from "@/lib/child-path";
+import { resolveChildPathForProgress } from "@/lib/child-path";
 import type { UserProgress } from "@/lib/progress";
 
 interface AssignedPathSectionProps {
@@ -11,7 +11,7 @@ interface AssignedPathSectionProps {
 }
 
 export function AssignedPathSection({ progress }: AssignedPathSectionProps) {
-  const resolved = resolveChildPath(progress.name, progress);
+  const resolved = resolveChildPathForProgress(progress);
 
   if (!resolved) {
     return (

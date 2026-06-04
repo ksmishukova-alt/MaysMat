@@ -7,7 +7,8 @@ export type StepType =
   | "table_input"
   | "number_input"
   | "comparison"
-  | "auto_explanation";
+  | "auto_explanation"
+  | "paper_upload";
 
 export interface DragOption {
   id: string;
@@ -56,39 +57,26 @@ export interface WorksheetRow {
   suffix?: string;
 }
 
-export interface TaskStep {
-  id: string;
-  type: StepType;
-  title: string;
-  hint?: string;
-  highlight?: boolean;
-  // condition_parse
-  parseData?: ConditionParseData;
-  // drag_select / single_select
-  options?: DragOption[];
-  /** Подпись над вариантами (single_select) */
-  selectPrompt?: string;
-  // order_questions — порядок задаётся порядком элементов в массиве
-  orderItems?: OrderQuestionItem[];
-  // worksheet_table
-  worksheetRows?: WorksheetRow[];
-  // table_input
-  rows?: TableRow[];
-  tableColumnLabel?: string;
-  // number_input
-  question?: string;
-  context?: string;
-  answer?: number;
-  successMessage?: string;
-  // comparison
-  leftLabel?: string;
-  leftValue?: string;
-  rightLabel?: string;
-  rightValue?: string;
-  // auto_explanation
-  template?: string[];
-  animation?: { items: { emoji: string; count: number }[] };
-}
+/** Discriminated union шагов — см. task-steps.ts */
+export type { DiscriminatedTaskStep, DiscriminatedTaskStep as TaskStep } from "@/data/task-steps";
+export type {
+  AutoExplanationStep,
+  ConditionParseStep,
+  DragSelectStep as DragSelectStepDef,
+  NumberInputStep as NumberInputStepDef,
+  OrderQuestionsStep as OrderQuestionsStepDef,
+  SingleSelectStep as SingleSelectStepDef,
+  TableInputStep as TableInputStepDef,
+  WorksheetTableStep as WorksheetTableStepDef,
+} from "@/data/task-steps";
+export { assertTaskStepShape, isStepType } from "@/data/task-steps";
+
+import type { DiscriminatedTaskStep } from "@/data/task-steps";
+
+/** Вес навыков (сумма ≈ 1 или баллы) */
+export type SkillWeights = Partial<
+  Record<"modeling" | "logic" | "combinatorics" | "proof" | "graphs" | "invariants", number>
+>;
 
 export interface Task {
   id: string;
@@ -98,11 +86,17 @@ export interface Task {
   condition: string;
   stage: number;
   maxStars: number;
+  /** 1 — много подсказок, 5 — почти самостоятельно */
+  independenceLevel?: 1 | 2 | 3 | 4 | 5;
+  /** Нужна загрузка решения на бумаге (есть шаг paper_upload) */
+  requiresUpload?: boolean;
+  /** Какие навыки тренирует задача */
+  skillWeights?: SkillWeights;
   /** Шаг «Дано / Найти» после чтения условия (настраивается в админке модератора) */
   enableGivenStep?: boolean;
   /** Данные для шага «Дано / Найти» */
   givenStep?: ConditionParseData;
-  steps: TaskStep[];
+  steps: DiscriminatedTaskStep[];
 }
 
 export const TASKS: Record<string, Task> = {
@@ -115,6 +109,9 @@ export const TASKS: Record<string, Task> = {
       "В инкубаторе лежало 120 яиц. Из некоторых вылупились цыплята, а из остальных — змеи. В сумме у детёнышей оказалось 162 ноги.\n\nСколько вылупилось змей?",
     stage: 1,
     maxStars: 3,
+    independenceLevel: 2,
+    requiresUpload: true,
+    skillWeights: { modeling: 0.8, logic: 0.2 },
     givenStep: {
       given: [
         { id: "g-eggs", text: "120 яиц" },
@@ -240,6 +237,12 @@ export const TASKS: Record<string, Task> = {
           "Значит, змей было 120 − 81 = 39.",
         ],
       },
+      {
+        id: "step-paper",
+        type: "paper_upload",
+        title: "Шаг 12. Решение на листочке",
+        hint: "Сфотографируй аккуратный черновик с ответом 39 змей",
+      },
     ],
   },
   "heads-legs-02": {
@@ -251,6 +254,9 @@ export const TASKS: Record<string, Task> = {
       "У бабушки на дворе живут кролики и утки. Всего у них 5 голов и 16 лап.\n\nСколько у бабушки кроликов и сколько уток?",
     stage: 1,
     maxStars: 3,
+    independenceLevel: 3,
+    requiresUpload: true,
+    skillWeights: { modeling: 0.9, logic: 0.1 },
     steps: [
       {
         id: "step-1",
@@ -347,6 +353,12 @@ export const TASKS: Record<string, Task> = {
           "Нужно 6 ÷ 2 = 3 замены.",
           "Значит, кроликов 3, а уток 5 − 3 = 2.",
         ],
+      },
+      {
+        id: "step-paper",
+        type: "paper_upload",
+        title: "Шаг 10. Решение на листочке",
+        hint: "Загрузи фото с ответом: 3 кролика и 2 утки",
       },
     ],
   },

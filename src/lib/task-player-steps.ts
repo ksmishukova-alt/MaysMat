@@ -1,10 +1,17 @@
-import type { ConditionParseData, Task, TaskStep } from "@/data/tasks";
+import type { ConditionParseData, Task } from "@/data/tasks";
 
-export type PlayerStepType = TaskStep["type"] | "read_condition";
+export type PlayerStepType = DiscriminatedTaskStep["type"] | "read_condition";
 
-export interface PlayerStep extends Omit<TaskStep, "type"> {
-  type: PlayerStepType;
-}
+/** Шаг плеера: union шагов задачи + read_condition */
+export type PlayerStep =
+  | (DiscriminatedTaskStep & { type: DiscriminatedTaskStep["type"] })
+  | {
+      id: string;
+      type: "read_condition";
+      title: string;
+      hint?: string;
+      highlight?: boolean;
+    };
 
 export function buildPlayerSteps(
   task: Task,

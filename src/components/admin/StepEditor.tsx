@@ -626,6 +626,6 @@ export function createEmptyStep(type: TaskStep["type"], taskId: string, index: n
     case "auto_explanation":
       return { id, type, title: "Разбор", template: ["Пункт 1"] };
     default:
-      return { id, type, title: "Новый шаг" };
+      return { id, type, title: "Новый шаг" } as TaskStep;
   }
 }

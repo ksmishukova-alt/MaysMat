@@ -4,6 +4,14 @@ import type { DailySubject } from "@/lib/daily";
 import { getDailyState, markDailySubjectComplete } from "@/lib/daily";
 import { pickStampForTask } from "@/data/task-stamps";
 
+import type { ChildProfile } from "@/lib/user-profile";
+import {
+  createFreshChildProfile,
+  DEMO_CHILD_PROFILE,
+  isDemoMode,
+} from "@/lib/user-profile";
+import { evaluateAchievements } from "@/lib/achievements";
+
 const STORAGE_KEY = "album-myshleniya-progress";
 
 export const PROGRESS_UPDATED_EVENT = "mysmat-progress-updated";
@@ -27,6 +35,8 @@ export interface ActivityEntry {
 }
 
 export interface UserProgress {
+  /** Профиль ребёнка (id, класс, маршрут…) */
+  child: ChildProfile;
   name: string;
   level: number;
   totalStars: number;
@@ -50,35 +60,105 @@ export interface UserProgress {
   unlockedStreakShieldSets?: import("@/data/streak-shield-catalog").StreakShieldSetId[];
 }
 
-const DEFAULT: UserProgress = {
-  name: "София",
+function createFreshProgress(): UserProgress {
+  const child = createFreshChildProfile();
+  return {
+    child,
+    name: child.name,
+    level: 1,
+    totalStars: 0,
+    streakDays: 0,
+    cardCharge: 0,
+    completedTasks: {},
+    branchProgress: {},
+  };
+}
+
+const DEMO: UserProgress = {
+  child: DEMO_CHILD_PROFILE,
+  name: DEMO_CHILD_PROFILE.name,
   level: 12,
   totalStars: 782,
   streakDays: 0,
   cardCharge: 72,
   completedTasks: {},
   branchProgress: { "modeling-heads-legs": 0 },
+  avatarId: DEMO_CHILD_PROFILE.avatarId,
 };
+
+function resolveDefaultProgress(): UserProgress {
+  if (typeof window !== "undefined" && isDemoMode()) return DEMO;
+  return createFreshProgress();
+}
+
+const DEFAULT: UserProgress = createFreshProgress();
 
 /** Стартовое значение для SSR — без localStorage */
 export const DEFAULT_PROGRESS: UserProgress = DEFAULT;
+
+/** Демо-прогресс Софии (?demo=1) */
+export const DEMO_PROGRESS: UserProgress = DEMO;
+
+function migrateProgress(raw: Partial<UserProgress>): UserProgress {
+  const base = resolveDefaultProgress();
+  const merged = { ...base, ...raw };
+
+  if (!merged.child || !merged.child.childId) {
+    const child = createFreshChildProfile({
+      name: merged.name || "",
+      avatarId: merged.avatarId,
+      grade: undefined,
+    });
+    if (merged.name === "София" && merged.totalStars === 782) {
+      merged.child = { ...DEMO_CHILD_PROFILE, ...child, name: merged.name };
+    } else {
+      merged.child = child;
+    }
+  }
+
+  if (merged.avatarId && !merged.child.avatarId) {
+    merged.child = { ...merged.child, avatarId: merged.avatarId };
+  }
+  if (merged.name && !merged.child.name) {
+    merged.child = { ...merged.child, name: merged.name };
+  }
+  merged.name = merged.child.name || merged.name || "";
+
+  return merged as UserProgress;
+}
 
 export function loadProgress(): UserProgress {
   if (typeof window === "undefined") return DEFAULT;
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return DEFAULT;
-    return { ...DEFAULT, ...JSON.parse(raw) };
+    if (!raw) return resolveDefaultProgress();
+    return migrateProgress(JSON.parse(raw) as Partial<UserProgress>);
   } catch {
-    return DEFAULT;
+    return resolveDefaultProgress();
   }
 }
 
 export function saveProgress(progress: UserProgress): void {
   if (typeof window === "undefined") return;
   progress.level = computeLevel(progress.totalStars);
+  progress.name = progress.child?.name ?? progress.name;
+  if (progress.child && progress.avatarId) {
+    progress.child.avatarId = progress.avatarId;
+  }
   localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
   window.dispatchEvent(new Event(PROGRESS_UPDATED_EVENT));
+}
+
+/** Обновить поля профиля ребёнка */
+export function updateChildProfile(
+  patch: Partial<import("@/lib/user-profile").ChildProfile>,
+): UserProgress {
+  const progress = loadProgress();
+  progress.child = { ...progress.child, ...patch };
+  if (patch.name != null) progress.name = patch.name;
+  if (patch.avatarId != null) progress.avatarId = patch.avatarId;
+  saveProgress(progress);
+  return progress;
 }
 
 /** Уровень по сумме звёзд (переход N→N+1 = 2N+1) */
@@ -165,6 +245,7 @@ export function completeTask(
   };
 
   saveProgress(progress);
+  evaluateAchievements(progress);
   return progress;
 }
 
@@ -243,5 +324,6 @@ export function completeDailySubject(subject: DailySubject): UserProgress {
   }
 
   saveProgress(progress);
+  evaluateAchievements(progress);
   return progress;
 }

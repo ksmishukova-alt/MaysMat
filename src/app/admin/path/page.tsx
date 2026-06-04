@@ -29,8 +29,9 @@ export default function AdminPathPage() {
 
   useEffect(() => {
     const p = loadProgress();
-    setChildName(p.name);
-    const existing = getChildPath(p.name);
+    const key = p.child?.childId ?? p.name;
+    setChildName(key);
+    const existing = getChildPath(key);
     if (existing) {
       setTitle(existing.title);
       setNote(existing.note ?? "");
@@ -71,7 +72,7 @@ export default function AdminPathPage() {
 
   const handleSave = useCallback(() => {
     const config: ChildPathConfig = { title, note: note || undefined, items };
-    saveChildPath(childName.trim() || "София", config);
+    saveChildPath(childName.trim(), config);
     setSaved(true);
   }, [childName, title, note, items]);
 

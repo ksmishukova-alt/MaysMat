@@ -294,21 +294,7 @@ export function HomeDailyPriorityBlock({ state }: HomeDailyPriorityBlockProps) {
 
         </div>
 
-        <Link
-
-          href="/tasks"
-
-          className="mt-4 inline-flex items-center gap-2 rounded-xl bg-brand-purple px-5 py-2.5 text-sm font-semibold text-white shadow-md transition hover:opacity-90"
-
-        >
-
-          Перейти к daily →
-
-        </Link>
-
       </div>
-
-
 
       <div className="grid gap-2 sm:grid-cols-3">
 
