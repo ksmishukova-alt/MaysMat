@@ -1,0 +1,104 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-main: #f0e6ff;
+  --card-bg: #ffffff;
+  --brand-purple: #7c3aed;
+}
+
+body {
+  background: var(--bg-main);
+  color: #1f2937;
+  min-height: 100vh;
+}
+
+@layer components {
+  .text-bubble-brand {
+    font-size: 1.55rem;
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    color: #b794f6;
+    -webkit-text-stroke: 0.5px rgba(255, 255, 255, 0.35);
+    text-shadow:
+      0 1px 0 #ffffff,
+      0 2px 0 #e9d5ff,
+      0 3px 0 #c4b5fd,
+      0 4px 0 #a78bfa,
+      0 5px 0 #8b5cf6,
+      0 7px 16px rgba(91, 33, 182, 0.3);
+  }
+
+  .text-bubble-tagline {
+    letter-spacing: 0.1em;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.55);
+  }
+}
+
+@layer utilities {
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: #c9b0ff;
+    border-radius: 999px;
+  }
+
+  @keyframes island-emerge {
+    from {
+      opacity: 0;
+      transform: translateY(3rem) scale(0.88);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  @keyframes stamp-slam {
+    0% {
+      transform: scale(1.6) rotate(-14deg);
+      opacity: 0;
+    }
+    55% {
+      transform: scale(1.05) rotate(4deg);
+      opacity: 1;
+    }
+    100% {
+      transform: scale(1) rotate(-3deg);
+      opacity: 1;
+    }
+  }
+
+  @keyframes island-submerged-pulse {
+    0%,
+    100% {
+      opacity: 0.45;
+    }
+    50% {
+      opacity: 0.65;
+    }
+  }
+
+  @keyframes wave-shimmer {
+    0% {
+      transform: translateX(-10%);
+    }
+    100% {
+      transform: translateX(10%);
+    }
+  }
+
+  .island-emerge {
+    animation: island-emerge 0.95s cubic-bezier(0.22, 1.2, 0.36, 1) forwards;
+  }
+
+  .stamp-slam {
+    animation: stamp-slam 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  }
+
+  .island-submerged {
+    animation: island-submerged-pulse 2.8s ease-in-out infinite;
+  }
+}
