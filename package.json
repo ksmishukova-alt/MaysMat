@@ -11,6 +11,7 @@
     "generate:dirichlet": "node scripts/generate-dirichlet-content.mjs",
     "qa:dirichlet": "npx tsx scripts/qa-dirichlet-guided.ts",
     "qa:heads-legs": "node scripts/qa-heads-legs.mjs",
+    "qa:task-quality": "npx tsx scripts/scan-task-quality.ts",
     "qa:entity-emojis": "npx tsx scripts/audit-entity-emojis.ts",
     "qa:task-audit": "npx tsx scripts/audit-all-tasks-report.ts",
     "qa:categories": "node scripts/audit-categories.mjs"

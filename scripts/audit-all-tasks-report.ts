@@ -52,7 +52,7 @@ function collectText(steps: DiscriminatedTaskStep[]): string {
       for (const it of s.orderItems ?? []) parts.push(it.text);
     }
     if (s.type === "proof_lines") {
-      for (const c of s.proofCards ?? []) parts.push(c.text);
+      for (const ln of s.solutionLines ?? []) parts.push(ln.template);
     }
     if (s.type === "word_solution") {
       for (const ln of s.solutionLines ?? []) parts.push(ln.template);
@@ -164,8 +164,7 @@ function auditDirichlet(task: Task): Finding[] {
     f.push({ severity: "error", text: "Нет шага «клетки»" });
   }
 
-  const readStep = steps.find((s) => s.type === "read_condition");
-  void readStep; // read_condition добавляется в TaskPlayer, не в guided steps
+  // read_condition добавляется в TaskPlayer, не в guided steps
 
   return f;
 }
@@ -192,18 +191,16 @@ function auditHeadsLegs(task: Task): Finding[] {
     }
   }
 
-  const feature = steps.find((s) => s.type === "worksheet_table" && s.id.includes("feature"));
-  if (feature?.type === "worksheet_table") {
-    for (const r of feature.worksheetRows ?? []) {
+  const feature = steps.find((s) => s.type === "table_input" && s.id.includes("features"));
+  if (feature?.type === "table_input") {
+    for (const r of feature.rows ?? []) {
       if (r.emoji === "📦" && !BOX_OK.test(r.label)) {
         f.push({ severity: "warn", text: `feature: «${r.label}» → 📦` });
       }
     }
   }
 
-  if (!steps.some((s) => s.type === "read_condition")) {
-    f.push({ severity: "info", text: "read_condition в TaskPlayer (не в массиве steps)" });
-  }
+  // read_condition добавляется в TaskPlayer, не в guided steps
 
   if (meta.solutionMode === "E" && !task.requiresUpload && !steps.some((s) => s.type === "paper_upload")) {
     f.push({ severity: "info", text: "Режим E: paper_upload на уровне TaskPlayer (не в guided steps)" });

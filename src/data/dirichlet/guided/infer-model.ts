@@ -13,29 +13,28 @@ export type { DirichletEntity, DirichletInferredModel } from "../types";
 
 
 function mergeModel(
-
   base: DirichletInferredModel,
-
   patch?: Partial<DirichletInferredModel>,
-
 ): DirichletInferredModel {
-
   if (!patch) return base;
 
-  return {
-
+  const merged: DirichletInferredModel = {
     rabbits: patch.rabbits ?? base.rabbits,
-
     cells: patch.cells ?? base.cells,
-
     counts: { ...base.counts, ...patch.counts },
-
     compareOp: patch.compareOp ?? base.compareOp,
-
     conclusionText: patch.conclusionText ?? base.conclusionText,
-
   };
 
+  const c = merged.counts;
+  if (c.minInCell != null && c.minInCell > 1) {
+    const derivedK = c.minInCell - 1;
+    if (c.k == null || (c.m != null && c.k >= c.m)) {
+      c.k = derivedK;
+    }
+  }
+
+  return merged;
 }
 
 

@@ -110,17 +110,95 @@ export const DIRICHLET_MODEL_MANUAL_OVERRIDES: Partial<
   },
 
   "M2.2": {
-
     rabbits: [{ id: "students", label: "Ученики школы" }],
-
     cells: [{ id: "days", label: "Дни года" }],
-
-    counts: { n: 800, m: 366, minInCell: 3 },
-
+    counts: { n: 800, m: 366, k: 2, minInCell: 3 },
     compareOp: "gt",
-
     conclusionText: "хотя бы трое родились в один день",
+  },
 
+  "M2.3": {
+    rabbits: [{ id: "boots", label: "Сапоги (600 штук)" }],
+    cells: [
+      { id: "41L", label: "41 левый" },
+      { id: "41R", label: "41 правый" },
+      { id: "42L", label: "42 левый" },
+      { id: "42R", label: "42 правый" },
+      { id: "43L", label: "43 левый" },
+      { id: "43R", label: "43 правый" },
+    ],
+    counts: { n: 600, m: 6, k: 99, minInCell: 100 },
+    compareOp: "gt",
+    conclusionText: "можно составить не менее 100 годных пар",
+  },
+
+  "M2.5": {
+    rabbits: [{ id: "students", label: "Ученики класса" }],
+    cells: [{ id: "rows", label: "Ряды в зале" }],
+    counts: { n: 30, m: 29, k: 1, minInCell: 2 },
+    compareOp: "gt",
+    conclusionText: "в зале 29 рядов",
+  },
+
+  "M2.7": {
+    rabbits: [{ id: "tasks", label: "Решённые задачи (29)" }],
+    cells: [{ id: "students", label: "Школьники (7 человек)" }],
+    counts: { n: 29, m: 7, k: 4, minInCell: 5 },
+    compareOp: "gt",
+    conclusionText: "найдётся школьник, решивший не менее пяти задач",
+  },
+
+  "M0.4": {
+    rabbits: [{ id: "cars", label: "Автомобили семьи" }],
+    cells: [{ id: "weekdays", label: "Дни недели (выходной)" }],
+    counts: { n: null, m: 7 },
+    compareOp: "gt",
+    conclusionText: "6 автомобилей для 5 взрослых; для 8 взрослых — 10",
+  },
+
+  "M3.1": {
+    rabbits: [{ id: "coins", label: "Монеты в кармане" }],
+    cells: [
+      { id: "one", label: "1 рубль" },
+      { id: "two", label: "2 рубля" },
+    ],
+    counts: { n: 5, m: 2 },
+    conclusionText: "три монеты по 1 ₽ и две по 2 ₽",
+  },
+
+  "M3.3": {
+    rabbits: [{ id: "drawn", label: "Вынутые шары" }],
+    cells: [
+      { id: "red", label: "Красные" },
+      { id: "blue", label: "Синие" },
+      { id: "yellow", label: "Жёлтые" },
+      { id: "black", label: "Чёрные" },
+      { id: "white", label: "Белые" },
+    ],
+    counts: { n: 38, m: 5, k: 37, minInCell: 38 },
+    compareOp: "gt",
+    conclusionText: "38 шаров — заведомо 10 одного цвета",
+  },
+
+  "M3.5": {
+    rabbits: [{ id: "drawn", label: "Вынутые шарики" }],
+    cells: [
+      { id: "red", label: "Красные" },
+      { id: "blue", label: "Синие" },
+      { id: "green", label: "Зелёные" },
+      { id: "white", label: "Белые" },
+    ],
+    counts: { n: 88, m: 4, k: 87, minInCell: 88 },
+    compareOp: "gt",
+    conclusionText: "88 шариков — три разных цвета гарантированы",
+  },
+
+  "M3.2": {
+    rabbits: [{ id: "balls", label: "Шарики" }],
+    cells: [{ id: "colors", label: "Цвета (чёрный и белый)" }],
+    counts: { n: 3, m: 2, k: 2, minInCell: 3 },
+    compareOp: "gt",
+    conclusionText: "3 шара — заведомо два одного цвета",
   },
 
   "M2.6": {
@@ -137,38 +215,18 @@ export const DIRICHLET_MODEL_MANUAL_OVERRIDES: Partial<
 
   },
 
-  "M3.1": {
-
-    rabbits: [{ id: "drawn", label: "Вынутые предметы" }],
-
-    cells: [{ id: "colors", label: "Цвета шариков" }],
-
-    counts: { n: 5, m: 4, minInCell: 2 },
-
-    compareOp: "gt",
-
-    conclusionText: "два шарика одного цвета",
-
-  },
-
-  "M3.2": {
-
-    rabbits: [{ id: "balls", label: "Шарики" }],
-
-    cells: [{ id: "colors", label: "Цвета (чёрный и белый)" }],
-
-    conclusionText: "3 шара — заведомо два одного цвета",
-
-  },
-
   "M4.17": {
-
     rabbits: [{ id: "objects", label: "Клетки таблицы 13×13" }],
-
     cells: [{ id: "table-rows", label: "Кресты (строка + столбец)" }],
-
     conclusionText: "не могут — все клетки диагонали быть хорошими",
+  },
 
+  "M5.15": {
+    rabbits: [{ id: "points", label: "Точки в прямоугольнике" }],
+    cells: [{ id: "parts", label: "Части разбиения (5 фигур)" }],
+    counts: { n: 6, m: 5, minInCell: 2 },
+    compareOp: "gt",
+    conclusionText: "две точки на расстоянии не больше √2",
   },
 
   "M4.11": {

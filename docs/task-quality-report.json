@@ -1,0 +1,2719 @@
+{
+  "generatedAt": "2026-06-05T23:23:03.365Z",
+  "totalTasks": 269,
+  "ready": 146,
+  "needsReview": 87,
+  "blocked": 36,
+  "childRouteVisible": 23,
+  "issuesByType": {
+    "missing_answer_key": 32,
+    "contains_external_reference": 27,
+    "contains_N_equals_N": 4,
+    "missing_visual_asset": 4,
+    "requires_manual_review": 4,
+    "too_hard_for_child_route": 63
+  },
+  "tasks": [
+    {
+      "id": "heads-legs-1-01",
+      "branchId": "modeling-heads-legs",
+      "methodTaskId": "1.1",
+      "publishTier": "childRoute",
+      "qaStatus": "ready",
+      "issues": [],
+      "routeOrder": 1,
+      "childVisible": true
+    },
+    {
+      "id": "heads-legs-1-03",
+      "branchId": "modeling-heads-legs",
+      "methodTaskId": "1.3",
+      "publishTier": "childRoute",
+      "qaStatus": "ready",
+      "issues": [],
+      "routeOrder": 3,
+      "childVisible": true
+    },
+    {
+      "id": "heads-legs-1-04",
+      "branchId": "modeling-heads-legs",
+      "methodTaskId": "1.4",
+      "publishTier": "childRoute",
+      "qaStatus": "ready",
+      "issues": [],
+      "routeOrder": 4,
+      "childVisible": true
+    },
+    {
+      "id": "heads-legs-1-10",
+      "branchId": "modeling-heads-legs",
+      "methodTaskId": "1.10",
+      "publishTier": "childRoute",
+      "qaStatus": "ready",
+      "issues": [],
+      "routeOrder": 7,
+      "childVisible": true
+    },
+    {
+      "id": "heads-legs-1-05",
+      "branchId": "modeling-heads-legs",
+      "methodTaskId": "1.5",
+      "publishTier": "childRoute",
+      "qaStatus": "ready",
+      "issues": [],
+      "routeOrder": 8,
+      "childVisible": true
+    },
+    {
+      "id": "heads-legs-1-13",
+      "branchId": "modeling-heads-legs",
+      "methodTaskId": "1.13",
+      "publishTier": "childRoute",
+      "qaStatus": "ready",
+      "issues": [],
+      "routeOrder": 10,
+      "childVisible": true
+    },
+    {
+      "id": "heads-legs-2-01",
+      "branchId": "modeling-heads-legs",
+      "methodTaskId": "2.1",
+      "publishTier": "childRoute",
+      "qaStatus": "ready",
+      "issues": [],
+      "routeOrder": 11,
+      "childVisible": true
+    },
+    {
+      "id": "heads-legs-2-02",
+      "branchId": "modeling-heads-legs",
+      "methodTaskId": "2.2",
+      "publishTier": "childRoute",
+      "qaStatus": "ready",
+      "issues": [],
+      "routeOrder": 12,
+      "childVisible": true
+    },
+    {
+      "id": "heads-legs-2-03",
+      "branchId": "modeling-heads-legs",
+      "methodTaskId": "2.3",
+      "publishTier": "childRoute",
+      "qaStatus": "ready",
+      "issues": [],
+      "routeOrder": 13,
+      "childVisible": true
+    },
+    {
+      "id": "heads-legs-2-07",
+      "branchId": "modeling-heads-legs",
+      "methodTaskId": "2.7",
+      "publishTier": "childRoute",
+      "qaStatus": "ready",
+      "issues": [],
+      "routeOrder": 17,
+      "childVisible": true
+    },
+    {
+      "id": "heads-legs-1-14",
+      "branchId": "modeling-heads-legs",
+      "methodTaskId": "1.14",
+      "publishTier": "childRoute",
+      "qaStatus": "ready",
+      "issues": [],
+      "routeOrder": 20,
+      "childVisible": true
+    },
+    {
+      "id": "heads-legs-3-02",
+      "branchId": "modeling-heads-legs",
+      "methodTaskId": "3.2",
+      "publishTier": "childRoute",
+      "qaStatus": "ready",
+      "issues": [],
+      "routeOrder": 21,
+      "childVisible": true
+    },
+    {
+      "id": "heads-legs-3-04",
+      "branchId": "modeling-heads-legs",
+      "methodTaskId": "3.4",
+      "publishTier": "childRoute",
+      "qaStatus": "ready",
+      "issues": [],
+      "routeOrder": 23,
+      "childVisible": true
+    },
+    {
+      "id": "heads-legs-3-06",
+      "branchId": "modeling-heads-legs",
+      "methodTaskId": "3.6",
+      "publishTier": "childRoute",
+      "qaStatus": "ready",
+      "issues": [],
+      "routeOrder": 25,
+      "childVisible": true
+    },
+    {
+      "id": "dirichlet-t1-01",
+      "branchId": "proof-dirichlet",
+      "methodTaskId": "M0.1",
+      "publishTier": "childRoute",
+      "qaStatus": "ready",
+      "issues": [],
+      "routeOrder": 101,
+      "childVisible": true
+    },
+    {
+      "id": "dirichlet-t1-02",
+      "branchId": "proof-dirichlet",
+      "methodTaskId": "M0.2",
+      "publishTier": "childRoute",
+      "qaStatus": "ready",
+      "issues": [],
+      "routeOrder": 102,
+      "childVisible": true
+    },
+    {
+      "id": "dirichlet-t1-06",
+      "branchId": "proof-dirichlet",
+      "methodTaskId": "M1.3",
+      "publishTier": "childRoute",
+      "qaStatus": "ready",
+      "issues": [],
+      "routeOrder": 103,
+      "childVisible": true
+    },
+    {
+      "id": "dirichlet-t1-09",
+      "branchId": "proof-dirichlet",
+      "methodTaskId": "M2.1",
+      "publishTier": "childRoute",
+      "qaStatus": "ready",
+      "issues": [],
+      "routeOrder": 104,
+      "childVisible": true
+    },
+    {
+      "id": "dirichlet-t1-12",
+      "branchId": "proof-dirichlet",
+      "methodTaskId": "M2.4",
+      "publishTier": "childRoute",
+      "qaStatus": "ready",
+      "issues": [],
+      "routeOrder": 105,
+      "childVisible": true
+    },
+    {
+      "id": "dirichlet-t1-13",
+      "branchId": "proof-dirichlet",
+      "methodTaskId": "M1.5",
+      "publishTier": "childRoute",
+      "qaStatus": "ready",
+      "issues": [],
+      "routeOrder": 106,
+      "childVisible": true
+    },
+    {
+      "id": "dirichlet-t1-15",
+      "branchId": "proof-dirichlet",
+      "methodTaskId": "M2.6",
+      "publishTier": "childRoute",
+      "qaStatus": "ready",
+      "issues": [],
+      "routeOrder": 107,
+      "childVisible": true
+    },
+    {
+      "id": "dirichlet-t2-02",
+      "branchId": "proof-unlucky",
+      "methodTaskId": "M3.2",
+      "publishTier": "childRoute",
+      "qaStatus": "ready",
+      "issues": [],
+      "routeOrder": 108,
+      "childVisible": true
+    },
+    {
+      "id": "dirichlet-t1-10",
+      "branchId": "proof-dirichlet",
+      "methodTaskId": "M2.2",
+      "publishTier": "childRoute",
+      "qaStatus": "ready",
+      "issues": [],
+      "routeOrder": 109,
+      "childVisible": true
+    },
+    {
+      "id": "heads-legs-1-02",
+      "branchId": "modeling-heads-legs",
+      "methodTaskId": "1.2",
+      "publishTier": "hidden",
+      "qaStatus": "blocked",
+      "issues": [
+        "missing_answer_key"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "heads-legs-1-06",
+      "branchId": "modeling-heads-legs",
+      "methodTaskId": "1.6",
+      "publishTier": "hidden",
+      "qaStatus": "blocked",
+      "issues": [
+        "missing_answer_key"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "heads-legs-1-07",
+      "branchId": "modeling-heads-legs",
+      "methodTaskId": "1.7",
+      "publishTier": "hidden",
+      "qaStatus": "blocked",
+      "issues": [
+        "missing_answer_key"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "heads-legs-1-08",
+      "branchId": "modeling-heads-legs",
+      "methodTaskId": "1.8",
+      "publishTier": "hidden",
+      "qaStatus": "blocked",
+      "issues": [
+        "missing_answer_key"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "heads-legs-2-04",
+      "branchId": "modeling-heads-legs",
+      "methodTaskId": "2.4",
+      "publishTier": "hidden",
+      "qaStatus": "blocked",
+      "issues": [
+        "missing_answer_key"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "heads-legs-2-05",
+      "branchId": "modeling-heads-legs",
+      "methodTaskId": "2.5",
+      "publishTier": "hidden",
+      "qaStatus": "blocked",
+      "issues": [
+        "missing_answer_key"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "heads-legs-2-06",
+      "branchId": "modeling-heads-legs",
+      "methodTaskId": "2.6",
+      "publishTier": "hidden",
+      "qaStatus": "blocked",
+      "issues": [
+        "missing_answer_key"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "heads-legs-1-09",
+      "branchId": "modeling-heads-legs",
+      "methodTaskId": "1.9",
+      "publishTier": "hidden",
+      "qaStatus": "blocked",
+      "issues": [
+        "missing_answer_key"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "heads-legs-1-11",
+      "branchId": "modeling-heads-legs",
+      "methodTaskId": "1.11",
+      "publishTier": "hidden",
+      "qaStatus": "blocked",
+      "issues": [
+        "missing_answer_key"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "heads-legs-3-03",
+      "branchId": "modeling-heads-legs",
+      "methodTaskId": "3.3",
+      "publishTier": "hidden",
+      "qaStatus": "blocked",
+      "issues": [
+        "missing_answer_key"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "heads-legs-3-05",
+      "branchId": "modeling-heads-legs",
+      "methodTaskId": "3.5",
+      "publishTier": "hidden",
+      "qaStatus": "blocked",
+      "issues": [
+        "missing_answer_key"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "heads-legs-3-07",
+      "branchId": "modeling-heads-legs",
+      "methodTaskId": "3.7",
+      "publishTier": "hidden",
+      "qaStatus": "blocked",
+      "issues": [
+        "missing_answer_key"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "heads-legs-4-01",
+      "branchId": "modeling-heads-legs",
+      "methodTaskId": "4.1",
+      "publishTier": "hidden",
+      "qaStatus": "blocked",
+      "issues": [
+        "missing_answer_key"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "heads-legs-4-02",
+      "branchId": "modeling-heads-legs",
+      "methodTaskId": "4.2",
+      "publishTier": "hidden",
+      "qaStatus": "blocked",
+      "issues": [
+        "missing_answer_key"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "heads-legs-4-03",
+      "branchId": "modeling-heads-legs",
+      "methodTaskId": "4.3",
+      "publishTier": "hidden",
+      "qaStatus": "blocked",
+      "issues": [
+        "missing_answer_key"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "heads-legs-4-04",
+      "branchId": "modeling-heads-legs",
+      "methodTaskId": "4.4",
+      "publishTier": "hidden",
+      "qaStatus": "blocked",
+      "issues": [
+        "missing_answer_key"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "heads-legs-4-05",
+      "branchId": "modeling-heads-legs",
+      "methodTaskId": "4.5",
+      "publishTier": "hidden",
+      "qaStatus": "blocked",
+      "issues": [
+        "missing_answer_key"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "heads-legs-5-01",
+      "branchId": "modeling-heads-legs",
+      "methodTaskId": "5.1",
+      "publishTier": "hidden",
+      "qaStatus": "blocked",
+      "issues": [
+        "missing_answer_key"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "heads-legs-5-02",
+      "branchId": "modeling-heads-legs",
+      "methodTaskId": "5.2",
+      "publishTier": "hidden",
+      "qaStatus": "blocked",
+      "issues": [
+        "missing_answer_key"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "heads-legs-5-03",
+      "branchId": "modeling-heads-legs",
+      "methodTaskId": "5.3",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "heads-legs-5-04",
+      "branchId": "modeling-heads-legs",
+      "methodTaskId": "5.4",
+      "publishTier": "hidden",
+      "qaStatus": "blocked",
+      "issues": [
+        "missing_answer_key"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "heads-legs-5-05",
+      "branchId": "modeling-heads-legs",
+      "methodTaskId": "5.5",
+      "publishTier": "hidden",
+      "qaStatus": "blocked",
+      "issues": [
+        "missing_answer_key"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "heads-legs-5-06",
+      "branchId": "modeling-heads-legs",
+      "methodTaskId": "5.6",
+      "publishTier": "hidden",
+      "qaStatus": "blocked",
+      "issues": [
+        "missing_answer_key"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "heads-legs-5-07",
+      "branchId": "modeling-heads-legs",
+      "methodTaskId": "5.7",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "heads-legs-6-01",
+      "branchId": "modeling-heads-legs",
+      "methodTaskId": "6.1",
+      "publishTier": "hidden",
+      "qaStatus": "blocked",
+      "issues": [
+        "missing_answer_key"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "heads-legs-6-02",
+      "branchId": "modeling-heads-legs",
+      "methodTaskId": "6.2",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "heads-legs-6-03",
+      "branchId": "modeling-heads-legs",
+      "methodTaskId": "6.3",
+      "publishTier": "hidden",
+      "qaStatus": "blocked",
+      "issues": [
+        "missing_answer_key"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "heads-legs-6-04",
+      "branchId": "modeling-heads-legs",
+      "methodTaskId": "6.4",
+      "publishTier": "hidden",
+      "qaStatus": "blocked",
+      "issues": [
+        "missing_answer_key"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "heads-legs-3-01",
+      "branchId": "modeling-heads-legs",
+      "methodTaskId": "3.1",
+      "publishTier": "hidden",
+      "qaStatus": "blocked",
+      "issues": [
+        "missing_answer_key"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "heads-legs-6-05",
+      "branchId": "modeling-heads-legs",
+      "methodTaskId": "6.5",
+      "publishTier": "hidden",
+      "qaStatus": "blocked",
+      "issues": [
+        "missing_answer_key"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "heads-legs-7-06",
+      "branchId": "modeling-heads-legs",
+      "methodTaskId": "7.6",
+      "publishTier": "hidden",
+      "qaStatus": "blocked",
+      "issues": [
+        "missing_answer_key"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "heads-legs-7-01",
+      "branchId": "modeling-heads-legs",
+      "methodTaskId": "7.1",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "heads-legs-7-02",
+      "branchId": "modeling-heads-legs",
+      "methodTaskId": "7.2",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "heads-legs-7-03",
+      "branchId": "modeling-heads-legs",
+      "methodTaskId": "7.3",
+      "publishTier": "hidden",
+      "qaStatus": "blocked",
+      "issues": [
+        "missing_answer_key"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "heads-legs-7-04",
+      "branchId": "modeling-heads-legs",
+      "methodTaskId": "7.4",
+      "publishTier": "hidden",
+      "qaStatus": "blocked",
+      "issues": [
+        "missing_answer_key"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "heads-legs-7-05",
+      "branchId": "modeling-heads-legs",
+      "methodTaskId": "7.5",
+      "publishTier": "hidden",
+      "qaStatus": "blocked",
+      "issues": [
+        "missing_answer_key"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "heads-legs-7-07",
+      "branchId": "modeling-heads-legs",
+      "methodTaskId": "7.7",
+      "publishTier": "hidden",
+      "qaStatus": "blocked",
+      "issues": [
+        "missing_answer_key"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t1-03",
+      "branchId": "proof-dirichlet",
+      "methodTaskId": "M0.3",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t1-04",
+      "branchId": "proof-dirichlet",
+      "methodTaskId": "M1.1",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t1-05",
+      "branchId": "proof-dirichlet",
+      "methodTaskId": "M1.2",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t1-08",
+      "branchId": "proof-dirichlet",
+      "methodTaskId": "M1.4",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t1-07",
+      "branchId": "proof-dirichlet",
+      "methodTaskId": "M0.4",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t1-11",
+      "branchId": "proof-dirichlet",
+      "methodTaskId": "M2.3",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t1-14",
+      "branchId": "proof-dirichlet",
+      "methodTaskId": "M2.5",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t1-16",
+      "branchId": "proof-dirichlet",
+      "methodTaskId": "M2.7",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t2-01",
+      "branchId": "proof-unlucky",
+      "methodTaskId": "M3.1",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t2-04",
+      "branchId": "proof-unlucky",
+      "methodTaskId": "M3.4",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t2-03",
+      "branchId": "proof-unlucky",
+      "methodTaskId": "M3.3",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t2-05",
+      "branchId": "proof-unlucky",
+      "methodTaskId": "M3.5",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t3-02",
+      "branchId": "arith-remainders",
+      "methodTaskId": "M4.2",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t3-04",
+      "branchId": "arith-remainders",
+      "methodTaskId": "M4.4",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t3-11",
+      "branchId": "arith-remainders",
+      "methodTaskId": "M4.11",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t3-12",
+      "branchId": "arith-remainders",
+      "methodTaskId": "M4.12",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t3-21",
+      "branchId": "arith-remainders",
+      "methodTaskId": "M4.21",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t3-01",
+      "branchId": "arith-remainders",
+      "methodTaskId": "M4.1",
+      "publishTier": "methodistOnly",
+      "qaStatus": "needsReview",
+      "issues": [
+        "contains_external_reference"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t3-03",
+      "branchId": "arith-remainders",
+      "methodTaskId": "M4.3",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t3-05",
+      "branchId": "arith-remainders",
+      "methodTaskId": "M4.5",
+      "publishTier": "methodistOnly",
+      "qaStatus": "needsReview",
+      "issues": [
+        "contains_external_reference"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t3-06",
+      "branchId": "arith-remainders",
+      "methodTaskId": "M4.6",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t3-07",
+      "branchId": "arith-remainders",
+      "methodTaskId": "M4.7",
+      "publishTier": "methodistOnly",
+      "qaStatus": "needsReview",
+      "issues": [
+        "contains_external_reference"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t3-08",
+      "branchId": "arith-remainders",
+      "methodTaskId": "M4.8",
+      "publishTier": "methodistOnly",
+      "qaStatus": "needsReview",
+      "issues": [
+        "contains_external_reference"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t3-09",
+      "branchId": "arith-remainders",
+      "methodTaskId": "M4.9",
+      "publishTier": "methodistOnly",
+      "qaStatus": "needsReview",
+      "issues": [
+        "contains_external_reference"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t3-10",
+      "branchId": "arith-remainders",
+      "methodTaskId": "M4.10",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t3-13",
+      "branchId": "arith-remainders",
+      "methodTaskId": "M4.13",
+      "publishTier": "methodistOnly",
+      "qaStatus": "needsReview",
+      "issues": [
+        "contains_external_reference"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t3-14",
+      "branchId": "arith-remainders",
+      "methodTaskId": "M4.14",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t3-15",
+      "branchId": "arith-remainders",
+      "methodTaskId": "M4.15",
+      "publishTier": "methodistOnly",
+      "qaStatus": "needsReview",
+      "issues": [
+        "contains_external_reference"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t3-16",
+      "branchId": "arith-remainders",
+      "methodTaskId": "M4.16",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t3-17",
+      "branchId": "arith-remainders",
+      "methodTaskId": "M4.17",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t3-18",
+      "branchId": "arith-remainders",
+      "methodTaskId": "M4.18",
+      "publishTier": "methodistOnly",
+      "qaStatus": "needsReview",
+      "issues": [
+        "contains_external_reference"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t3-19",
+      "branchId": "arith-remainders",
+      "methodTaskId": "M4.19",
+      "publishTier": "methodistOnly",
+      "qaStatus": "needsReview",
+      "issues": [
+        "contains_external_reference"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t3-20",
+      "branchId": "arith-remainders",
+      "methodTaskId": "M4.20",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t3-22",
+      "branchId": "arith-remainders",
+      "methodTaskId": "M4.22",
+      "publishTier": "methodistOnly",
+      "qaStatus": "needsReview",
+      "issues": [
+        "contains_external_reference"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t3-23",
+      "branchId": "arith-remainders",
+      "methodTaskId": "M4.23",
+      "publishTier": "methodistOnly",
+      "qaStatus": "needsReview",
+      "issues": [
+        "contains_external_reference"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t4-29",
+      "branchId": "geo-cutting",
+      "methodTaskId": "M5.30",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t4-01",
+      "branchId": "geo-cutting",
+      "methodTaskId": "M5.1",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t4-02",
+      "branchId": "geo-cutting",
+      "methodTaskId": "M5.2",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t4-03",
+      "branchId": "geo-cutting",
+      "methodTaskId": "M5.3",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t4-04",
+      "branchId": "geo-cutting",
+      "methodTaskId": "M5.5",
+      "publishTier": "methodistOnly",
+      "qaStatus": "needsReview",
+      "issues": [
+        "contains_external_reference"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t4-05",
+      "branchId": "geo-cutting",
+      "methodTaskId": "M5.6",
+      "publishTier": "methodistOnly",
+      "qaStatus": "needsReview",
+      "issues": [
+        "contains_N_equals_N"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t4-06",
+      "branchId": "geo-cutting",
+      "methodTaskId": "M5.7",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t4-07",
+      "branchId": "geo-cutting",
+      "methodTaskId": "M5.8",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t4-08",
+      "branchId": "geo-cutting",
+      "methodTaskId": "M5.9",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t4-09",
+      "branchId": "geo-cutting",
+      "methodTaskId": "M5.10",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t4-10",
+      "branchId": "geo-cutting",
+      "methodTaskId": "M5.11",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t4-11",
+      "branchId": "geo-cutting",
+      "methodTaskId": "M5.12",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t4-12",
+      "branchId": "geo-cutting",
+      "methodTaskId": "M5.13",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t4-13",
+      "branchId": "geo-cutting",
+      "methodTaskId": "M5.14",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t4-15",
+      "branchId": "geo-cutting",
+      "methodTaskId": "M5.16",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t4-16",
+      "branchId": "geo-cutting",
+      "methodTaskId": "M5.17",
+      "publishTier": "methodistOnly",
+      "qaStatus": "needsReview",
+      "issues": [
+        "contains_external_reference"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t4-17",
+      "branchId": "geo-cutting",
+      "methodTaskId": "M5.18",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t4-18",
+      "branchId": "geo-cutting",
+      "methodTaskId": "M5.19",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t4-19",
+      "branchId": "geo-cutting",
+      "methodTaskId": "M5.20",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t4-20",
+      "branchId": "geo-cutting",
+      "methodTaskId": "M5.21",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t4-21",
+      "branchId": "geo-cutting",
+      "methodTaskId": "M5.22",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t4-22",
+      "branchId": "geo-cutting",
+      "methodTaskId": "M5.23",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t4-23",
+      "branchId": "geo-cutting",
+      "methodTaskId": "M5.24",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t4-24",
+      "branchId": "geo-cutting",
+      "methodTaskId": "M5.25",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t4-25",
+      "branchId": "geo-cutting",
+      "methodTaskId": "M5.26",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t4-27",
+      "branchId": "geo-cutting",
+      "methodTaskId": "M5.28",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t4-28",
+      "branchId": "geo-cutting",
+      "methodTaskId": "M5.29",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t4-30",
+      "branchId": "geo-cutting",
+      "methodTaskId": "M5.31",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t4-32",
+      "branchId": "geo-cutting",
+      "methodTaskId": "M5.33",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t4-33",
+      "branchId": "geo-cutting",
+      "methodTaskId": "M5.34",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t4-34",
+      "branchId": "geo-cutting",
+      "methodTaskId": "M5.35",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t4-35",
+      "branchId": "geo-cutting",
+      "methodTaskId": "M5.36",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t4-36",
+      "branchId": "geo-cutting",
+      "methodTaskId": "M5.37",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t4-37",
+      "branchId": "geo-cutting",
+      "methodTaskId": "M5.38",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t4-38",
+      "branchId": "geo-cutting",
+      "methodTaskId": "M5.39",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t4-39",
+      "branchId": "geo-cutting",
+      "methodTaskId": "M5.40",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t4-40",
+      "branchId": "geo-cutting",
+      "methodTaskId": "M5.41",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t4-41",
+      "branchId": "geo-cutting",
+      "methodTaskId": "M5.42",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t4-42",
+      "branchId": "geo-cutting",
+      "methodTaskId": "M5.43",
+      "publishTier": "methodistOnly",
+      "qaStatus": "needsReview",
+      "issues": [
+        "contains_external_reference"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t4-43",
+      "branchId": "geo-cutting",
+      "methodTaskId": "M5.44",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t4-44",
+      "branchId": "geo-cutting",
+      "methodTaskId": "M5.45",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t4-48",
+      "branchId": "geo-cutting",
+      "methodTaskId": "M5.49",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t4-49",
+      "branchId": "geo-cutting",
+      "methodTaskId": "M5.50",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t4-50",
+      "branchId": "geo-cutting",
+      "methodTaskId": "M5.51",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t4-51",
+      "branchId": "geo-cutting",
+      "methodTaskId": "M5.52",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t4-52",
+      "branchId": "geo-cutting",
+      "methodTaskId": "M5.53",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t4-53",
+      "branchId": "geo-cutting",
+      "methodTaskId": "M5.54",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t4-54",
+      "branchId": "geo-cutting",
+      "methodTaskId": "M5.55",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t4-14",
+      "branchId": "geo-cutting",
+      "methodTaskId": "M5.15",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t4-26",
+      "branchId": "geo-cutting",
+      "methodTaskId": "M5.27",
+      "publishTier": "hidden",
+      "qaStatus": "blocked",
+      "issues": [
+        "missing_visual_asset",
+        "requires_manual_review"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t4-31",
+      "branchId": "geo-cutting",
+      "methodTaskId": "M5.32",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t4-45",
+      "branchId": "geo-cutting",
+      "methodTaskId": "M5.46",
+      "publishTier": "hidden",
+      "qaStatus": "blocked",
+      "issues": [
+        "contains_external_reference",
+        "requires_manual_review",
+        "missing_visual_asset"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t4-46",
+      "branchId": "geo-cutting",
+      "methodTaskId": "M5.47",
+      "publishTier": "hidden",
+      "qaStatus": "blocked",
+      "issues": [
+        "missing_visual_asset",
+        "requires_manual_review"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t4-47",
+      "branchId": "geo-cutting",
+      "methodTaskId": "M5.48",
+      "publishTier": "hidden",
+      "qaStatus": "blocked",
+      "issues": [
+        "requires_manual_review",
+        "missing_visual_asset"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t5-01",
+      "branchId": "proof-table-cells",
+      "methodTaskId": "M6.1",
+      "publishTier": "methodistOnly",
+      "qaStatus": "needsReview",
+      "issues": [
+        "contains_external_reference"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t5-02",
+      "branchId": "proof-table-cells",
+      "methodTaskId": "M6.2",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t5-03",
+      "branchId": "proof-table-cells",
+      "methodTaskId": "M6.3",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t5-04",
+      "branchId": "proof-table-cells",
+      "methodTaskId": "M6.4",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t5-05",
+      "branchId": "proof-table-cells",
+      "methodTaskId": "M6.5",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t5-06",
+      "branchId": "proof-table-cells",
+      "methodTaskId": "M6.6",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t5-07",
+      "branchId": "proof-table-cells",
+      "methodTaskId": "M6.7",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t5-08",
+      "branchId": "proof-table-cells",
+      "methodTaskId": "M6.8",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t5-09",
+      "branchId": "proof-table-cells",
+      "methodTaskId": "M6.9",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t5-10",
+      "branchId": "proof-table-cells",
+      "methodTaskId": "M6.10",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t5-11",
+      "branchId": "proof-table-cells",
+      "methodTaskId": "M6.11",
+      "publishTier": "methodistOnly",
+      "qaStatus": "needsReview",
+      "issues": [
+        "contains_external_reference"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t5-12",
+      "branchId": "proof-table-cells",
+      "methodTaskId": "M6.12",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t5-13",
+      "branchId": "proof-table-cells",
+      "methodTaskId": "M6.13",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t5-14",
+      "branchId": "proof-table-cells",
+      "methodTaskId": "M6.14",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t5-15",
+      "branchId": "proof-table-cells",
+      "methodTaskId": "M6.15",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t5-16",
+      "branchId": "proof-table-cells",
+      "methodTaskId": "M6.16",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t5-17",
+      "branchId": "proof-table-cells",
+      "methodTaskId": "M6.17",
+      "publishTier": "methodistOnly",
+      "qaStatus": "needsReview",
+      "issues": [
+        "contains_external_reference"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t5-18",
+      "branchId": "proof-table-cells",
+      "methodTaskId": "M6.18",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t5-19",
+      "branchId": "proof-table-cells",
+      "methodTaskId": "M6.19",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t5-20",
+      "branchId": "proof-table-cells",
+      "methodTaskId": "M6.20",
+      "publishTier": "methodistOnly",
+      "qaStatus": "needsReview",
+      "issues": [
+        "contains_external_reference"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t6-01",
+      "branchId": "logic-matching",
+      "methodTaskId": "M7.1",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t6-30",
+      "branchId": "logic-matching",
+      "methodTaskId": "M7.30",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t6-02",
+      "branchId": "logic-matching",
+      "methodTaskId": "M7.2",
+      "publishTier": "methodistOnly",
+      "qaStatus": "needsReview",
+      "issues": [
+        "contains_external_reference"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t6-03",
+      "branchId": "logic-matching",
+      "methodTaskId": "M7.3",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t6-04",
+      "branchId": "logic-matching",
+      "methodTaskId": "M7.4",
+      "publishTier": "methodistOnly",
+      "qaStatus": "needsReview",
+      "issues": [
+        "contains_external_reference"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t6-05",
+      "branchId": "logic-matching",
+      "methodTaskId": "M7.5",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t6-06",
+      "branchId": "logic-matching",
+      "methodTaskId": "M7.6",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t6-07",
+      "branchId": "logic-matching",
+      "methodTaskId": "M7.7",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t6-08",
+      "branchId": "logic-matching",
+      "methodTaskId": "M7.8",
+      "publishTier": "methodistOnly",
+      "qaStatus": "needsReview",
+      "issues": [
+        "contains_external_reference"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t6-09",
+      "branchId": "logic-matching",
+      "methodTaskId": "M7.9",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t6-10",
+      "branchId": "logic-matching",
+      "methodTaskId": "M7.10",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t6-11",
+      "branchId": "logic-matching",
+      "methodTaskId": "M7.11",
+      "publishTier": "methodistOnly",
+      "qaStatus": "needsReview",
+      "issues": [
+        "contains_external_reference"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t6-12",
+      "branchId": "logic-matching",
+      "methodTaskId": "M7.12",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t6-13",
+      "branchId": "logic-matching",
+      "methodTaskId": "M7.13",
+      "publishTier": "methodistOnly",
+      "qaStatus": "needsReview",
+      "issues": [
+        "contains_external_reference"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t6-14",
+      "branchId": "logic-matching",
+      "methodTaskId": "M7.14",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t6-15",
+      "branchId": "logic-matching",
+      "methodTaskId": "M7.15",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t6-16",
+      "branchId": "logic-matching",
+      "methodTaskId": "M7.16",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t6-17",
+      "branchId": "logic-matching",
+      "methodTaskId": "M7.17",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t6-18",
+      "branchId": "logic-matching",
+      "methodTaskId": "M7.18",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t6-19",
+      "branchId": "logic-matching",
+      "methodTaskId": "M7.19",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t6-20",
+      "branchId": "logic-matching",
+      "methodTaskId": "M7.20",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t6-21",
+      "branchId": "logic-matching",
+      "methodTaskId": "M7.21",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t6-22",
+      "branchId": "logic-matching",
+      "methodTaskId": "M7.22",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t6-23",
+      "branchId": "logic-matching",
+      "methodTaskId": "M7.23",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t6-24",
+      "branchId": "logic-matching",
+      "methodTaskId": "M7.24",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t6-25",
+      "branchId": "logic-matching",
+      "methodTaskId": "M7.25",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t6-26",
+      "branchId": "logic-matching",
+      "methodTaskId": "M7.26",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t6-27",
+      "branchId": "logic-matching",
+      "methodTaskId": "M7.27",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t6-28",
+      "branchId": "logic-matching",
+      "methodTaskId": "M7.28",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t6-29",
+      "branchId": "logic-matching",
+      "methodTaskId": "M7.29",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t6-31",
+      "branchId": "logic-matching",
+      "methodTaskId": "M7.31",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t6-32",
+      "branchId": "logic-matching",
+      "methodTaskId": "M7.32",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t6-33",
+      "branchId": "logic-matching",
+      "methodTaskId": "M7.33",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t6-34",
+      "branchId": "logic-matching",
+      "methodTaskId": "M7.34",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t7-01",
+      "branchId": "inv-coloring",
+      "methodTaskId": "M8.1",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t7-02",
+      "branchId": "inv-coloring",
+      "methodTaskId": "M8.2",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t8-01",
+      "branchId": "proof-extreme",
+      "methodTaskId": "M5.4",
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t9-01",
+      "branchId": "proof-constructions",
+      "methodTaskId": "M9.1",
+      "publishTier": "archive",
+      "qaStatus": "needsReview",
+      "issues": [
+        "too_hard_for_child_route"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t9-10",
+      "branchId": "proof-constructions",
+      "methodTaskId": "M9.10",
+      "publishTier": "archive",
+      "qaStatus": "needsReview",
+      "issues": [
+        "too_hard_for_child_route"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t9-27",
+      "branchId": "proof-constructions",
+      "methodTaskId": "M9.27",
+      "publishTier": "archive",
+      "qaStatus": "needsReview",
+      "issues": [
+        "too_hard_for_child_route"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t9-32",
+      "branchId": "proof-constructions",
+      "methodTaskId": "M9.32",
+      "publishTier": "archive",
+      "qaStatus": "needsReview",
+      "issues": [
+        "too_hard_for_child_route"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t9-37",
+      "branchId": "proof-constructions",
+      "methodTaskId": "M9.37",
+      "publishTier": "archive",
+      "qaStatus": "needsReview",
+      "issues": [
+        "too_hard_for_child_route"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t9-57",
+      "branchId": "proof-constructions",
+      "methodTaskId": "M9.57",
+      "publishTier": "archive",
+      "qaStatus": "needsReview",
+      "issues": [
+        "too_hard_for_child_route"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t9-02",
+      "branchId": "proof-constructions",
+      "methodTaskId": "M9.2",
+      "publishTier": "archive",
+      "qaStatus": "needsReview",
+      "issues": [
+        "too_hard_for_child_route"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t9-03",
+      "branchId": "proof-constructions",
+      "methodTaskId": "M9.3",
+      "publishTier": "archive",
+      "qaStatus": "needsReview",
+      "issues": [
+        "contains_external_reference",
+        "too_hard_for_child_route"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t9-04",
+      "branchId": "proof-constructions",
+      "methodTaskId": "M9.4",
+      "publishTier": "archive",
+      "qaStatus": "needsReview",
+      "issues": [
+        "too_hard_for_child_route"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t9-05",
+      "branchId": "proof-constructions",
+      "methodTaskId": "M9.5",
+      "publishTier": "archive",
+      "qaStatus": "needsReview",
+      "issues": [
+        "too_hard_for_child_route"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t9-06",
+      "branchId": "proof-constructions",
+      "methodTaskId": "M9.6",
+      "publishTier": "archive",
+      "qaStatus": "needsReview",
+      "issues": [
+        "too_hard_for_child_route"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t9-07",
+      "branchId": "proof-constructions",
+      "methodTaskId": "M9.7",
+      "publishTier": "archive",
+      "qaStatus": "needsReview",
+      "issues": [
+        "too_hard_for_child_route"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t9-08",
+      "branchId": "proof-constructions",
+      "methodTaskId": "M9.8",
+      "publishTier": "archive",
+      "qaStatus": "needsReview",
+      "issues": [
+        "too_hard_for_child_route"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t9-09",
+      "branchId": "proof-constructions",
+      "methodTaskId": "M9.9",
+      "publishTier": "archive",
+      "qaStatus": "needsReview",
+      "issues": [
+        "too_hard_for_child_route"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t9-11",
+      "branchId": "proof-constructions",
+      "methodTaskId": "M9.11",
+      "publishTier": "archive",
+      "qaStatus": "needsReview",
+      "issues": [
+        "contains_N_equals_N",
+        "too_hard_for_child_route"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t9-12",
+      "branchId": "proof-constructions",
+      "methodTaskId": "M9.12",
+      "publishTier": "archive",
+      "qaStatus": "needsReview",
+      "issues": [
+        "too_hard_for_child_route"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t9-13",
+      "branchId": "proof-constructions",
+      "methodTaskId": "M9.13",
+      "publishTier": "archive",
+      "qaStatus": "needsReview",
+      "issues": [
+        "too_hard_for_child_route"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t9-14",
+      "branchId": "proof-constructions",
+      "methodTaskId": "M9.14",
+      "publishTier": "archive",
+      "qaStatus": "needsReview",
+      "issues": [
+        "too_hard_for_child_route"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t9-15",
+      "branchId": "proof-constructions",
+      "methodTaskId": "M9.15",
+      "publishTier": "archive",
+      "qaStatus": "needsReview",
+      "issues": [
+        "too_hard_for_child_route"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t9-16",
+      "branchId": "proof-constructions",
+      "methodTaskId": "M9.16",
+      "publishTier": "archive",
+      "qaStatus": "needsReview",
+      "issues": [
+        "too_hard_for_child_route"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t9-17",
+      "branchId": "proof-constructions",
+      "methodTaskId": "M9.17",
+      "publishTier": "archive",
+      "qaStatus": "needsReview",
+      "issues": [
+        "too_hard_for_child_route"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t9-18",
+      "branchId": "proof-constructions",
+      "methodTaskId": "M9.18",
+      "publishTier": "archive",
+      "qaStatus": "needsReview",
+      "issues": [
+        "too_hard_for_child_route"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t9-19",
+      "branchId": "proof-constructions",
+      "methodTaskId": "M9.19",
+      "publishTier": "archive",
+      "qaStatus": "needsReview",
+      "issues": [
+        "too_hard_for_child_route"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t9-20",
+      "branchId": "proof-constructions",
+      "methodTaskId": "M9.20",
+      "publishTier": "archive",
+      "qaStatus": "needsReview",
+      "issues": [
+        "too_hard_for_child_route"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t9-21",
+      "branchId": "proof-constructions",
+      "methodTaskId": "M9.21",
+      "publishTier": "archive",
+      "qaStatus": "needsReview",
+      "issues": [
+        "too_hard_for_child_route"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t9-22",
+      "branchId": "proof-constructions",
+      "methodTaskId": "M9.22",
+      "publishTier": "archive",
+      "qaStatus": "needsReview",
+      "issues": [
+        "too_hard_for_child_route"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t9-23",
+      "branchId": "proof-constructions",
+      "methodTaskId": "M9.23",
+      "publishTier": "archive",
+      "qaStatus": "needsReview",
+      "issues": [
+        "too_hard_for_child_route"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t9-24",
+      "branchId": "proof-constructions",
+      "methodTaskId": "M9.24",
+      "publishTier": "archive",
+      "qaStatus": "needsReview",
+      "issues": [
+        "too_hard_for_child_route"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t9-25",
+      "branchId": "proof-constructions",
+      "methodTaskId": "M9.25",
+      "publishTier": "archive",
+      "qaStatus": "needsReview",
+      "issues": [
+        "too_hard_for_child_route"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t9-26",
+      "branchId": "proof-constructions",
+      "methodTaskId": "M9.26",
+      "publishTier": "archive",
+      "qaStatus": "needsReview",
+      "issues": [
+        "too_hard_for_child_route"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t9-28",
+      "branchId": "proof-constructions",
+      "methodTaskId": "M9.28",
+      "publishTier": "archive",
+      "qaStatus": "needsReview",
+      "issues": [
+        "too_hard_for_child_route"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t9-29",
+      "branchId": "proof-constructions",
+      "methodTaskId": "M9.29",
+      "publishTier": "archive",
+      "qaStatus": "needsReview",
+      "issues": [
+        "too_hard_for_child_route"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t9-30",
+      "branchId": "proof-constructions",
+      "methodTaskId": "M9.30",
+      "publishTier": "archive",
+      "qaStatus": "needsReview",
+      "issues": [
+        "too_hard_for_child_route"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t9-31",
+      "branchId": "proof-constructions",
+      "methodTaskId": "M9.31",
+      "publishTier": "archive",
+      "qaStatus": "needsReview",
+      "issues": [
+        "contains_external_reference",
+        "too_hard_for_child_route"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t9-33",
+      "branchId": "proof-constructions",
+      "methodTaskId": "M9.33",
+      "publishTier": "archive",
+      "qaStatus": "needsReview",
+      "issues": [
+        "too_hard_for_child_route"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t9-34",
+      "branchId": "proof-constructions",
+      "methodTaskId": "M9.34",
+      "publishTier": "archive",
+      "qaStatus": "needsReview",
+      "issues": [
+        "contains_external_reference",
+        "too_hard_for_child_route"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t9-35",
+      "branchId": "proof-constructions",
+      "methodTaskId": "M9.35",
+      "publishTier": "archive",
+      "qaStatus": "needsReview",
+      "issues": [
+        "too_hard_for_child_route"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t9-36",
+      "branchId": "proof-constructions",
+      "methodTaskId": "M9.36",
+      "publishTier": "archive",
+      "qaStatus": "needsReview",
+      "issues": [
+        "too_hard_for_child_route"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t9-38",
+      "branchId": "proof-constructions",
+      "methodTaskId": "M9.38",
+      "publishTier": "archive",
+      "qaStatus": "needsReview",
+      "issues": [
+        "too_hard_for_child_route"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t9-39",
+      "branchId": "proof-constructions",
+      "methodTaskId": "M9.39",
+      "publishTier": "archive",
+      "qaStatus": "needsReview",
+      "issues": [
+        "too_hard_for_child_route"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t9-40",
+      "branchId": "proof-constructions",
+      "methodTaskId": "M9.40",
+      "publishTier": "archive",
+      "qaStatus": "needsReview",
+      "issues": [
+        "too_hard_for_child_route"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t9-41",
+      "branchId": "proof-constructions",
+      "methodTaskId": "M9.41",
+      "publishTier": "archive",
+      "qaStatus": "needsReview",
+      "issues": [
+        "too_hard_for_child_route"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t9-42",
+      "branchId": "proof-constructions",
+      "methodTaskId": "M9.42",
+      "publishTier": "archive",
+      "qaStatus": "needsReview",
+      "issues": [
+        "contains_N_equals_N",
+        "too_hard_for_child_route"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t9-43",
+      "branchId": "proof-constructions",
+      "methodTaskId": "M9.43",
+      "publishTier": "archive",
+      "qaStatus": "needsReview",
+      "issues": [
+        "too_hard_for_child_route"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t9-44",
+      "branchId": "proof-constructions",
+      "methodTaskId": "M9.44",
+      "publishTier": "archive",
+      "qaStatus": "needsReview",
+      "issues": [
+        "too_hard_for_child_route"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t9-45",
+      "branchId": "proof-constructions",
+      "methodTaskId": "M9.45",
+      "publishTier": "archive",
+      "qaStatus": "needsReview",
+      "issues": [
+        "too_hard_for_child_route"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t9-46",
+      "branchId": "proof-constructions",
+      "methodTaskId": "M9.46",
+      "publishTier": "archive",
+      "qaStatus": "needsReview",
+      "issues": [
+        "too_hard_for_child_route"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t9-47",
+      "branchId": "proof-constructions",
+      "methodTaskId": "M9.47",
+      "publishTier": "archive",
+      "qaStatus": "needsReview",
+      "issues": [
+        "too_hard_for_child_route"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t9-48",
+      "branchId": "proof-constructions",
+      "methodTaskId": "M9.48",
+      "publishTier": "archive",
+      "qaStatus": "needsReview",
+      "issues": [
+        "too_hard_for_child_route"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t9-49",
+      "branchId": "proof-constructions",
+      "methodTaskId": "M9.49",
+      "publishTier": "archive",
+      "qaStatus": "needsReview",
+      "issues": [
+        "too_hard_for_child_route"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t9-50",
+      "branchId": "proof-constructions",
+      "methodTaskId": "M9.50",
+      "publishTier": "archive",
+      "qaStatus": "needsReview",
+      "issues": [
+        "too_hard_for_child_route"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t9-51",
+      "branchId": "proof-constructions",
+      "methodTaskId": "M9.51",
+      "publishTier": "archive",
+      "qaStatus": "needsReview",
+      "issues": [
+        "too_hard_for_child_route"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t9-52",
+      "branchId": "proof-constructions",
+      "methodTaskId": "M9.52",
+      "publishTier": "archive",
+      "qaStatus": "needsReview",
+      "issues": [
+        "too_hard_for_child_route"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t9-53",
+      "branchId": "proof-constructions",
+      "methodTaskId": "M9.53",
+      "publishTier": "archive",
+      "qaStatus": "needsReview",
+      "issues": [
+        "too_hard_for_child_route"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t9-54",
+      "branchId": "proof-constructions",
+      "methodTaskId": "M9.54",
+      "publishTier": "archive",
+      "qaStatus": "needsReview",
+      "issues": [
+        "too_hard_for_child_route"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t9-55",
+      "branchId": "proof-constructions",
+      "methodTaskId": "M9.55",
+      "publishTier": "archive",
+      "qaStatus": "needsReview",
+      "issues": [
+        "too_hard_for_child_route"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t9-56",
+      "branchId": "proof-constructions",
+      "methodTaskId": "M9.56",
+      "publishTier": "archive",
+      "qaStatus": "needsReview",
+      "issues": [
+        "too_hard_for_child_route"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t9-58",
+      "branchId": "proof-constructions",
+      "methodTaskId": "M9.58",
+      "publishTier": "archive",
+      "qaStatus": "needsReview",
+      "issues": [
+        "too_hard_for_child_route"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t9-59",
+      "branchId": "proof-constructions",
+      "methodTaskId": "M9.59",
+      "publishTier": "archive",
+      "qaStatus": "needsReview",
+      "issues": [
+        "too_hard_for_child_route"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t9-60",
+      "branchId": "proof-constructions",
+      "methodTaskId": "M9.60",
+      "publishTier": "archive",
+      "qaStatus": "needsReview",
+      "issues": [
+        "contains_N_equals_N",
+        "too_hard_for_child_route"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t9-61",
+      "branchId": "proof-constructions",
+      "methodTaskId": "M9.61",
+      "publishTier": "archive",
+      "qaStatus": "needsReview",
+      "issues": [
+        "too_hard_for_child_route"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t9-62",
+      "branchId": "proof-constructions",
+      "methodTaskId": "M9.62",
+      "publishTier": "archive",
+      "qaStatus": "needsReview",
+      "issues": [
+        "too_hard_for_child_route"
+      ],
+      "childVisible": false
+    },
+    {
+      "id": "dirichlet-t9-63",
+      "branchId": "proof-constructions",
+      "methodTaskId": "M9.63",
+      "publishTier": "archive",
+      "qaStatus": "needsReview",
+      "issues": [
+        "too_hard_for_child_route"
+      ],
+      "childVisible": false
+    }
+  ]
+}

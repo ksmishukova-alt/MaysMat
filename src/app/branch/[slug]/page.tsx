@@ -13,7 +13,7 @@ import { PaperVerdictSync } from "@/components/PaperVerdictSync";
 import { getThinkingTypeLabel } from "@/data/branch-meta";
 
 import { getMethodology } from "@/data/methodologies";
-
+import { isMethodologyBankBranch } from "@/data/methodology-bank/theme-branches";
 import { getBranchBySlug } from "@/data/thinking-map";
 
 
@@ -60,6 +60,13 @@ export default async function BranchPage({ params }: Props) {
 
         </p>
 
+        {slug === "heads-legs" ? (
+          <p className="mt-1 text-xs text-gray-400">
+            Задачи идут по порядку сложности (1–51). Номера в методичке (например 1.13) могут отличаться —
+            пропуск «1.12» относится к старой нумерации, а не к пропуску в списке ниже.
+          </p>
+        ) : null}
+
       </div>
 
 
@@ -83,7 +90,11 @@ export default async function BranchPage({ params }: Props) {
       {slug === "heads-legs" ? <HeadsLegsMigrationBanner /> : null}
       {slug === "heads-legs" ? <PaperVerdictSync /> : null}
 
-      <BranchTaskList branchId={branch.id} branchTaskCount={branch.taskCount} />
+      <BranchTaskList
+        branchId={branch.id}
+        branchTaskCount={branch.taskCount}
+        methodologyBank={isMethodologyBankBranch(branch.id)}
+      />
 
     </AppShell>
 

@@ -136,5 +136,21 @@ export function validateWordSolution(
     }
   }
 
+  if (accepted.kind === "multi_set") {
+    const matched = accepted.sets.filter((set) => {
+      const nums = Object.values(set);
+      return nums.every((n) => t.includes(String(n)));
+    });
+    if (matched.length === 0) {
+      return { ok: false, message: "Запиши хотя бы один полный вариант ответа со всеми числами." };
+    }
+    if (matched.length < accepted.sets.length && !/вариант|возможн|или|также|ещё|еще/i.test(t)) {
+      return {
+        ok: false,
+        message: `В задаче ${accepted.sets.length} варианта ответа — найди и запиши все.`,
+      };
+    }
+  }
+
   return { ok: true };
 }

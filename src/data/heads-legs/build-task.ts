@@ -17,6 +17,7 @@ import { TOTALS_OVERRIDES } from "./guided/totals-overrides";
 import { inferTaskEntities } from "./guided/participants";
 
 import { inferModelFromCondition } from "@/lib/heads-legs-model-infer";
+import { resolveTaskPublishing } from "@/data/task-publishing/resolve";
 
 import { normalizeSolutionMode } from "./solution-modes";
 
@@ -170,37 +171,23 @@ export function catalogEntryToMeta(entry: HeadsLegsCatalogEntry): HeadsLegsTaskM
 
 
 export function buildHeadsLegsTask(meta: HeadsLegsTaskMeta): Task {
-
-  return {
-
+  const task: Task = {
     id: meta.id,
-
     branchId: BRANCH_ID,
-
     number: meta.number,
-
     title: meta.title,
-
     condition: meta.condition,
-
     stage: meta.stage,
-
     maxStars: 3,
-
     independenceLevel: defaultIndependence(meta.difficultyLevel),
-
     requiresUpload: false,
-
     skillWeights: { modeling: 0.85, logic: 0.15 },
-
     enableGivenStep: false,
-
     steps: buildSteps(meta),
-
     headsLegsMeta: meta,
-
   };
-
+  task.publishing = resolveTaskPublishing(task);
+  return task;
 }
 
 

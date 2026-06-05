@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import type { WordSolutionStep as WordSolutionStepDef } from "@/data/task-steps";
 import type { RunnerContext } from "@/lib/runner-context";
 import { validateWordSolutionFull } from "@/lib/word-solution-blanks";
@@ -17,10 +17,12 @@ export function WordSolutionStep({ step, runnerContext = "heads-legs", onComplet
   const [blanks, setBlanks] = useState<Record<string, string>>({});
   const [error, setError] = useState<string | null>(null);
   const [hintIdx, setHintIdx] = useState(0);
+  const [scaffoldDone, setScaffoldDone] = useState(false);
 
   const mode = step.solutionMode;
   const accepted = step.acceptedAnswers;
   const lines = step.solutionLines ?? [];
+  const modeCWithScaffold = mode === "C" && lines.length > 0;
 
   const submit = () => {
     const result = validateWordSolutionFull(text, mode, accepted, lines, blanks);
@@ -34,7 +36,7 @@ export function WordSolutionStep({ step, runnerContext = "heads-legs", onComplet
     }
   };
 
-  const renderLine = (line: (typeof lines)[0], li: number) => {
+  const renderLine = (line: (typeof lines)[0], li: number, readOnly = false) => {
     let bi = 0;
     return (
       <div key={li} className="rounded-lg bg-gray-50 px-3 py-2 text-sm leading-relaxed">
@@ -43,6 +45,16 @@ export function WordSolutionStep({ step, runnerContext = "heads-legs", onComplet
           if (!m) return <span key={pi}>{part}</span>;
           const blank = line.blanks[bi++];
           if (!blank) return <span key={pi}>{part}</span>;
+          if (readOnly) {
+            const sample = Array.isArray(blank.accept)
+              ? String(blank.accept[0] ?? "…")
+              : "…";
+            return (
+              <span key={blank.id} className="mx-1 rounded bg-lavender-100 px-1.5 py-0.5 font-medium text-brand-purple">
+                {sample}
+              </span>
+            );
+          }
           const wide = blank.type === "expression" || blank.type === "conclusion";
           return (
             <input
@@ -91,6 +103,26 @@ export function WordSolutionStep({ step, runnerContext = "heads-legs", onComplet
     );
   }
 
+  if (modeCWithScaffold && !scaffoldDone) {
+    return (
+      <div className="space-y-4">
+        <p className="text-sm font-medium text-gray-800">Шаг 1. Изучи опору</p>
+        <p className="text-sm text-gray-600">
+          Прочитай образец решения. Цифры в цветных блоках — подсказка, как может выглядеть запись. Запомни
+          порядок шагов, затем напишешь своими словами.
+        </p>
+        <div className="space-y-2">{lines.map((line, li) => renderLine(line, li, true))}</div>
+        <button
+          type="button"
+          onClick={() => setScaffoldDone(true)}
+          className="w-full rounded-xl bg-brand-purple py-3 text-sm font-semibold text-white"
+        >
+          Понятно — напишу своими словами →
+        </button>
+      </div>
+    );
+  }
+
   if (mode === "B" || mode === "E") {
     return (
       <div className="space-y-4">
@@ -130,12 +162,24 @@ export function WordSolutionStep({ step, runnerContext = "heads-legs", onComplet
 
   return (
     <div className="space-y-3">
+      {modeCWithScaffold ? (
+        <p className="text-sm font-medium text-gray-800">Шаг 2. Напиши решение своими словами</p>
+      ) : null}
       <p className="text-sm text-gray-600">
         {mode === "D"
           ? "Объясни, почему единственный ответ найти нельзя, или запиши полное решение."
-          : "Запиши развёрнутое решение: предположение → вычисления → ответ."}
+          : mode === "C"
+            ? "Запиши развёрнутое решение своими словами: предположение → вычисления → ответ."
+            : "Запиши развёрнутое решение: предположение → вычисления → ответ."}
       </p>
-      {lines.length > 0 ? <div className="space-y-2">{lines.map((l, i) => renderLine(l, i))}</div> : null}
+      {mode === "C" && accepted.kind === "multi_set" ? (
+        <p className="text-sm text-amber-800">
+          В этой задаче несколько правильных ответов — найди и запиши все варианты.
+        </p>
+      ) : null}
+      {mode !== "C" && lines.length > 0 ? (
+        <div className="space-y-2">{lines.map((l, i) => renderLine(l, i))}</div>
+      ) : null}
       <ul className="list-inside list-disc text-xs text-gray-500">
         <li>Есть ли предположение «представим, что все…»?</li>
         <li>Есть ли вычисления и сравнение с условием?</li>

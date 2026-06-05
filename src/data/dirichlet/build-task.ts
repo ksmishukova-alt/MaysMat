@@ -2,6 +2,8 @@ import type { DiscriminatedTaskStep } from "@/data/task-steps";
 import type { Task } from "@/data/tasks";
 
 import { getThemeBranchConfig } from "@/data/methodology-bank/theme-branches";
+import { patchAnswerReference, resolveTaskPublishing } from "@/data/task-publishing/resolve";
+import { CONDITION_PATCHES } from "@/data/task-publishing/config";
 
 import { DIRICHLET_ANSWERS } from "./answers.generated";
 import { buildDirichletGuidedSteps } from "./build-steps";
@@ -21,12 +23,20 @@ function defaultIndependence(meta: DirichletCatalogEntry): 1 | 2 | 3 | 4 | 5 {
 }
 
 export function catalogEntryToMeta(entry: DirichletCatalogEntry): DirichletTaskMeta {
+  const rawAnswers = DIRICHLET_ANSWERS[entry.methodTaskId] ?? {
+    kind: "proof",
+    solutionReference: "См. методичку.",
+  };
+  const solutionReference = patchAnswerReference(
+    entry.methodTaskId,
+    rawAnswers.solutionReference ?? "",
+  );
+  const condition = CONDITION_PATCHES[entry.methodTaskId] ?? entry.condition;
+
   return {
     ...entry,
-    acceptedAnswers: DIRICHLET_ANSWERS[entry.methodTaskId] ?? {
-      kind: "proof",
-      solutionReference: "См. методичку.",
-    },
+    condition,
+    acceptedAnswers: { ...rawAnswers, solutionReference },
     solutionLines: DIRICHLET_SOLUTION_LINES[entry.methodTaskId] ?? [],
     hintLevels: DIRICHLET_HINTS[entry.methodTaskId] ?? [
       "Найди «клетки» и «предметы».",
@@ -40,7 +50,7 @@ export function buildDirichletTask(meta: DirichletTaskMeta): Task {
   const steps: DiscriminatedTaskStep[] = buildDirichletGuidedSteps(meta);
   const branchCfg = getThemeBranchConfig(meta.themeId);
 
-  return {
+  const task: Task = {
     id: meta.id,
     branchId: meta.branchId,
     number: meta.number,
@@ -55,6 +65,9 @@ export function buildDirichletTask(meta: DirichletTaskMeta): Task {
     steps,
     dirichletMeta: meta,
   };
+
+  task.publishing = resolveTaskPublishing(task);
+  return task;
 }
 
 export function buildAllDirichletTasks(): Record<string, Task> {

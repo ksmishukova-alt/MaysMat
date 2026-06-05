@@ -10,6 +10,11 @@ import { buildCountWorksheetRows, describeCellCount, describeRabbitCount, extrac
 import { buildF1DirectModelSteps } from "./f1-direct-steps";
 import { inferDirichletModel, type DirichletEntity, type DirichletInferredModel } from "./infer-model";
 import { CELLS_STEP_TITLE, RABBITS_STEP_TITLE, rabbitsStepHint, cellsStepHint } from "./entity-hints";
+import {
+  buildCustomFlowModelSteps,
+  hasCustomFlowModelSteps,
+  skipsDefaultEntityDrag,
+} from "./custom";
 import { applyDirichletScreenPhases } from "./screen-architecture";
 import {
   includeIntroStep,
@@ -127,15 +132,16 @@ function buildCountsStep(meta: DirichletTaskMeta, model: DirichletInferredModel)
   };
 }
 
-function buildCompareStep(meta: DirichletTaskMeta, model: DirichletInferredModel): DiscriminatedTaskStep {
-  const n = model.counts.n ?? "N";
-  const m = model.counts.m ?? "M";
+function buildCompareStep(meta: DirichletTaskMeta, model: DirichletInferredModel): DiscriminatedTaskStep | null {
+  const n = model.counts.n;
+  const m = model.counts.m;
+  if (n == null || m == null) {
+    return null;
+  }
+
   const rabbitLabel = describeRabbitCount(meta, model);
   const cellLabel = describeCellCount(model);
-  const nGtM =
-    model.counts.n != null && model.counts.m != null
-      ? model.counts.n > model.counts.m
-      : model.compareOp === "gt";
+  const nGtM = n > m;
 
   return {
     id: `${meta.id}-compare`,
@@ -213,8 +219,15 @@ function buildConclusionStep(meta: DirichletTaskMeta, model: DirichletInferredMo
   ];
 }
 
+function resolveGeneralizedK(model: DirichletInferredModel): number {
+  const { k, minInCell, m } = model.counts;
+  if (minInCell != null && minInCell > 1) return minInCell - 1;
+  if (k != null && (m == null || k < m)) return k;
+  return 2;
+}
+
 function buildGeneralizedSteps(meta: DirichletTaskMeta, model: DirichletInferredModel): DiscriminatedTaskStep[] {
-  const k = model.counts.k ?? (model.counts.minInCell != null ? model.counts.minInCell - 1 : 2);
+  const k = resolveGeneralizedK(model);
   const m = model.counts.m ?? 0;
   const n = model.counts.n ?? 0;
   const target = model.counts.minInCell ?? k + 1;
@@ -365,10 +378,14 @@ function buildFlowModelSteps(
   meta: DirichletTaskMeta,
   model: DirichletInferredModel,
 ): DiscriminatedTaskStep[] {
-  const common: DiscriminatedTaskStep[] = [
-    buildCountsStep(meta, model),
-    buildCompareStep(meta, model),
-  ];
+  if (hasCustomFlowModelSteps(meta.methodTaskId)) {
+    const custom = buildCustomFlowModelSteps(meta.methodTaskId, meta.id, model, meta);
+    if (custom) return custom;
+  }
+
+  const common: DiscriminatedTaskStep[] = [buildCountsStep(meta, model)];
+  const compare = buildCompareStep(meta, model);
+  if (compare) common.push(compare);
 
   switch (meta.flowId) {
     case "F1_DIRECT":
@@ -460,12 +477,13 @@ export function buildDirichletGuidedSteps(meta: DirichletTaskMeta): Discriminate
   if (hasIntro) {
     steps.push(buildIntroStep(meta));
   }
-  steps.push(
-    buildRabbitsStep(meta, model, hasIntro),
-    buildCellsStep(meta, model, hasIntro),
-    ...buildFlowModelSteps(meta, model),
-    ...buildWrittenSteps(meta),
-  );
+  if (!skipsDefaultEntityDrag(meta.methodTaskId)) {
+    steps.push(
+      buildRabbitsStep(meta, model, hasIntro),
+      buildCellsStep(meta, model, hasIntro),
+    );
+  }
+  steps.push(...buildFlowModelSteps(meta, model), ...buildWrittenSteps(meta));
 
   return applyDirichletScreenPhases(steps, meta);
 }

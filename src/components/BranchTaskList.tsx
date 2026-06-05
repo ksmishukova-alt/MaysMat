@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import { TaskCompletionStampById } from "@/components/TaskCompletionStamp";
 import { useResolvedTasksForBranch, useTaskStore } from "@/lib/use-task-store";
@@ -10,28 +11,83 @@ import {
   PAPER_STATUS_LABEL,
   type PaperReviewStatus,
 } from "@/lib/paper-task-review";
+import { isArchiveVisible, isChildVisible } from "@/data/task-publishing/resolve";
 
 interface BranchTaskListProps {
   branchId: string;
   branchTaskCount: number;
+  /** Ветки methodology-bank: скрывать архив по умолчанию */
+  methodologyBank?: boolean;
 }
 
-export function BranchTaskList({ branchId, branchTaskCount }: BranchTaskListProps) {
+export function BranchTaskList({
+  branchId,
+  branchTaskCount,
+  methodologyBank = false,
+}: BranchTaskListProps) {
   const store = useTaskStore();
   const userProgress = useProgress();
-  const tasks = useResolvedTasksForBranch(branchId);
+  const allTasks = useResolvedTasksForBranch(branchId);
+  const [showArchive, setShowArchive] = useState(false);
+
+  const tasks = useMemo(() => {
+    const filtered = allTasks.filter((task) => {
+      const pub = task.publishing;
+      if (!pub) return true;
+      if (isChildVisible(pub)) return true;
+      if (methodologyBank && showArchive && isArchiveVisible(pub)) return true;
+      return false;
+    });
+
+    return filtered.sort((a, b) => {
+      const ra = a.publishing?.routeOrder ?? a.number;
+      const rb = b.publishing?.routeOrder ?? b.number;
+      return ra - rb;
+    });
+  }, [allTasks, methodologyBank, showArchive]);
+
+  const childCount = allTasks.filter((t) => t.publishing && isChildVisible(t.publishing)).length;
+  const archiveCount = allTasks.filter(
+    (t) => t.publishing && t.publishing.publishTier === "archive",
+  ).length;
+
   const customCount = Object.values(store.customTasks).filter((t) => t.branchId === branchId).length;
 
   return (
     <div className="rounded-card bg-white p-6 shadow-card">
-      <h2 className="mb-4 font-semibold">Задачи</h2>
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+        <h2 className="font-semibold">Задачи</h2>
+        {methodologyBank && archiveCount > 0 ? (
+          <label className="flex cursor-pointer items-center gap-2 text-sm text-gray-600">
+            <input
+              type="checkbox"
+              checked={showArchive}
+              onChange={(e) => setShowArchive(e.target.checked)}
+              className="rounded border-gray-300"
+            />
+            Олимпиадный архив (+{archiveCount})
+          </label>
+        ) : null}
+      </div>
+      {methodologyBank ? (
+        <p className="mb-4 text-xs text-gray-500">
+          Детский маршрут: {childCount} задач. Остальные — в банке методиста или архиве.
+        </p>
+      ) : null}
       <div className="space-y-3">
-        {tasks.map((task) => {
+        {tasks.map((task, index) => {
+          const displayNum = task.publishing?.routeOrder ?? task.number;
+          const labelNum = methodologyBank ? index + 1 : displayNum;
           const isCopy = Boolean(store.customTasks[task.id]);
           const done = getTaskCompletion(task.id, userProgress);
           const paperStatus: PaperReviewStatus = task.requiresUpload
             ? getPaperReviewStatus(task.id)
             : "not_started";
+          const tier = task.publishing?.publishTier;
+          const tierBadge =
+            tier === "archive" ? (
+              <span className="ml-2 text-xs font-normal text-violet-600">архив</span>
+            ) : null;
 
           if (done) {
             return (
@@ -44,7 +100,8 @@ export function BranchTaskList({ branchId, branchTaskCount }: BranchTaskListProp
                     <span className="rounded-full bg-emerald-500 px-2 py-0.5 text-xs text-white">
                       ✓ решено
                     </span>
-                    Задача {task.number}. {task.title}
+                    Задача {labelNum}. {task.title}
+                    {tierBadge}
                     {isCopy ? (
                       <span className="text-xs font-normal text-brand-purple">копия</span>
                     ) : null}
@@ -73,7 +130,8 @@ export function BranchTaskList({ branchId, branchTaskCount }: BranchTaskListProp
               >
                 <div>
                   <div className="font-medium">
-                    Задача {task.number}. {task.title}
+                    Задача {labelNum}. {task.title}
+                    {tierBadge}
                   </div>
                   <div className="mt-1 text-sm text-sky-800">{PAPER_STATUS_LABEL.pending}</div>
                 </div>
@@ -96,7 +154,8 @@ export function BranchTaskList({ branchId, branchTaskCount }: BranchTaskListProp
               >
                 <div>
                   <div className="font-medium">
-                    Задача {task.number}. {task.title}
+                    Задача {labelNum}. {task.title}
+                    {tierBadge}
                   </div>
                   <div className="mt-1 text-sm text-amber-800">{PAPER_STATUS_LABEL.redo}</div>
                 </div>
@@ -115,7 +174,8 @@ export function BranchTaskList({ branchId, branchTaskCount }: BranchTaskListProp
             >
               <div>
                 <div className="font-medium">
-                  Задача {task.number}. {task.title}
+                  Задача {labelNum}. {task.title}
+                  {tierBadge}
                   {isCopy ? (
                     <span className="ml-2 text-xs font-normal text-brand-purple">копия</span>
                   ) : null}
@@ -129,17 +189,19 @@ export function BranchTaskList({ branchId, branchTaskCount }: BranchTaskListProp
             </Link>
           );
         })}
-        {Array.from({
-          length: Math.max(0, Math.min(5, branchTaskCount + customCount - tasks.length)),
-        }).map((_, i) => (
-          <div
-            key={`placeholder-${i}`}
-            className="flex items-center justify-between rounded-xl border border-dashed border-gray-200 p-4 opacity-50"
-          >
-            <div className="font-medium text-gray-400">Задача {tasks.length + i + 1} — скоро</div>
-            <span className="text-sm text-gray-300">🔒</span>
-          </div>
-        ))}
+        {!methodologyBank
+          ? Array.from({
+              length: Math.max(0, Math.min(5, branchTaskCount + customCount - tasks.length)),
+            }).map((_, i) => (
+              <div
+                key={`placeholder-${i}`}
+                className="flex items-center justify-between rounded-xl border border-dashed border-gray-200 p-4 opacity-50"
+              >
+                <div className="font-medium text-gray-400">Задача {tasks.length + i + 1} — скоро</div>
+                <span className="text-sm text-gray-300">🔒</span>
+              </div>
+            ))
+          : null}
       </div>
     </div>
   );

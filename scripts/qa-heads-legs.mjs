@@ -39,18 +39,54 @@ function extractSolutionModes(text) {
   return [...text.matchAll(/"solutionMode":\s*"([A-E])"/g)].map((x) => x[1]);
 }
 
-function checkSpecialTasks(answersText, catalogText) {
-  if (!answersText.includes('"1.13"') || !/value:\s*12/.test(answersText)) {
-    errors.push("1.13: ожидается single_scalar value 12");
+function checkSpecialTasks(answersText, catalogText, solutionText) {
+  if (!answersText.includes('"1.13"') || !/atst:\s*9/.test(answersText)) {
+    errors.push("1.13: ожидается single { atst: 9, atat: 3 }");
   }
-  if (!catalogText.includes("12 роботов") && !catalogText.includes("12 робот")) {
-    warnings.push("1.13: в условии не найдено «12 роботов»");
+  if (!catalogText.includes("AT-ST") || !catalogText.includes("AT-AT")) {
+    errors.push("1.13: вопрос должен про состав роботов AT-ST / AT-AT");
   }
   if (!answersText.includes('"6.1"') || !/228/.test(answersText.split('"6.1"')[1]?.slice(0, 200) ?? "")) {
     errors.push("6.1: ожидается ответ 228");
   }
-  if (!catalogText.includes("захвачено всего")) {
-    warnings.push("6.1: формулировка «захвачено всего» не найдена в каталоге");
+  if (!catalogText.includes("571")) {
+    errors.push("6.1 P0: в условии должно быть число 571 пленников");
+  }
+  if (!answersText.includes('"6.5"') || !/multi_set/.test(answersText.split('"6.5"')[1]?.slice(0, 120) ?? "")) {
+    errors.push("6.5: ожидается multi_set с тремя вариантами");
+  }
+  if (/чек-лист|разработчик|режима A/i.test(solutionText)) {
+    errors.push("7.7 P0: служебный чек-лист разработчика в solution-lines");
+  }
+}
+
+
+function checkPreflight(catalogText, solutionText) {
+  if (/чек-лист|разработчик|режима\s+[A-E]|min_count:/i.test(solutionText)) {
+    errors.push("solution-lines: найден служебный текст разработчика");
+  }
+
+  const cond61 = catalogText.match(/"methodTaskId":\s*"6\.1"[\s\S]*?"condition":\s*"([^"]+)"/)?.[1] ?? "";
+  if (!cond61.includes("571")) {
+    errors.push("6.1 P0: число 571 должно быть в условии");
+  }
+  if (/всего было захвачено/i.test(cond61)) {
+    errors.push('6.1: некорректная форма — ожидается «всего был захвачен 571 пленник»');
+  }
+  if (!/всего был захвачен 571/i.test(cond61)) {
+    errors.push('6.1: ожидается фраза «всего был захвачен 571 пленник»');
+  }
+
+  const cond31 = catalogText.match(/"methodTaskId":\s*"3\.1"[\s\S]*?"condition":\s*"([^"]+)"/)?.[1] ?? "";
+  if (/Всего она проверила/i.test(cond31)) {
+    errors.push("3.1 P2: условие без субъекта — ожидается «Учительница проверила…»");
+  }
+
+  const customIndex = fs.readFileSync(path.join(HL, "guided", "custom", "index.ts"), "utf-8");
+  for (const id of ["1.9", "1.14", "5.1", "5.5"]) {
+    if (!new RegExp(`"${id}"`).test(customIndex)) {
+      errors.push(`${id} P2: нет custom steps в guided/custom/index.ts`);
+    }
   }
 }
 
@@ -87,8 +123,22 @@ function checkBuildTask() {
   }
 }
 
+function resolveNpx() {
+  if (process.platform === "win32") {
+    const pf = process.env.ProgramFiles || "C:\\Program Files";
+    const candidate = path.join(pf, "nodejs", "npx.cmd");
+    if (fs.existsSync(candidate)) return candidate;
+  }
+  return "npx";
+}
+
 function runGuidedQa() {
-  const r = spawnSync("npx", ["tsx", "scripts/qa-guided-steps.ts"], {
+  const npx = resolveNpx();
+  const cmd =
+    process.platform === "win32"
+      ? `"${npx}" --yes tsx scripts/qa-guided-steps.ts`
+      : `${npx} --yes tsx scripts/qa-guided-steps.ts`;
+  const r = spawnSync(cmd, {
     cwd: ROOT,
     encoding: "utf-8",
     shell: true,
@@ -146,7 +196,8 @@ for (const mid of methodIds) {
 const dupMethod = methodIds.filter((id, i) => methodIds.indexOf(id) !== i);
 if (dupMethod.length) errors.push(`Дубли methodTaskId: ${[...new Set(dupMethod)].join(", ")}`);
 
-checkSpecialTasks(answers, catalog);
+checkSpecialTasks(answers, catalog, solutions);
+checkPreflight(catalog, solutions);
 checkModeCoverage(modes);
 checkBlankIds(solutions);
 checkBuildTask();

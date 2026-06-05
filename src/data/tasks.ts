@@ -78,6 +78,7 @@ export { assertTaskStepShape, isStepType } from "@/data/task-steps";
 import type { DiscriminatedTaskStep } from "@/data/task-steps";
 import type { DirichletTaskMeta } from "@/data/dirichlet/types";
 import type { HeadsLegsTaskMeta } from "@/data/heads-legs/types";
+import type { TaskPublishingMeta } from "@/data/task-publishing/types";
 import { DIRICHLET_TASKS } from "@/data/dirichlet";
 import { HEADS_LEGS_TASKS } from "@/data/heads-legs";
 
@@ -120,6 +121,8 @@ export interface Task {
   enableGivenStep?: boolean;
   /** Данные для шага «Дано / Найти» */
   givenStep?: ConditionParseData;
+  /** QA / публикация (детский маршрут vs архив) */
+  publishing?: TaskPublishingMeta;
   steps: DiscriminatedTaskStep[];
 }
 

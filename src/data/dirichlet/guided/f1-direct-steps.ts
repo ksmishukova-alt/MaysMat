@@ -12,7 +12,7 @@ import {
   inferMinInCell,
   isBooleanQuestion,
 } from "./count-patterns";
-import { buildCustomF1Steps, hasCustomF1Steps } from "./custom";
+import { buildCustomF1Steps, buildCustomFlowModelSteps, hasCustomF1Steps, hasCustomFlowModelSteps, skipsDefaultEntityDrag } from "./custom";
 
 function buildCountsStep(meta: DirichletTaskMeta, model: DirichletInferredModel): DiscriminatedTaskStep {
   return {
@@ -25,15 +25,16 @@ function buildCountsStep(meta: DirichletTaskMeta, model: DirichletInferredModel)
   };
 }
 
-function buildCompareStep(meta: DirichletTaskMeta, model: DirichletInferredModel): DiscriminatedTaskStep {
-  const n = model.counts.n ?? "N";
-  const m = model.counts.m ?? "M";
+function buildCompareStep(meta: DirichletTaskMeta, model: DirichletInferredModel): DiscriminatedTaskStep | null {
+  const n = model.counts.n;
+  const m = model.counts.m;
+  if (n == null || m == null) {
+    return null;
+  }
+
   const rabbitLabel = describeRabbitCount(meta, model);
   const cellLabel = describeCellCount(model);
-  const nGtM =
-    model.counts.n != null && model.counts.m != null
-      ? model.counts.n > model.counts.m
-      : model.compareOp === "gt";
+  const nGtM = n > m;
 
   return {
     id: `${meta.id}-compare`,
@@ -151,7 +152,9 @@ function buildBooleanAnswerStep(meta: DirichletTaskMeta, model: DirichletInferre
 }
 
 function buildDefaultF1Steps(meta: DirichletTaskMeta, model: DirichletInferredModel): DiscriminatedTaskStep[] {
-  const steps: DiscriminatedTaskStep[] = [buildCountsStep(meta, model), buildCompareStep(meta, model)];
+  const steps: DiscriminatedTaskStep[] = [buildCountsStep(meta, model)];
+  const compare = buildCompareStep(meta, model);
+  if (compare) steps.push(compare);
 
   const nGtM =
     model.counts.n != null && model.counts.m != null

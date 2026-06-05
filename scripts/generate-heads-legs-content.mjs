@@ -32,6 +32,14 @@ function classifyBlank(content) {
   return { type: "object", accept: [c] };
 }
 
+const DEV_CHECKLIST_MARKERS = [
+  /чек-лист/i,
+  /разработчик/i,
+  /режима\s+[A-E]/i,
+  /Не использовать один общий шаблон/i,
+  /min_count:/i,
+];
+
 function parseSolutionLines(blockLines, methodTaskId) {
   const result = [];
   for (const raw of blockLines) {
@@ -40,7 +48,8 @@ function parseSolutionLines(blockLines, methodTaskId) {
     if (
       line.startsWith("Методическая") ||
       line.startsWith("Пошаговые") ||
-      /^\d+\.\s/.test(line)
+      /^\d+\.\s/.test(line) ||
+      DEV_CHECKLIST_MARKERS.some((re) => re.test(line))
     ) {
       break;
     }
@@ -67,10 +76,13 @@ function parseSolutionLines(blockLines, methodTaskId) {
 const SOLUTION_OVERRIDES = {
   "1.13": [
     { template: "Всего роботов [12], всего ног [39].", blanks: [] },
-    { template: "Пусть AT-AT будет [3], тогда AT-ST [9].", blanks: [] },
-    { template: "Проверка: [3×4 + 9×3 = 39] ног.", blanks: [] },
-    { template: "В каждом роботе [1] штурмовик, значит штурмовиков [12].", blanks: [] },
-    { template: "Ответ: [12 штурмовиков].", blanks: [] },
+    { template: "Представим, что все роботы — AT-ST (по [3] ноги).", blanks: [] },
+    { template: "Тогда ног было бы [12 × 3 = 36].", blanks: [] },
+    { template: "Лишних ног [39 − 36 = 3].", blanks: [] },
+    { template: "Замена одного AT-ST на AT-AT добавляет [1] ногу.", blanks: [] },
+    { template: "Роботов AT-AT [3 ÷ 1 = 3], роботов AT-ST [12 − 3 = 9].", blanks: [] },
+    { template: "Проверка: [9×3 + 3×4 = 39] ног.", blanks: [] },
+    { template: "Ответ: [9 роботов AT-ST и 3 робота AT-AT].", blanks: [] },
   ],
   "2.1": [
     { template: "Представим, что все клумбы были около [Гимназии].", blanks: [] },
@@ -84,10 +96,18 @@ const SOLUTION_OVERRIDES = {
   ],
 };
 
+function stripDevChecklist(solutionLines) {
+  const cutIdx = solutionLines.findIndex((line) =>
+    DEV_CHECKLIST_MARKERS.some((re) => re.test(line.template)),
+  );
+  return cutIdx >= 0 ? solutionLines.slice(0, cutIdx) : solutionLines;
+}
+
 function postProcessSolutionLines(methodTaskId, solutionLines) {
+  let lines = solutionLines;
   if (SOLUTION_OVERRIDES[methodTaskId]) {
     const raw = SOLUTION_OVERRIDES[methodTaskId];
-    return raw.map((line, li) => {
+    lines = raw.map((line, li) => {
       const blanks = [];
       let bi = 0;
       const re = /\[([^\]]+)\]/g;
@@ -103,8 +123,76 @@ function postProcessSolutionLines(methodTaskId, solutionLines) {
       return { template: line.template, blanks };
     });
   }
-  return solutionLines;
+  return stripDevChecklist(lines);
 }
+
+/** Рекомендованный порядок сложности (аудит ветки, §5) */
+const CATALOG_ORDER = [
+  "1.1",
+  "1.2",
+  "1.3",
+  "1.4",
+  "1.6",
+  "1.7",
+  "1.10",
+  "1.5",
+  "1.8",
+  "1.13",
+  "2.1",
+  "2.2",
+  "2.3",
+  "2.4",
+  "2.5",
+  "2.6",
+  "2.7",
+  "1.9",
+  "1.11",
+  "1.14",
+  "3.2",
+  "3.3",
+  "3.4",
+  "3.5",
+  "3.6",
+  "3.7",
+  "4.1",
+  "4.2",
+  "4.3",
+  "4.4",
+  "4.5",
+  "5.1",
+  "5.2",
+  "5.3",
+  "5.4",
+  "5.5",
+  "5.6",
+  "5.7",
+  "6.1",
+  "6.2",
+  "6.3",
+  "6.4",
+  "3.1",
+  "6.5",
+  "7.6",
+  "7.1",
+  "7.2",
+  "7.3",
+  "7.4",
+  "7.5",
+  "7.7",
+];
+
+const PEDAGOGICAL_LEVEL_BY_ID = Object.fromEntries(
+  [
+    ["1.1", "1.2", "1.3", "1.4", "1.6", "1.7", "1.10"],
+    ["1.5", "1.8", "1.13", "2.1", "2.2", "2.3", "2.4", "2.5", "2.6", "2.7"],
+    ["1.9", "1.11", "1.14"],
+    ["3.2", "3.3", "3.4", "3.5", "3.6", "3.7", "4.1", "4.2", "4.3", "4.4", "4.5"],
+    ["5.1", "5.2", "5.3", "5.4", "5.5", "5.6", "5.7"],
+    ["6.1", "6.2", "6.3", "6.4"],
+    ["3.1", "6.5", "7.6"],
+    ["7.1", "7.2", "7.3", "7.4", "7.5", "7.7"],
+  ].flatMap((ids, idx) => ids.map((id) => [id, idx + 1])),
+);
 
 const DEFAULT_HINTS = {
   1: [
@@ -202,25 +290,46 @@ for (let i = 0; i < lines.length; i++) {
   entries.push({ difficulty, num, title, condition, solutionMode, methodTaskId });
 }
 
-// Правки ТЗ
+// Правки ТЗ / аудит P0–P1
 const fix113 = entries.find((e) => e.methodTaskId === "1.13");
 if (fix113) {
   fix113.condition =
-    "На Альдераан высадилось несколько шагающих роботов AT-ST (трёхногие) и AT-AT (четырёхногие). В каждом роботе было по одному штурмовику. Всего на планете высадилось 12 роботов и 39 ног. Сколько высадилось штурмовиков?";
+    "На Альдераан высадилось несколько шагающих роботов AT-ST (трёхногие) и AT-AT (четырёхногие). Всего высадилось 12 роботов и 39 ног. Сколько роботов AT-ST и сколько AT-AT?";
   fix113.solutionMode = "C";
 }
 
 const fix61 = entries.find((e) => e.methodTaskId === "6.1");
 if (fix61) {
-  fix61.condition = fix61.condition.replace(
-    /Сколько было захвачено генералов.*/,
-    "Сколько генералов было захвачено всего?",
+  fix61.condition =
+    "Дарт Вейдер захватил 40 баз повстанцев. На каждой базе он захватывал 12 генералов, 15 адмиралов или 17 дипломатов. Известно, что адмиралов было в два раза меньше, чем дипломатов, и всего был захвачен 571 пленник. Сколько генералов было захвачено всего?";
+}
+
+const fix31 = entries.find((e) => e.methodTaskId === "3.1");
+if (fix31) {
+  fix31.condition =
+    "Учительница проверила всего 42 задачи. Каждый третьеклассник решил по 3 задачи, а каждый пятиклассник — по 5. Сколько было третьеклассников и пятиклассников?";
+}
+
+const fix65 = entries.find((e) => e.methodTaskId === "6.5");
+if (fix65) {
+  fix65.condition = fix65.condition.replace(
+    /Сколько лет[^?]*\?/i,
+    "Найди все возможные варианты: сколько лет каждый мастер обучал юнлингов.",
   );
 }
 
+const byMethodId = Object.fromEntries(entries.map((e) => [e.methodTaskId, e]));
+for (const id of CATALOG_ORDER) {
+  if (!byMethodId[id]) {
+    throw new Error(`CATALOG_ORDER: нет задачи ${id} в исходнике`);
+  }
+}
+const orderedEntries = CATALOG_ORDER.map((id) => byMethodId[id]);
+
 let globalNum = 0;
-const catalog = entries.map((e) => {
+const catalog = orderedEntries.map((e) => {
   globalNum++;
+  const pedagogicalLevel = PEDAGOGICAL_LEVEL_BY_ID[e.methodTaskId] ?? e.difficulty;
   return {
     id: `heads-legs-${e.difficulty}-${String(e.num).padStart(2, "0")}`,
     methodTaskId: e.methodTaskId,
@@ -230,7 +339,7 @@ const catalog = entries.map((e) => {
     difficultyLevel: e.difficulty,
     patternId: e.difficulty,
     solutionMode: e.solutionMode,
-    stage: e.difficulty,
+    stage: pedagogicalLevel,
   };
 });
 

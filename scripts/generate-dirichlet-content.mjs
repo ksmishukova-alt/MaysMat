@@ -121,6 +121,78 @@ function inferSolutionMode(level, writingMode) {
   return "B";
 }
 
+/** Приоритет из аудита: OK → P2 → P1 → P0 */
+const AUDIT_OK = new Set([
+  "M0.1", "M0.2", "M1.3", "M2.1", "M2.4", "M1.5", "M2.6",
+  "M4.2", "M4.4", "M4.11", "M4.12", "M4.21", "M7.1",
+]);
+const AUDIT_P0 = new Set([
+  "M0.4", "M2.2", "M2.3", "M2.5", "M2.7", "M3.1", "M3.3", "M3.5",
+  "M5.15", "M5.27", "M5.32", "M5.46", "M5.47", "M5.48",
+]);
+const AUDIT_P2 = new Set([
+  "M1.2", "M5.30", "M7.30", "M9.1", "M9.10", "M9.27", "M9.32", "M9.37", "M9.57",
+]);
+
+/** Рекомендованный порядок внутри темы T1 (базовый Дирихле) */
+const T1_CATALOG_ORDER = [
+  "M0.1", "M0.2", "M1.3", "M2.1", "M2.4", "M1.5", "M2.6",
+  "M0.3", "M1.1", "M1.2", "M1.4", "M2.2", "M0.4", "M2.3", "M2.5", "M2.7",
+];
+
+const THEME_CATALOG_ORDER = {
+  T1_DIRICHLET_CORE: T1_CATALOG_ORDER,
+  T2_UNLUCKY: ["M3.2", "M3.1", "M3.4", "M3.3", "M3.5"],
+};
+
+function auditSortKey(methodTaskId) {
+  if (AUDIT_OK.has(methodTaskId)) return 0;
+  if (AUDIT_P2.has(methodTaskId)) return 1;
+  if (AUDIT_P0.has(methodTaskId)) return 3;
+  return 2;
+}
+
+function reorderCatalogEntries(entries) {
+  const byTheme = new Map();
+  for (const e of entries) {
+    if (!byTheme.has(e.themeId)) byTheme.set(e.themeId, []);
+    byTheme.get(e.themeId).push(e);
+  }
+
+  const out = [];
+  for (const [themeId, list] of byTheme) {
+    const explicit = THEME_CATALOG_ORDER[themeId];
+    if (explicit) {
+      const byId = Object.fromEntries(list.map((e) => [e.methodTaskId, e]));
+      for (const id of explicit) {
+        if (byId[id]) out.push(byId[id]);
+      }
+      for (const e of list) {
+        if (!explicit.includes(e.methodTaskId)) out.push(e);
+      }
+    } else {
+      list.sort((a, b) => {
+        const pa = auditSortKey(a.methodTaskId);
+        const pb = auditSortKey(b.methodTaskId);
+        if (pa !== pb) return pa - pb;
+        return a.difficultyLevel - b.difficultyLevel;
+      });
+      out.push(...list);
+    }
+  }
+  return out;
+}
+
+const CONDITION_PATCHES = {
+  "M5.15":
+    "В прямоугольнике 3×4 расположено 6 точек. Докажите, что среди них найдутся две точки, расстояние между которыми не превосходит √2.",
+};
+
+const ANSWER_KEY_PATCHES = {
+  "M5.32":
+    "Ответ: нельзя. Ключ: у скобки «П» три единичных отрезка — на каждом из 12 рёбер каркаса куба 2×2×2 нужны оба конца, но у одной детали только два конца; проволочный каркас из таких скобок невозможен.",
+};
+
 function tsKey(key) {
   return /^[a-zA-Z_][a-zA-Z0-9_]*$/.test(key) ? key : JSON.stringify(key);
 }
@@ -177,7 +249,8 @@ function main() {
       const rank = String(task.theme_rank).padStart(2, "0");
       const id = `dirichlet-${short}-${rank}`;
       const methodTaskId = task.task_id_old;
-      const parsed = parseAnswerKey(task.answer_key);
+      const rawAnswerKey = ANSWER_KEY_PATCHES[methodTaskId] ?? task.answer_key;
+      const parsed = parseAnswerKey(rawAnswerKey);
       const flowId = task.flow_id;
       const model = parseTaskModel(task, flowId);
       const lines = buildEnrichedProofLines(model, flowId, methodTaskId);
@@ -185,14 +258,15 @@ function main() {
       proofCards[methodTaskId] = buildProofCardOrder(model, flowId);
       const level = Number(task.level) || 1;
       const solutionMode = inferSolutionMode(level, task.writing_mode ?? "");
+      const conditionText = CONDITION_PATCHES[methodTaskId] ?? task.statement.trim();
 
       catalog.push({
         id,
         methodTaskId,
         number: branchNumber,
         globalNumber: globalNum,
-        title: makeTitle(task.statement, methodTaskId, theme.child_title, task.theme_rank),
-        condition: task.statement.trim(),
+        title: makeTitle(conditionText, methodTaskId, theme.child_title, task.theme_rank),
+        condition: conditionText,
         difficultyLevel: Math.round(level * 10) / 10,
         stage: inferStage(themeIndex, level),
         themeId: theme.theme_id,
@@ -226,11 +300,19 @@ function main() {
     }
   });
 
+  const orderedCatalog = reorderCatalogEntries(catalog);
+  const branchCountersFinal = {};
+  orderedCatalog.forEach((entry, idx) => {
+    entry.globalNumber = idx + 1;
+    branchCountersFinal[entry.branchId] = (branchCountersFinal[entry.branchId] ?? 0) + 1;
+    entry.number = branchCountersFinal[entry.branchId];
+  });
+
   fs.mkdirSync(outDir, { recursive: true });
 
   fs.writeFileSync(
     path.join(outDir, "catalog.generated.ts"),
-    `/** AUTO-GENERATED — scripts/generate-dirichlet-content.mjs */\nimport type { DirichletCatalogEntry } from "./types";\n\nexport const DIRICHLET_CATALOG: DirichletCatalogEntry[] = ${tsString(catalog)};\n`,
+    `/** AUTO-GENERATED — scripts/generate-dirichlet-content.mjs */\nimport type { DirichletCatalogEntry } from "./types";\n\nexport const DIRICHLET_CATALOG: DirichletCatalogEntry[] = ${tsString(orderedCatalog)};\n`,
     "utf8",
   );
 
@@ -264,8 +346,8 @@ function main() {
     "utf8",
   );
 
-  console.log(`Готово: ${catalog.length} задач в ${config.themes.length} темах`);
-  console.log("По веткам:", branchCounters);
+  console.log(`Готово: ${orderedCatalog.length} задач в ${config.themes.length} темах`);
+  console.log("По веткам:", branchCountersFinal);
 }
 
 main();

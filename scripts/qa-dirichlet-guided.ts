@@ -3,6 +3,7 @@
  * Запуск: npx tsx scripts/qa-dirichlet-guided.ts
  */
 import { DIRICHLET_TASKS } from "../src/data/dirichlet/build-task";
+import { skipsDefaultEntityDrag } from "../src/data/dirichlet/guided/custom";
 import { parseSupportLevel, resolveWrittenPhase } from "../src/data/dirichlet/guided/support-level";
 
 const tasks = Object.values(DIRICHLET_TASKS).sort((a, b) => a.number - b.number);
@@ -17,14 +18,19 @@ for (const task of tasks) {
   const plan = meta ? resolveWrittenPhase(meta) : null;
   const support = meta ? parseSupportLevel(meta.supportMode) : null;
 
-  if (!types.includes("drag_select")) {
-    errors.push(`${task.id}: нет drag_select (зайцы/клетки)`);
-  }
-  if (!steps.some((s) => s.id.includes("-rabbits"))) {
-    errors.push(`${task.id}: нет шага «зайцы»`);
-  }
-  if (!steps.some((s) => s.id.includes("-cells"))) {
-    errors.push(`${task.id}: нет шага «клетки»`);
+  const methodId = meta?.methodTaskId ?? "";
+  const skipEntityDrag = skipsDefaultEntityDrag(methodId);
+
+  if (!skipEntityDrag) {
+    if (!types.includes("drag_select")) {
+      errors.push(`${task.id}: нет drag_select (зайцы/клетки)`);
+    }
+    if (!steps.some((s) => s.id.includes("-rabbits"))) {
+      errors.push(`${task.id}: нет шага «зайцы»`);
+    }
+    if (!steps.some((s) => s.id.includes("-cells"))) {
+      errors.push(`${task.id}: нет шага «клетки»`);
+    }
   }
 
   const withoutPhase = steps.filter((s) => s.screenPhaseCount == null);

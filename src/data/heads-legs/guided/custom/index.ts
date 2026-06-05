@@ -1,8 +1,12 @@
 import type { DiscriminatedTaskStep } from "@/data/task-steps";
+import { buildSteps19 } from "./steps-1-9";
+import { buildSteps114 } from "./steps-1-14";
 import { buildSteps31 } from "./steps-3-1";
 import { buildSteps32 } from "./steps-3-2";
 import { buildSteps35Secondary } from "./steps-3-5";
 import { buildSteps37 } from "./steps-3-7";
+import { buildSteps51 } from "./steps-5-1";
+import { buildSteps55 } from "./steps-5-5";
 import { buildSteps61 } from "./steps-6-1";
 import { buildSteps62 } from "./steps-6-2";
 import { buildSteps63 } from "./steps-6-3";
@@ -14,9 +18,13 @@ import { buildSteps76 } from "./steps-7-6";
 type CustomPlacement = "replace-worksheets" | "after-worksheets";
 
 const REPLACE: Record<string, (taskId: string) => DiscriminatedTaskStep[]> = {
+  "1.9": buildSteps19,
+  "1.14": buildSteps114,
   "3.1": buildSteps31,
   "3.2": buildSteps32,
   "3.7": buildSteps37,
+  "5.1": buildSteps51,
+  "5.5": buildSteps55,
   "6.1": buildSteps61,
   "6.2": buildSteps62,
   "6.3": buildSteps63,

@@ -18,8 +18,8 @@ function collectOptions(steps: DiscriminatedTaskStep[]): Array<{ taskId: string;
         out.push({ taskId: "", stepId: step.id, opt });
       }
     }
-    if (step.type === "worksheet_table") {
-      for (const row of step.worksheetRows ?? []) {
+    if (step.type === "table_input") {
+      for (const row of step.rows ?? []) {
         if (row.emoji && row.label) {
           out.push({ taskId: "", stepId: step.id, opt: { label: row.label, emoji: row.emoji } });
         }
