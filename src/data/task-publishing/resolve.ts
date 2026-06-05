@@ -1,4 +1,5 @@
 import type { DiscriminatedTaskStep } from "@/data/task-steps";
+import type { AcceptedAnswer } from "@/data/heads-legs/types";
 import type { Task } from "@/data/tasks";
 
 import {
@@ -16,6 +17,43 @@ import type { QaIssue, TaskPublishingMeta, VisualStatus } from "./types";
 const EXTERNAL_REF_RE = /см\.\s*задач|см\.\s*решение|задача\s*#\d|задача\s*1#/i;
 const INCOMPLETE_COND_RE = /не превосходит\s*\.|не превосходит\s*$/i;
 const SYMBOLIC_NM_RE = /N\s*=\s*N|M\s*=\s*M|\(N\s*=\s*N\)|\(M\s*=\s*M\)/;
+
+function headsLegsAnswerText(ans: AcceptedAnswer | undefined): string {
+  if (!ans) return "";
+  switch (ans.kind) {
+    case "proof":
+      return ans.solutionReference ?? ans.answerPhrase ?? "";
+    case "text":
+      return ans.format;
+    default:
+      return "";
+  }
+}
+
+function hasHeadsLegsAnswerKey(ans: AcceptedAnswer | undefined): boolean {
+  if (!ans) return false;
+  switch (ans.kind) {
+    case "proof":
+      return Boolean(
+        ans.answerTokens?.length ||
+          ans.signatureNumbers?.length ||
+          ans.answerPhrase ||
+          ans.solutionReference?.trim(),
+      );
+    case "single":
+      return Object.keys(ans.values).length > 0;
+    case "single_scalar":
+      return true;
+    case "multi_set":
+      return ans.sets.length > 0;
+    case "diagnostic":
+      return true;
+    case "text":
+      return ans.format.trim().length > 0;
+    default:
+      return false;
+  }
+}
 
 function collectStepText(steps: DiscriminatedTaskStep[]): string {
   const parts: string[] = [];
@@ -38,22 +76,13 @@ function scanIssues(task: Task): QaIssue[] {
   const issues: QaIssue[] = [];
   const stepText = collectStepText(task.steps);
   const condition = task.condition ?? "";
-  const answerRef =
-    task.dirichletMeta?.acceptedAnswers?.solutionReference ??
-    task.headsLegsMeta?.acceptedAnswers?.solutionReference ??
-    task.headsLegsMeta?.acceptedAnswers?.answerPhrase ??
-    "";
+  const hlAns = task.headsLegsMeta?.acceptedAnswers;
+  const answerRef = task.dirichletMeta?.acceptedAnswers?.solutionReference ?? headsLegsAnswerText(hlAns);
 
   if (SYMBOLIC_NM_RE.test(stepText)) issues.push("contains_N_equals_N");
   if (EXTERNAL_REF_RE.test(answerRef)) issues.push("contains_external_reference");
   if (INCOMPLETE_COND_RE.test(condition)) issues.push("incomplete_condition");
-  const hlAns = task.headsLegsMeta?.acceptedAnswers;
-  const hasHlAnswer =
-    task.headsLegsMeta &&
-    (hlAns?.answerTokens?.length ||
-      hlAns?.signatureNumbers?.length ||
-      hlAns?.answerPhrase ||
-      (hlAns?.kind === "single" && hlAns.values && Object.keys(hlAns.values).length > 0));
+  const hasHlAnswer = Boolean(task.headsLegsMeta && hasHeadsLegsAnswerKey(hlAns));
   if (
     !hasHlAnswer &&
     (!answerRef.trim() || answerRef.trim() === "См. методичку.")
