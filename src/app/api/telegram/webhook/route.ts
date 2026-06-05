@@ -7,6 +7,14 @@ import {
   setAwaitingComment,
   setSubjectVerdict,
 } from "@/lib/daily-verdict-store";
+import {
+  clearAwaitingPaperComment,
+  getAwaitingPaperComment,
+  getPaperVerdict,
+  parsePaperVerdictCallback,
+  setAwaitingPaperComment,
+  setPaperVerdict,
+} from "@/lib/paper-verdict-store";
 import { answerCallback, notifyVerdictOnMessage, telegramApi } from "@/lib/telegram";
 import type { DailySubject } from "@/lib/daily";
 
@@ -41,6 +49,41 @@ export async function POST(request: Request) {
 
   const cq = update.callback_query;
   if (cq?.data && cq.message) {
+    const paperParsed = parsePaperVerdictCallback(cq.data);
+    if (paperParsed) {
+      const { action, submissionId } = paperParsed;
+      const existing = getPaperVerdict(submissionId);
+      const chatId = cq.message.chat.id;
+
+      if (!existing) {
+        await answerCallback(cq.id, "Отправка не найдена");
+        return NextResponse.json({ ok: true });
+      }
+
+      if (action === "ok") {
+        setPaperVerdict(submissionId, "approved", { stars: 3 });
+        clearAwaitingPaperComment(chatId);
+        const label = `✅ Зачёт: задача ${existing.taskNumber}`;
+        await answerCallback(cq.id, label);
+        await notifyVerdictOnMessage(
+          chatId,
+          cq.message.message_id,
+          `${label} «${existing.taskTitle}»\nРебёнок увидит это в приложении.`,
+        );
+        return NextResponse.json({ ok: true });
+      }
+
+      setPaperVerdict(submissionId, "redo");
+      setAwaitingPaperComment(chatId, { submissionId, taskId: existing.taskId });
+      await answerCallback(cq.id, "Напишите комментарий");
+      await notifyVerdictOnMessage(
+        chatId,
+        cq.message.message_id,
+        `🔄 Переделать: задача ${existing.taskNumber} «${existing.taskTitle}»\n\nНапишите комментарий для ребёнка (или «—» без комментария).`,
+      );
+      return NextResponse.json({ ok: true });
+    }
+
     const parsed = parseVerdictCallback(cq.data);
     if (!parsed) {
       await answerCallback(cq.id, "Неизвестная команда");
@@ -79,6 +122,23 @@ export async function POST(request: Request) {
 
   const msg = update.message;
   if (msg?.text) {
+    const paperPending = getAwaitingPaperComment(msg.chat.id);
+    if (paperPending) {
+      const raw = msg.text.trim();
+      const comment = raw === "—" || raw === "-" ? undefined : raw;
+      setPaperVerdict(paperPending.submissionId, "redo", { comment });
+      clearAwaitingPaperComment(msg.chat.id);
+
+      const existing = getPaperVerdict(paperPending.submissionId);
+      await telegramApi("sendMessage", {
+        chat_id: msg.chat.id,
+        text: comment
+          ? `💬 Задача ${existing?.taskNumber ?? ""}: «${comment}»\n\nРебёнок увидит комментарий.`
+          : `🔄 Переделать без комментария.`,
+      });
+      return NextResponse.json({ ok: true });
+    }
+
     const pending = getAwaitingComment(msg.chat.id);
     if (pending) {
       const raw = msg.text.trim();

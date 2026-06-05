@@ -7,6 +7,8 @@ import { AppShell } from "@/components/AppShell";
 import { BranchIntroVideo } from "@/components/BranchIntroVideo";
 
 import { BranchTaskList } from "@/components/BranchTaskList";
+import { HeadsLegsMigrationBanner } from "@/components/HeadsLegsMigrationBanner";
+import { PaperVerdictSync } from "@/components/PaperVerdictSync";
 
 import { getThinkingTypeLabel } from "@/data/branch-meta";
 
@@ -78,7 +80,8 @@ export default async function BranchPage({ params }: Props) {
 
       ) : null}
 
-
+      {slug === "heads-legs" ? <HeadsLegsMigrationBanner /> : null}
+      {slug === "heads-legs" ? <PaperVerdictSync /> : null}
 
       <BranchTaskList branchId={branch.id} branchTaskCount={branch.taskCount} />
 

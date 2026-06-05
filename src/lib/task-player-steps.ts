@@ -1,4 +1,6 @@
 import type { ConditionParseData, Task } from "@/data/tasks";
+import type { DiscriminatedTaskStep } from "@/data/task-steps";
+import { applyDirichletReadPhase, resolveDirichletPhaseCount } from "@/data/dirichlet/build-steps";
 
 export type PlayerStepType = DiscriminatedTaskStep["type"] | "read_condition";
 
@@ -11,21 +13,44 @@ export type PlayerStep =
       title: string;
       hint?: string;
       highlight?: boolean;
+      screenPhaseId?: string;
+      screenPhaseTitle?: string;
+      screenPhaseIndex?: number;
+      screenPhaseCount?: number;
+      screenSubStep?: string;
     };
 
 export function buildPlayerSteps(
   task: Task,
-  options: { enableGivenStep: boolean; givenStep?: ConditionParseData }
+  options: { enableGivenStep: boolean; givenStep?: ConditionParseData },
 ): PlayerStep[] {
   const contentSteps = task.steps.filter((step) => step.type !== "condition_parse");
+
+  const phaseCount = task.dirichletMeta
+    ? resolveDirichletPhaseCount(task.dirichletMeta.flowId)
+    : task.headsLegsMeta?.methodTaskId === "3.1"
+      ? 3
+      : task.headsLegsMeta?.methodTaskId === "3.5"
+        ? 5
+        : task.headsLegsMeta?.methodTaskId === "6.4"
+          ? 3
+          : 4;
 
   const prefix: PlayerStep[] = [
     {
       id: `${task.id}-read`,
       type: "read_condition",
-      title: "Прочитай задачу",
+      title: "Прочитай условие",
+      screenPhaseId: "condition",
+      screenPhaseTitle: "Понимаем задачу",
+      screenPhaseIndex: 1,
+      screenPhaseCount: phaseCount,
     },
   ];
+
+  if (task.dirichletMeta) {
+    prefix[0] = applyDirichletReadPhase(prefix[0], task.dirichletMeta.flowId);
+  }
 
   if (options.enableGivenStep && options.givenStep) {
     prefix.push({

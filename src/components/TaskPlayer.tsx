@@ -20,6 +20,14 @@ import {
   type TaskSession,
   type TaskStepAnswer,
 } from "@/lib/task-session";
+import { PaperTaskScreen } from "@/components/PaperTaskScreen";
+import { migrateHeadsLegsBranch } from "@/lib/heads-legs-migration";
+import { highlightConditionText } from "@/lib/highlight-condition";
+import { resolveExplanationRole } from "@/data/task-steps";
+import { ModelBuildStep } from "./task-steps/ModelBuildStep";
+import { NumericSolveStep } from "./task-steps/NumericSolveStep";
+import { ProofLinesStep } from "./task-steps/ProofLinesStep";
+import { WordSolutionStep } from "./task-steps/WordSolutionStep";
 import { VideoModal } from "@/components/VideoModal";
 import { DragSelectStep } from "./task-steps/DragSelectStep";
 import { ConditionParseStep } from "./task-steps/ConditionParseStep";
@@ -32,13 +40,26 @@ import { NumberInputStep } from "./task-steps/NumberInputStep";
 import { AutoExplanationStep } from "./task-steps/AutoExplanationStep";
 import { PaperUploadStep } from "./task-steps/PaperUploadStep";
 import { ProgressBar } from "./ProgressBar";
+import { TaskScreenShell } from "./task-steps/TaskScreenShell";
 
 interface TaskPlayerProps {
   task: Task;
   totalTasksInBranch?: number;
 }
 
-export function TaskPlayer({ task, totalTasksInBranch = 50 }: TaskPlayerProps) {
+export function TaskPlayer(props: TaskPlayerProps) {
+  useEffect(() => {
+    migrateHeadsLegsBranch();
+  }, []);
+
+  if (props.task.requiresUpload) {
+    return <PaperTaskScreen task={props.task} />;
+  }
+
+  return <DigitalTaskPlayer {...props} />;
+}
+
+function DigitalTaskPlayer({ task, totalTasksInBranch = 51 }: TaskPlayerProps) {
   const router = useRouter();
   const playerSteps = useMemo(
     () =>
@@ -87,6 +108,14 @@ export function TaskPlayer({ task, totalTasksInBranch = 50 }: TaskPlayerProps) {
   );
 
   const step = playerSteps[stepIndex];
+  const prevStep = stepIndex > 0 ? playerSteps[stepIndex - 1] : null;
+  const isHeadsLegs = task.branchId === "modeling-heads-legs";
+  const isMethodBank = Boolean(task.dirichletMeta);
+  const useGuidedShell = isHeadsLegs || isMethodBank;
+  const showPhaseHeader =
+    useGuidedShell &&
+    step?.screenPhaseTitle != null &&
+    step.screenPhaseTitle !== prevStep?.screenPhaseTitle;
   const progressPct = ((stepIndex + 1) / playerSteps.length) * 100;
   const helpMeta = getTaskHelpVideo(task.id);
   const hideHeaderCondition =
@@ -255,13 +284,15 @@ export function TaskPlayer({ task, totalTasksInBranch = 50 }: TaskPlayerProps) {
             </span>
           ) : null}
           {task.requiresUpload ? (
-            <span className="rounded-full bg-amber-100 px-2 py-0.5 text-amber-800">📸 с листочком</span>
+            <span className="rounded-full bg-violet-100 px-2 py-0.5 text-violet-800">📝 письменно</span>
           ) : null}
         </div>
         <h2 className="text-xl font-bold">{task.title}</h2>
         {!hideHeaderCondition ? (
           <p className="mt-4 whitespace-pre-line text-base leading-relaxed text-gray-700">
-            {task.condition}
+            {isMethodBank
+              ? highlightConditionText(task.condition, "dirichlet")
+              : task.condition}
           </p>
         ) : null}
       </div>
@@ -299,22 +330,54 @@ export function TaskPlayer({ task, totalTasksInBranch = 50 }: TaskPlayerProps) {
       </div>
 
       <div
-        className={`rounded-card bg-white p-6 shadow-card ${
+        className={`${useGuidedShell ? "" : "rounded-card bg-white p-6 shadow-card"} ${
           step.highlight ? "ring-2 ring-amber-300 ring-offset-2" : ""
         }`}
       >
-        {!isReadStep ? <h3 className="mb-4 text-lg font-semibold">{step.title}</h3> : null}
-        {step.hint && !hintMessage && !isReadStep && step.type !== "paper_upload" ? (
-          <p className="mb-4 text-sm text-gray-500">{step.hint}</p>
-        ) : null}
-        <StepRenderer
-          key={step.id}
-          step={step}
-          taskTitle={task.title}
-          condition={task.condition}
-          onComplete={() => advanceStep()}
-          onPaperUpload={handlePaperUpload}
-        />
+        {useGuidedShell ? (
+          <TaskScreenShell
+            phaseTitle={step.screenPhaseTitle}
+            phaseIndex={step.screenPhaseIndex}
+            phaseCount={step.screenPhaseCount}
+            showPhaseHeader={showPhaseHeader}
+            stepTitle={!isReadStep ? step.title : undefined}
+            subStepLabel={step.screenSubStep}
+            hint={
+              step.hint && !hintMessage && !isReadStep && step.type !== "paper_upload"
+                ? step.hint
+                : undefined
+            }
+            showStepTitle={!isReadStep}
+          >
+            <StepRenderer
+              key={step.id}
+              step={step}
+              taskTitle={task.title}
+              condition={task.condition}
+              isMethodBank={isMethodBank}
+              isLastStep={stepIndex >= playerSteps.length - 1}
+              onComplete={() => advanceStep()}
+              onPaperUpload={handlePaperUpload}
+            />
+          </TaskScreenShell>
+        ) : (
+          <>
+            {!isReadStep ? <h3 className="mb-4 text-lg font-semibold">{step.title}</h3> : null}
+            {step.hint && !hintMessage && !isReadStep && step.type !== "paper_upload" ? (
+              <p className="mb-4 text-sm text-gray-500">{step.hint}</p>
+            ) : null}
+            <StepRenderer
+              key={step.id}
+              step={step}
+              taskTitle={task.title}
+              condition={task.condition}
+              isMethodBank={isMethodBank}
+              isLastStep={stepIndex >= playerSteps.length - 1}
+              onComplete={() => advanceStep()}
+              onPaperUpload={handlePaperUpload}
+            />
+          </>
+        )}
       </div>
 
       {helpMeta ? (
@@ -335,15 +398,21 @@ function StepRenderer({
   step,
   taskTitle,
   condition,
+  isMethodBank,
+  isLastStep,
   onComplete,
   onPaperUpload,
 }: {
   step: PlayerStep;
   taskTitle: string;
   condition: string;
+  isMethodBank: boolean;
+  isLastStep: boolean;
   onComplete: () => void;
   onPaperUpload: (payload: { fileName: string; mimeType: string; dataUrl: string }) => void;
 }) {
+  const runnerContext = isMethodBank ? "dirichlet" : "heads-legs";
+
   switch (step.type) {
     case "read_condition":
       return (
@@ -351,6 +420,8 @@ function StepRenderer({
           stepId={step.id}
           title={taskTitle}
           condition={condition}
+          enableTts={isMethodBank}
+          highlightVariant={isMethodBank ? "dirichlet" : "heads-legs"}
           onComplete={onComplete}
         />
       );
@@ -365,7 +436,12 @@ function StepRenderer({
       );
     case "drag_select":
       return (
-        <DragSelectStep stepId={step.id} options={step.options!} onComplete={onComplete} />
+        <DragSelectStep
+          stepId={step.id}
+          options={step.options!}
+          runnerContext={runnerContext}
+          onComplete={onComplete}
+        />
       );
     case "single_select":
       return (
@@ -375,12 +451,13 @@ function StepRenderer({
           options={step.options!}
           prompt={step.selectPrompt}
           successMessage={step.successMessage}
+          runnerContext={runnerContext}
           onComplete={onComplete}
         />
       );
     case "order_questions":
       return (
-        <OrderQuestionsStep stepId={step.id} items={step.orderItems!} onComplete={onComplete} />
+        <OrderQuestionsStep stepId={step.id} items={step.orderItems!} runnerContext={runnerContext} onComplete={onComplete} />
       );
     case "worksheet_table":
       return (
@@ -388,6 +465,7 @@ function StepRenderer({
           stepId={step.id}
           rows={step.worksheetRows!}
           successMessage={step.successMessage}
+          runnerContext={runnerContext}
           onComplete={onComplete}
         />
       );
@@ -413,7 +491,13 @@ function StepRenderer({
         />
       );
     case "auto_explanation":
-      return <AutoExplanationStep template={step.template!} onComplete={onComplete} />;
+      return (
+        <AutoExplanationStep
+          template={step.template!}
+          role={resolveExplanationRole(step, isLastStep)}
+          onComplete={onComplete}
+        />
+      );
     case "paper_upload":
       return (
         <PaperUploadStep
@@ -422,6 +506,16 @@ function StepRenderer({
           onComplete={onPaperUpload}
         />
       );
+    case "model_build":
+      return (
+        <ModelBuildStep step={step} condition={condition} onComplete={onComplete} />
+      );
+    case "numeric_solve":
+      return <NumericSolveStep step={step} onComplete={onComplete} />;
+    case "proof_lines":
+      return <ProofLinesStep step={step} onComplete={onComplete} />;
+    case "word_solution":
+      return <WordSolutionStep step={step} runnerContext={runnerContext} onComplete={onComplete} />;
     default:
       return null;
   }

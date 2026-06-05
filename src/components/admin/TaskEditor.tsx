@@ -244,6 +244,28 @@ export function TaskEditor({ taskId }: TaskEditorProps) {
               className="w-full rounded-lg border border-lavender-200 px-3 py-2 text-sm"
             />
           </label>
+          <label className="flex items-center gap-2 self-end pb-2 sm:col-span-2">
+            <input
+              type="checkbox"
+              checked={draft.requiresUpload ?? false}
+              onChange={(e) => update({ requiresUpload: e.target.checked })}
+            />
+            <span className="text-sm">Решение на листочке / в тетради (режим «только бумага»)</span>
+          </label>
+          {draft.requiresUpload ? (
+            <label className="block sm:col-span-2">
+              <span className="mb-1 block text-xs font-medium text-gray-500">
+                Дополнение к инструкции (paperPrompt)
+              </span>
+              <textarea
+                value={draft.paperPrompt ?? ""}
+                onChange={(e) => update({ paperPrompt: e.target.value })}
+                rows={2}
+                className="w-full rounded-lg border border-lavender-200 px-3 py-2 text-sm"
+                placeholder="Необязательно"
+              />
+            </label>
+          ) : null}
           <label className="flex items-center gap-2 self-end pb-2">
             <input
               type="checkbox"
@@ -271,6 +293,7 @@ export function TaskEditor({ taskId }: TaskEditorProps) {
         </section>
       )}
 
+      {!draft.requiresUpload ? (
       <section className="rounded-card bg-white p-6 shadow-card">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
           <h2 className="text-lg font-semibold">Шаги решения ({draft.steps.length})</h2>
@@ -284,6 +307,9 @@ export function TaskEditor({ taskId }: TaskEditorProps) {
                 "table_input",
                 "worksheet_table",
                 "auto_explanation",
+                "model_build",
+                "numeric_solve",
+                "word_solution",
               ] as const
             ).map((type) => (
               <button
@@ -310,6 +336,12 @@ export function TaskEditor({ taskId }: TaskEditorProps) {
           ))}
         </div>
       </section>
+      ) : (
+        <section className="rounded-card border border-violet-200 bg-violet-50/40 p-6 text-sm text-violet-900">
+          Включён режим «только бумага» — цифровые шаги не используются. Ребёнок видит условие и
+          инструкцию письменного решения.
+        </section>
+      )}
 
       {mode === "builtin" && isBuiltInTaskId(draft.id) ? (
         <p className="text-xs text-gray-400">

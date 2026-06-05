@@ -19,6 +19,8 @@ export interface TaskOverride {
   maxStars?: number;
   number?: number;
   branchId?: string;
+  requiresUpload?: boolean;
+  paperPrompt?: string;
   steps?: TaskStep[];
 }
 
@@ -152,7 +154,7 @@ export function saveCustomTask(task: StoredCustomTask): TaskStoreData {
 
 export function saveResolvedTask(task: Task): TaskStoreData {
   if (isBuiltInTaskId(task.id) && !readTaskStore().customTasks[task.id]) {
-    const { id, branchId, number, title, condition, stage, maxStars, enableGivenStep, givenStep, steps } =
+    const { id, branchId, number, title, condition, stage, maxStars, enableGivenStep, givenStep, requiresUpload, paperPrompt, steps } =
       task;
     return setTaskOverride(task.id, {
       title,
@@ -163,6 +165,8 @@ export function saveResolvedTask(task: Task): TaskStoreData {
       branchId,
       enableGivenStep,
       givenStep,
+      requiresUpload,
+      paperPrompt,
       steps,
     });
   }

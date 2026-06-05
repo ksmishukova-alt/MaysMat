@@ -6,6 +6,8 @@ import type {
   TableRow,
   WorksheetRow,
 } from "@/data/tasks";
+import type { AcceptedAnswer, HeadsLegsEntity, HeadsLegsFeature, SolutionLine } from "@/data/heads-legs/types";
+import type { SolutionMode } from "@/data/heads-legs/solution-modes";
 
 /** Общие поля шага задачи */
 export interface TaskStepBase {
@@ -13,6 +15,13 @@ export interface TaskStepBase {
   title: string;
   hint?: string;
   highlight?: boolean;
+  /** Фаза экрана по архитектуре «Головы и ноги» */
+  screenPhaseId?: string;
+  screenPhaseTitle?: string;
+  screenPhaseIndex?: number;
+  screenPhaseCount?: number;
+  /** Подпись внутри фазы, напр. «Шаг 1 из 3» */
+  screenSubStep?: string;
 }
 
 export interface ConditionParseStep extends TaskStepBase {
@@ -70,6 +79,8 @@ export interface ComparisonStep extends TaskStepBase {
 export interface AutoExplanationStep extends TaskStepBase {
   type: "auto_explanation";
   template: string[];
+  /** intro — разбор условия; preview — итоговый текст перед завершением */
+  explanationRole?: "intro" | "preview";
   animation?: { items: { emoji: string; count: number }[] };
 }
 
@@ -77,6 +88,35 @@ export interface PaperUploadStep extends TaskStepBase {
   type: "paper_upload";
   /** Текст над полем загрузки */
   uploadPrompt?: string;
+}
+
+export interface ModelBuildStep extends TaskStepBase {
+  type: "model_build";
+  modelLevel?: number;
+  /** Только числа в слоты — выбор объектов на отдельном шаге */
+  skipEntitySelection?: boolean;
+  entities?: HeadsLegsEntity[];
+  features?: HeadsLegsFeature[];
+  totals?: { totalObjects?: number | null; totalFeature?: number | null };
+  constraints?: { bothTypesPresent?: boolean; allowZero?: boolean };
+}
+
+export interface ProofLinesStep extends TaskStepBase {
+  type: "proof_lines";
+  solutionLines: SolutionLine[];
+}
+
+export interface NumericSolveStep extends TaskStepBase {
+  type: "numeric_solve";
+  acceptedAnswers: AcceptedAnswer;
+}
+
+export interface WordSolutionStep extends TaskStepBase {
+  type: "word_solution";
+  solutionMode: SolutionMode;
+  solutionLines?: SolutionLine[];
+  acceptedAnswers: AcceptedAnswer;
+  hintLevels?: [string?, string?, string?];
 }
 
 /** Discriminated union — каждый тип шага со своими полями */
@@ -90,7 +130,11 @@ export type DiscriminatedTaskStep =
   | NumberInputStep
   | ComparisonStep
   | AutoExplanationStep
-  | PaperUploadStep;
+  | PaperUploadStep
+  | ModelBuildStep
+  | NumericSolveStep
+  | ProofLinesStep
+  | WordSolutionStep;
 
 export function isStepType<T extends StepType>(
   step: DiscriminatedTaskStep,
@@ -119,9 +163,27 @@ export function assertTaskStepShape(step: DiscriminatedTaskStep): string | null 
       return step.template?.length ? null : "auto_explanation: нужен template";
     case "paper_upload":
       return null;
+    case "model_build":
+      return null;
+    case "numeric_solve":
+      return step.acceptedAnswers ? null : "numeric_solve: нужен acceptedAnswers";
+    case "proof_lines":
+      return step.solutionLines?.length ? null : "proof_lines: нужны solutionLines";
+    case "word_solution":
+      return step.acceptedAnswers && step.solutionMode ? null : "word_solution: нужны acceptedAnswers и solutionMode";
     case "comparison":
       return null;
     default:
       return "неизвестный тип шага";
   }
+}
+
+/** intro — читаем и идём дальше; preview — финальный текст и завершение задачи */
+export function resolveExplanationRole(
+  step: Pick<AutoExplanationStep, "id" | "explanationRole">,
+  isLastStep: boolean,
+): "intro" | "preview" {
+  if (step.explanationRole) return step.explanationRole;
+  if (step.id.includes("-preview") || isLastStep) return "preview";
+  return "intro";
 }

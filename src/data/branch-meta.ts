@@ -53,10 +53,28 @@ export const ADVENTURES: Adventure[] = [
     branchIds: [
       "comb-two-ways",
       "proof-dirichlet",
+      "proof-unlucky",
+      "proof-table-cells",
+      "proof-extreme",
+      "proof-constructions",
       "proof-bottleneck",
       "proof-estimate",
       "inv-impossible",
     ],
+  },
+  {
+    id: "number-caves",
+    title: "Числовые пещеры",
+    emoji: "🔢",
+    tagline: "Остатки, делимость и свойства чисел",
+    branchIds: ["arith-divisibility", "arith-remainders", "arith-gcd", "arith-rebus"],
+  },
+  {
+    id: "figures-city",
+    title: "Город Фигур",
+    emoji: "📐",
+    tagline: "Разрезания, площади и симметрия",
+    branchIds: ["geo-cells", "geo-cutting", "geo-area", "geo-symmetry"],
   },
   {
     id: "invariant-island",
@@ -137,7 +155,8 @@ export const BRANCH_META: Record<string, BranchMeta> = {
   },
   "logic-matching": {
     adventureId: "math-lovers-mystery",
-    microSkill: "Устанавливать соответствия",
+    microSkill: "Находить связи и соответствия между объектами",
+    section: "Соответствия",
   },
   "logic-knights": {
     adventureId: "kingdom-of-truth",
@@ -160,6 +179,41 @@ export const BRANCH_META: Record<string, BranchMeta> = {
     adventureId: "proof-academy",
     microSkill: "Увидеть неизбежность переполнения",
     section: "Принцип Дирихле",
+  },
+  "proof-unlucky": {
+    adventureId: "proof-academy",
+    microSkill: "Построить худший случай и добавить один предмет",
+    section: "Метод неудачника",
+  },
+  "proof-table-cells": {
+    adventureId: "proof-academy",
+    microSkill: "Использовать таблицу значений как клетки",
+    section: "Табличные клетки",
+  },
+  "proof-extreme": {
+    adventureId: "proof-academy",
+    microSkill: "Рассуждать от крайнего случая",
+    section: "Принцип крайнего",
+  },
+  "proof-constructions": {
+    adventureId: "proof-academy",
+    microSkill: "Строить примеры и контрпримеры",
+    section: "Конструкции",
+  },
+  "arith-remainders": {
+    adventureId: "number-caves",
+    microSkill: "Связать остатки при делении с клетками",
+    section: "Остатки",
+  },
+  "geo-cutting": {
+    adventureId: "figures-city",
+    microSkill: "Разбить фигуру и применить переполнение",
+    section: "Разрезания",
+  },
+  "inv-coloring": {
+    adventureId: "invariant-island",
+    microSkill: "Находить однотонные пары через раскраску",
+    section: "Раскраски",
   },
   "inv-impossible": {
     adventureId: "proof-academy",

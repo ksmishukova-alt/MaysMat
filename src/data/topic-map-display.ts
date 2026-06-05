@@ -69,8 +69,36 @@ export const BRANCH_VISUALS: Record<string, TopicCardVisual> = {
     emoji: "🕊️",
     cardBg: "from-sky-50 via-blue-50 to-indigo-100",
     customArt: true,
-    demoProgress: 100,
-    demoStars: 3,
+    featured: true,
+  },
+  "proof-unlucky": {
+    emoji: "🎲",
+    cardBg: "from-amber-50 via-orange-50 to-yellow-100",
+    featured: true,
+  },
+  "proof-table-cells": {
+    emoji: "📋",
+    cardBg: "from-violet-50 via-purple-50 to-fuchsia-100",
+    featured: true,
+  },
+  "proof-extreme": {
+    emoji: "📍",
+    cardBg: "from-rose-50 via-red-50 to-orange-100",
+    featured: true,
+  },
+  "proof-constructions": {
+    emoji: "🧱",
+    cardBg: "from-stone-50 via-slate-50 to-zinc-100",
+    featured: true,
+  },
+  "arith-remainders": {
+    emoji: "➗",
+    cardBg: "from-red-50 via-orange-50 to-amber-100",
+    featured: true,
+  },
+  "geo-cutting": {
+    emoji: "✂️",
+    cardBg: "from-fuchsia-50 via-pink-50 to-purple-100",
     featured: true,
   },
   "inv-parity": {
@@ -103,6 +131,7 @@ export const BRANCH_VISUALS: Record<string, TopicCardVisual> = {
     emoji: "🔀",
     cardBg: "from-blue-50 to-cyan-100",
     customArt: true,
+    featured: true,
   },
   "comb-enumeration": {
     emoji: "🔢",
@@ -118,6 +147,7 @@ export const BRANCH_VISUALS: Record<string, TopicCardVisual> = {
     emoji: "🎨",
     cardBg: "from-lime-50 to-green-100",
     customArt: true,
+    featured: true,
   },
   "inv-impossible": {
     emoji: "🚫",
@@ -152,10 +182,16 @@ export const BRANCH_VISUALS: Record<string, TopicCardVisual> = {
 const FEATURED_IDS = [
   "logic-knights",
   "logic-euler",
+  "logic-matching",
   "comb-tree",
   "modeling-heads-legs",
   "fairy-caves",
   "proof-dirichlet",
+  "proof-unlucky",
+  "proof-constructions",
+  "arith-remainders",
+  "geo-cutting",
+  "inv-coloring",
   "inv-parity",
   "graphs-paths",
   "games-winning",

@@ -5,6 +5,11 @@ import { TaskCompletionStampById } from "@/components/TaskCompletionStamp";
 import { useResolvedTasksForBranch, useTaskStore } from "@/lib/use-task-store";
 import { getTaskCompletion } from "@/lib/progress";
 import { useProgress } from "@/lib/use-progress";
+import {
+  getPaperReviewStatus,
+  PAPER_STATUS_LABEL,
+  type PaperReviewStatus,
+} from "@/lib/paper-task-review";
 
 interface BranchTaskListProps {
   branchId: string;
@@ -24,6 +29,9 @@ export function BranchTaskList({ branchId, branchTaskCount }: BranchTaskListProp
         {tasks.map((task) => {
           const isCopy = Boolean(store.customTasks[task.id]);
           const done = getTaskCompletion(task.id, userProgress);
+          const paperStatus: PaperReviewStatus = task.requiresUpload
+            ? getPaperReviewStatus(task.id)
+            : "not_started";
 
           if (done) {
             return (
@@ -57,6 +65,48 @@ export function BranchTaskList({ branchId, branchTaskCount }: BranchTaskListProp
             );
           }
 
+          if (paperStatus === "pending") {
+            return (
+              <div
+                key={task.id}
+                className="flex items-center justify-between rounded-xl border border-sky-200 bg-sky-50/60 p-4"
+              >
+                <div>
+                  <div className="font-medium">
+                    Задача {task.number}. {task.title}
+                  </div>
+                  <div className="mt-1 text-sm text-sky-800">{PAPER_STATUS_LABEL.pending}</div>
+                </div>
+                <Link
+                  href={`/tasks/${task.id}`}
+                  className="rounded-lg border border-sky-300 bg-white px-3 py-2 text-xs text-sky-900"
+                >
+                  Открыть
+                </Link>
+              </div>
+            );
+          }
+
+          if (paperStatus === "redo") {
+            return (
+              <Link
+                key={task.id}
+                href={`/tasks/${task.id}`}
+                className="flex items-center justify-between rounded-xl border border-amber-200 bg-amber-50 p-4 hover:border-amber-400"
+              >
+                <div>
+                  <div className="font-medium">
+                    Задача {task.number}. {task.title}
+                  </div>
+                  <div className="mt-1 text-sm text-amber-800">{PAPER_STATUS_LABEL.redo}</div>
+                </div>
+                <span className="rounded-lg bg-brand-purple px-4 py-2 text-sm text-white">
+                  Исправить
+                </span>
+              </Link>
+            );
+          }
+
           return (
             <Link
               key={task.id}
@@ -72,6 +122,7 @@ export function BranchTaskList({ branchId, branchTaskCount }: BranchTaskListProp
                 </div>
                 <div className="text-sm text-gray-500">
                   Этап {task.stage} · до {task.maxStars} ★
+                  {task.requiresUpload ? " · 📝 письменно" : ""}
                 </div>
               </div>
               <span className="rounded-lg bg-brand-purple px-4 py-2 text-sm text-white">Начать</span>

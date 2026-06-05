@@ -282,3 +282,69 @@ export async function sendSupportMessage(
   }
   return { ok: true };
 }
+
+function paperVerdictKeyboard(submissionId: string) {
+  return {
+    inline_keyboard: [
+      [
+        { text: "✅ Зачёт", callback_data: `pok:${submissionId}` },
+        { text: "🔄 Переделать", callback_data: `pno:${submissionId}` },
+      ],
+    ],
+  };
+}
+
+export interface PaperTaskReportPayload {
+  submissionId: string;
+  taskId: string;
+  taskNumber: number;
+  taskTitle: string;
+  childName: string;
+  condition: string;
+  hasPhoto: boolean;
+}
+
+export async function sendPaperTaskReport(
+  payload: PaperTaskReportPayload,
+  photoBlob?: Blob,
+  photoName?: string,
+): Promise<{ ok: boolean; error?: string }> {
+  const chatId = process.env.TELEGRAM_PARENT_CHAT_ID;
+  if (!chatId) return { ok: false, error: "TELEGRAM_PARENT_CHAT_ID не задан" };
+
+  const text = [
+    "📝 <b>Головы и ноги · письменно</b>",
+    `От: <b>${escapeHtml(payload.childName)}</b>`,
+    `Задача ${payload.taskNumber}: <b>${escapeHtml(payload.taskTitle)}</b>`,
+    `ID: <code>${escapeHtml(payload.submissionId)}</code>`,
+    "",
+    `<i>Условие:</i> ${escapeHtml(truncate(payload.condition, 500))}`,
+    payload.hasPhoto ? "📎 Фото решения — во вложении" : "Без фото",
+  ].join("\n");
+
+  if (photoBlob) {
+    const formData = new FormData();
+    formData.append("chat_id", chatId);
+    formData.append("caption", fitCaption(text));
+    formData.append("parse_mode", "HTML");
+    formData.append(
+      "reply_markup",
+      JSON.stringify(paperVerdictKeyboard(payload.submissionId)),
+    );
+    const mime = photoBlob.type || "image/jpeg";
+    formData.append(mime.startsWith("image/") ? "photo" : "document", photoBlob, photoName ?? "solution.jpg");
+    const method = mime.startsWith("image/") ? "sendPhoto" : "sendDocument";
+    const result = await telegramMultipart(method, formData);
+    if (!result.ok) return { ok: false, error: result.description ?? "Telegram file error" };
+    return { ok: true };
+  }
+
+  const result = await telegramApi("sendMessage", {
+    chat_id: chatId,
+    text: fitCaption(text, 3900),
+    parse_mode: "HTML",
+    reply_markup: paperVerdictKeyboard(payload.submissionId),
+  });
+  if (!result.ok) return { ok: false, error: result.description ?? "Telegram API error" };
+  return { ok: true };
+}

@@ -1,0 +1,164 @@
+"use client";
+
+import { useCallback, useState } from "react";
+import type { WordSolutionStep as WordSolutionStepDef } from "@/data/task-steps";
+import type { RunnerContext } from "@/lib/runner-context";
+import { validateWordSolutionFull } from "@/lib/word-solution-blanks";
+import { WordSolutionFillBlanks } from "./WordSolutionFillBlanks";
+
+interface WordSolutionStepProps {
+  step: WordSolutionStepDef;
+  runnerContext?: RunnerContext;
+  onComplete: () => void;
+}
+
+export function WordSolutionStep({ step, runnerContext = "heads-legs", onComplete }: WordSolutionStepProps) {
+  const [text, setText] = useState("");
+  const [blanks, setBlanks] = useState<Record<string, string>>({});
+  const [error, setError] = useState<string | null>(null);
+  const [hintIdx, setHintIdx] = useState(0);
+
+  const mode = step.solutionMode;
+  const accepted = step.acceptedAnswers;
+  const lines = step.solutionLines ?? [];
+
+  const submit = () => {
+    const result = validateWordSolutionFull(text, mode, accepted, lines, blanks);
+    if (result.ok) {
+      onComplete();
+    } else {
+      setError(result.message ?? "Проверь решение.");
+      if (step.hintLevels?.[hintIdx]) {
+        setHintIdx((i) => Math.min(i + 1, (step.hintLevels?.length ?? 1) - 1));
+      }
+    }
+  };
+
+  const renderLine = (line: (typeof lines)[0], li: number) => {
+    let bi = 0;
+    return (
+      <div key={li} className="rounded-lg bg-gray-50 px-3 py-2 text-sm leading-relaxed">
+        {line.template.split(/(\[[^\]]*\])/).map((part, pi) => {
+          const m = part.match(/^\[(.*)\]$/);
+          if (!m) return <span key={pi}>{part}</span>;
+          const blank = line.blanks[bi++];
+          if (!blank) return <span key={pi}>{part}</span>;
+          const wide = blank.type === "expression" || blank.type === "conclusion";
+          return (
+            <input
+              key={blank.id}
+              type="text"
+              value={blanks[blank.id] ?? ""}
+              onChange={(e) => setBlanks((b) => ({ ...b, [blank.id]: e.target.value }))}
+              className={`mx-1 inline-block rounded border border-lavender-200 px-1 py-0.5 text-center ${
+                wide ? "min-w-[140px]" : "w-20"
+              }`}
+              placeholder={blank.placeholder ?? "…"}
+              aria-label={`Пропуск ${li + 1}`}
+            />
+          );
+        })}
+      </div>
+    );
+  };
+
+  if (mode === "A" && lines.length > 0) {
+    return (
+      <div className="space-y-4">
+        <WordSolutionFillBlanks
+          stepId={step.id}
+          lines={lines}
+          blanks={blanks}
+          onBlanksChange={setBlanks}
+        />
+        {error ? <p className="text-sm text-red-600">{error}</p> : null}
+        {step.hintLevels?.[hintIdx] ? (
+          <p className="text-sm text-amber-800">💡 {step.hintLevels[hintIdx]}</p>
+        ) : null}
+        <button
+          type="button"
+          onClick={submit}
+          className="w-full rounded-xl bg-brand-purple py-3 text-sm font-semibold text-white"
+        >
+          Проверить решение и ответ
+        </button>
+        <p className="text-xs text-gray-500">
+          {runnerContext === "dirichlet"
+            ? "⑭ Убедись, что есть вывод по принципу Дирихле и ответ на вопрос задачи."
+            : "⑭ Убедись, что есть строка «Ответ:» и в ней названы и звери, и птицы."}
+        </p>
+      </div>
+    );
+  }
+
+  if (mode === "B" || mode === "E") {
+    return (
+      <div className="space-y-4">
+        <p className="text-sm text-gray-600">
+          {mode === "B" && "Дополни пропуски в готовом тексте решения."}
+          {mode === "E" && "Запиши перебор: заполни строки проверки и итог."}
+        </p>
+        {lines.map((line, li) => renderLine(line, li))}
+        {mode === "B" && lines.length > 0 ? (
+          <p className="text-xs text-gray-400">
+            Или запиши полное решение ниже (не короче 3–4 предложений).
+          </p>
+        ) : null}
+        {mode === "B" && lines.length > 0 ? (
+          <textarea
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            rows={3}
+            className="w-full rounded-xl border border-lavender-200 px-3 py-2 text-sm"
+            placeholder="Полное решение своими словами…"
+          />
+        ) : null}
+        {error ? <p className="text-sm text-red-600">{error}</p> : null}
+        {step.hintLevels?.[hintIdx] ? (
+          <p className="text-sm text-amber-800">💡 {step.hintLevels[hintIdx]}</p>
+        ) : null}
+        <button
+          type="button"
+          onClick={submit}
+          className="rounded-xl bg-brand-purple px-5 py-2 text-sm font-semibold text-white"
+        >
+          Проверить решение
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-3">
+      <p className="text-sm text-gray-600">
+        {mode === "D"
+          ? "Объясни, почему единственный ответ найти нельзя, или запиши полное решение."
+          : "Запиши развёрнутое решение: предположение → вычисления → ответ."}
+      </p>
+      {lines.length > 0 ? <div className="space-y-2">{lines.map((l, i) => renderLine(l, i))}</div> : null}
+      <ul className="list-inside list-disc text-xs text-gray-500">
+        <li>Есть ли предположение «представим, что все…»?</li>
+        <li>Есть ли вычисления и сравнение с условием?</li>
+        <li>Есть ли строка «Ответ:»?</li>
+      </ul>
+      <textarea
+        value={text}
+        onChange={(e) => setText(e.target.value)}
+        rows={8}
+        className="w-full rounded-xl border border-lavender-200 px-3 py-2 text-sm"
+        placeholder="Представим, что…"
+      />
+      {error ? <p className="text-sm text-red-600">{error}</p> : null}
+      {step.hintLevels?.[hintIdx] ? (
+        <p className="text-sm text-amber-800">💡 {step.hintLevels[hintIdx]}</p>
+      ) : null}
+      <button
+        type="button"
+        onClick={submit}
+        className="rounded-xl bg-brand-purple px-5 py-2 text-sm font-semibold text-white"
+      >
+        Проверить решение
+      </button>
+    </div>
+  );
+}

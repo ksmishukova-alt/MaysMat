@@ -2,16 +2,48 @@
 
 import { useEffect, useState } from "react";
 import type { DragOption } from "@/data/tasks";
+import type { RunnerContext } from "@/lib/runner-context";
 import { STEP_SUCCESS_MS } from "./step-advance";
 import { StepSuccess } from "./StepSuccess";
 
 interface DragSelectStepProps {
   stepId?: string;
   options: DragOption[];
+  runnerContext?: RunnerContext;
   onComplete: () => void;
 }
 
-export function DragSelectStep({ stepId, options, onComplete }: DragSelectStepProps) {
+function stepPrompt(stepId: string | undefined, runnerContext: RunnerContext): string {
+  if (runnerContext === "dirichlet") {
+    if (stepId?.includes("-rabbits")) {
+      return "Найди в условии выше, что можно «раскладывать», и нажми на карточку.";
+    }
+    if (stepId?.includes("-cells")) {
+      return "Найди в условии, по каким группам делят объекты, и нажми на карточку.";
+    }
+    return "Выбери карточки по условию задачи.";
+  }
+  return "Нажми на карточки участников задачи";
+}
+
+function checkError(
+  stepId: string | undefined,
+  runnerContext: RunnerContext,
+  need: number,
+): string {
+  if (runnerContext === "dirichlet") {
+    return "Перечитай условие выше и выбери подходящую карточку.";
+  }
+  if (need > 2) return `Выбери все ${need} нужные карточки из условия`;
+  return "Выбери только участников, которые есть в задаче";
+}
+
+export function DragSelectStep({
+  stepId,
+  options,
+  runnerContext = "heads-legs",
+  onComplete,
+}: DragSelectStepProps) {
   const [selected, setSelected] = useState<string[]>([]);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
@@ -32,7 +64,7 @@ export function DragSelectStep({ stepId, options, onComplete }: DragSelectStepPr
     if (success) return;
     setError("");
     setSelected((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
     );
   };
 
@@ -44,7 +76,7 @@ export function DragSelectStep({ stepId, options, onComplete }: DragSelectStepPr
     if (ok) {
       setSuccess(true);
     } else {
-      setError("Выбери только участников, которые есть в задаче");
+      setError(checkError(stepId, runnerContext, correctIds.length));
     }
   };
 
@@ -54,9 +86,7 @@ export function DragSelectStep({ stepId, options, onComplete }: DragSelectStepPr
 
   return (
     <div>
-      <p className="mb-4 text-sm text-gray-500">
-        Нажми на карточки участников задачи
-      </p>
+      <p className="mb-4 text-sm text-gray-500">{stepPrompt(stepId, runnerContext)}</p>
       <div className="mb-6 flex flex-wrap gap-3">
         {options.map((opt) => {
           const isSelected = selected.includes(opt.id);

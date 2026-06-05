@@ -5,12 +5,15 @@ import type { DragOption } from "@/data/tasks";
 import { STEP_SUCCESS_MS } from "./step-advance";
 import { StepSuccess } from "./StepSuccess";
 
+import type { RunnerContext } from "@/lib/runner-context";
+
 interface SingleSelectStepProps {
   stepId?: string;
   context?: string;
   options: DragOption[];
   prompt?: string;
   successMessage?: string;
+  runnerContext?: RunnerContext;
   onComplete: () => void;
 }
 
@@ -20,6 +23,7 @@ export function SingleSelectStep({
   options,
   prompt = "Выбери один вариант",
   successMessage,
+  runnerContext = "heads-legs",
   onComplete,
 }: SingleSelectStepProps) {
   const [selected, setSelected] = useState<string | null>(null);
@@ -45,7 +49,11 @@ export function SingleSelectStep({
       setSuccess(true);
       setError("");
     } else {
-      setError("Подумай: у кого в задаче есть ноги?");
+      setError(
+        runnerContext === "dirichlet"
+          ? "Подумай: какой вариант следует из сравнения N и M?"
+          : "Подумай: у кого в задаче есть ноги?",
+      );
     }
   };
 

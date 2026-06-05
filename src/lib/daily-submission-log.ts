@@ -240,6 +240,7 @@ export function syncSubjectVerdictToLocalLog(
   date: string,
   subject: DailySubject,
   data: { verdict: DailyVerdict; verdictComment?: string },
+  options?: { notify?: boolean },
 ): DailyDayLog | null {
   const log = readDailyDayLog(date);
   if (!log) return null;
@@ -252,10 +253,15 @@ export function syncSubjectVerdictToLocalLog(
     };
     log.subjects[subject] = sub;
   }
+
+  const unchanged =
+    sub.verdict === data.verdict && sub.verdictComment === data.verdictComment;
+  if (unchanged) return log;
+
   sub.verdict = data.verdict;
   sub.verdictComment = data.verdictComment;
   writeDailyDayLog(log);
-  if (typeof window !== "undefined") {
+  if (options?.notify !== false && typeof window !== "undefined") {
     window.dispatchEvent(new Event(DAILY_VERDICT_UPDATED_EVENT));
   }
   return log;
@@ -395,10 +401,15 @@ export async function fetchDailyVerdict(date = todayKey()): Promise<DailyDayLog 
     for (const subject of SUBJECTS) {
       const v = data.subjects[subject];
       if (v?.verdict) {
-        syncSubjectVerdictToLocalLog(date, subject, {
-          verdict: v.verdict,
-          verdictComment: v.verdictComment,
-        });
+        syncSubjectVerdictToLocalLog(
+          date,
+          subject,
+          {
+            verdict: v.verdict,
+            verdictComment: v.verdictComment,
+          },
+          { notify: false },
+        );
       }
     }
     return readDailyDayLog(date);

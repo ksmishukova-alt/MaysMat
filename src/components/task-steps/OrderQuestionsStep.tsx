@@ -5,9 +5,12 @@ import type { OrderQuestionItem } from "@/data/tasks";
 import { STEP_SUCCESS_MS } from "./step-advance";
 import { StepSuccess } from "./StepSuccess";
 
+import type { RunnerContext } from "@/lib/runner-context";
+
 interface OrderQuestionsStepProps {
   stepId?: string;
   items: OrderQuestionItem[];
+  runnerContext?: RunnerContext;
   onComplete: () => void;
 }
 
@@ -33,7 +36,7 @@ function reorderList(list: string[], from: number, to: number): string[] {
   return next;
 }
 
-export function OrderQuestionsStep({ stepId, items, onComplete }: OrderQuestionsStepProps) {
+export function OrderQuestionsStep({ stepId, items, runnerContext = "heads-legs", onComplete }: OrderQuestionsStepProps) {
   const correctOrder = items.map((item) => item.id);
   const [order, setOrder] = useState<string[]>(correctOrder);
   const [success, setSuccess] = useState(false);
@@ -104,32 +107,16 @@ export function OrderQuestionsStep({ stepId, items, onComplete }: OrderQuestions
     event.currentTarget.releasePointerCapture(event.pointerId);
   };
 
-  const onDragStart = (index: number, event: React.DragEvent<HTMLLIElement>) => {
-    if (success) return;
-    setDragIndex(index);
-    setOverIndex(index);
-    dragIndexRef.current = index;
-    event.dataTransfer.effectAllowed = "move";
-    event.dataTransfer.setData("text/plain", String(index));
+  const moveUp = (index: number) => {
+    if (index <= 0 || success) return;
+    setError("");
+    applyReorder(index, index - 1);
   };
 
-  const onDragOver = (index: number, event: React.DragEvent<HTMLLIElement>) => {
-    event.preventDefault();
-    const from = dragIndexRef.current;
-    if (from === null || from === index) {
-      setOverIndex(index);
-      return;
-    }
-    applyReorder(from, index);
-    dragIndexRef.current = index;
-    setDragIndex(index);
-    setOverIndex(index);
-  };
-
-  const onDragEnd = () => {
-    dragIndexRef.current = null;
-    setDragIndex(null);
-    setOverIndex(null);
+  const moveDown = (index: number) => {
+    if (index >= order.length - 1 || success) return;
+    setError("");
+    applyReorder(index, index + 1);
   };
 
   const check = () => {
@@ -137,7 +124,11 @@ export function OrderQuestionsStep({ stepId, items, onComplete }: OrderQuestions
     if (ok) {
       setSuccess(true);
     } else {
-      setError("Подумай: с чего начинают задачу «головы и ноги»? Сначала участники, потом таблица…");
+      setError(
+        runnerContext === "dirichlet"
+          ? "Подумай: сначала зайцы и клетки, потом числа, сравнение и вывод."
+          : "Подумай: с чего начинают задачу «головы и ноги»? Сначала участники, потом таблица…",
+      );
     }
   };
 
@@ -148,11 +139,12 @@ export function OrderQuestionsStep({ stepId, items, onComplete }: OrderQuestions
   return (
     <div>
       <p className="mb-2 text-sm text-gray-500">
-        Вопросы перемешаны. Перетащи карточки так, чтобы под номерами 1, 2, 3… шли шаги
-        решения по порядку.
+        {runnerContext === "dirichlet"
+          ? "Строки перемешаны. Расставь шаги доказательства: зайцы → клетки → числа → вывод."
+          : "Строки перемешаны. Расставь их по порядку: сначала предположение, потом вычисления, в конце ответ."}
       </p>
       <p className="mb-4 text-xs text-gray-400">
-        Схватись за ручку ≡ слева или перетащи всю строку мышью.
+        Используй кнопки ↑ ↓ или перетащи за ручку ≡ слева.
       </p>
 
       <ul ref={listRef} className="mb-6 space-y-2">
@@ -165,11 +157,7 @@ export function OrderQuestionsStep({ stepId, items, onComplete }: OrderQuestions
             <li
               key={id}
               data-order-row
-              draggable
-              onDragStart={(event) => onDragStart(index, event)}
-              onDragOver={(event) => onDragOver(index, event)}
-              onDragEnd={onDragEnd}
-              className={`flex items-center gap-3 rounded-xl border px-3 py-3 transition ${
+              className={`flex items-center gap-2 rounded-xl border px-3 py-3 transition ${
                 isDragging
                   ? "scale-[1.02] border-brand-purple bg-lavender-50 shadow-md"
                   : isOver
@@ -185,6 +173,27 @@ export function OrderQuestionsStep({ stepId, items, onComplete }: OrderQuestions
               </div>
 
               <span className="min-w-0 flex-1 text-sm leading-snug">{item.text}</span>
+
+              <div className="flex shrink-0 flex-col gap-0.5">
+                <button
+                  type="button"
+                  aria-label="Поднять выше"
+                  disabled={index === 0}
+                  onClick={() => moveUp(index)}
+                  className="rounded border border-lavender-200 bg-white px-2 py-0.5 text-xs disabled:opacity-30"
+                >
+                  ↑
+                </button>
+                <button
+                  type="button"
+                  aria-label="Опустить ниже"
+                  disabled={index === order.length - 1}
+                  onClick={() => moveDown(index)}
+                  className="rounded border border-lavender-200 bg-white px-2 py-0.5 text-xs disabled:opacity-30"
+                >
+                  ↓
+                </button>
+              </div>
 
               <button
                 type="button"

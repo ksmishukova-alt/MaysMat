@@ -451,6 +451,11 @@ const STEP_TYPE_LABELS: Record<TaskStep["type"], string> = {
   number_input: "Числовой ответ",
   comparison: "Сравнение",
   auto_explanation: "Разбор",
+  paper_upload: "Фото листочка",
+  model_build: "Модель условия",
+  numeric_solve: "Числовой ответ",
+  proof_lines: "Карточки доказательства",
+  word_solution: "Решение словами",
 };
 
 export function StepEditor({
@@ -464,7 +469,8 @@ export function StepEditor({
   onChange: (step: TaskStep) => void;
   onRemove: () => void;
 }) {
-  const patch = (partial: Partial<TaskStep>) => onChange({ ...step, ...partial });
+  const patch = (partial: Partial<TaskStep>) =>
+    onChange({ ...step, ...partial } as TaskStep);
 
   return (
     <details className="group rounded-xl border border-lavender-200 bg-white" open={index < 2}>
@@ -625,6 +631,26 @@ export function createEmptyStep(type: TaskStep["type"], taskId: string, index: n
       return { id, type, title: "Числовой вопрос", question: "?", answer: 0 };
     case "auto_explanation":
       return { id, type, title: "Разбор", template: ["Пункт 1"] };
+    case "model_build":
+      return { id, type, title: "Сборка модели", modelLevel: 2 };
+    case "numeric_solve":
+      return {
+        id,
+        type,
+        title: "Числовой ответ",
+        acceptedAnswers: { kind: "single_scalar", value: 0 },
+      };
+    case "proof_lines":
+      return { id, type, title: "Карточки доказательства", solutionLines: [] };
+    case "word_solution":
+      return {
+        id,
+        type,
+        title: "Запиши решение словами",
+        solutionMode: "C",
+        acceptedAnswers: { kind: "single_scalar", value: 0 },
+        solutionLines: [],
+      };
     default:
       return { id, type, title: "Новый шаг" } as TaskStep;
   }

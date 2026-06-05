@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { AppShell } from "@/components/AppShell";
+import { AdminPaperReviewPanel } from "@/components/admin/AdminPaperReviewPanel";
 import { THINKING_TYPES } from "@/data/thinking-map";
 import type { Task } from "@/data/tasks";
 import {
@@ -137,6 +138,10 @@ export default function AdminTasksPage() {
           </Link>
           .
         </p>
+
+        <div className="mb-6">
+          <AdminPaperReviewPanel />
+        </div>
 
         {!ready ? (
           <p className="text-sm text-gray-500">Загрузка…</p>
