@@ -10,8 +10,12 @@ export type {
   RemaindersRuleInstance,
   HeadsLegsRuleInstance,
   HeadsLegsValueRuleInstance,
+  HeadsLegsProductionRuleInstance,
   HeadsLegsMethodRuleInstance,
   HeadsLegsValueAnswerTransform,
+  HeadsLegsProductionAnswerTransform,
+  HeadsLegsAnswerTransform,
+  TaskCompletenessStatus,
 } from "./types";
 
 export const remaindersHousesRule: MethodRule = {
@@ -73,10 +77,32 @@ export const headsLegsValueBaseRule: MethodRule = {
   ],
 };
 
+export const headsLegsProductionBaseRule: MethodRule = {
+  id: "heads-legs-production-base",
+  title: "Кто сколько сделал?",
+  childTitle: "Представим, что все участники сделали одинаково",
+  anchorPhrase: "Сначала представим, что все участники сделали одинаково.",
+  helpButtonLabel: "Запутался? Вспомни правило",
+  fullRule: [
+    "Найдём, сколько всего участников.",
+    "Узнаем, сколько всего они сделали / получили / собрали.",
+    "Представим, что все были одного вида.",
+    "Посчитаем, сколько получилось бы всего.",
+    "Сравним с условием.",
+    "Найдём разницу.",
+    "Узнаем, на сколько один участник второго вида отличается от первого.",
+    "Разделим разницу на шаг замены.",
+    "Найдём количество участников второго вида.",
+    "Найдём количество участников первого вида.",
+    "Проверим, что именно спрашивают в задаче.",
+  ],
+};
+
 export const METHOD_RULES: Record<string, MethodRule> = {
   "remainders-houses": remaindersHousesRule,
   "heads-legs-base": headsLegsBaseRule,
   "heads-legs-value-base": headsLegsValueBaseRule,
+  "heads-legs-production-base": headsLegsProductionBaseRule,
 };
 
 export function getMethodRule(ruleId: string): MethodRule | undefined {
@@ -153,6 +179,11 @@ export function localizeRuleLines(rule: MethodRule, modulus: number): string[] {
 }
 
 function assumeFeature(instance: HeadsLegsMethodRuleInstance): number {
+  if (instance.ruleId === "heads-legs-production-base") {
+    return instance.assumeKind === instance.firstKind
+      ? instance.firstResult
+      : instance.secondResult;
+  }
   return instance.assumeKind === instance.firstKind
     ? instance.firstFeature
     : instance.secondFeature;
@@ -164,8 +195,88 @@ function otherKind(instance: HeadsLegsMethodRuleInstance): string {
     : instance.firstKind;
 }
 
+function buildProductionRuleExample(instance: import("./types").HeadsLegsProductionRuleInstance): string[] {
+  if (instance.totalParticipants == null) {
+    return [
+      instance.sceneIntro ?? "В задаче два вида участников.",
+      "",
+      ...(instance.featureLines ? [instance.featureLines[0], instance.featureLines[1], ""] : []),
+      `Всего ${instance.totalResult} ${instance.resultName}.`,
+      "",
+      "Здесь нет числа «сколько всего участников» — ищем ответ перебором или дополнительным условием.",
+      "",
+      `В этой задаче нужно найти: ${instance.questionAsks}.`,
+    ];
+  }
+
+  const feat = assumeFeature(instance);
+  const trial = instance.totalParticipants * feat;
+  const diff = instance.totalResult - trial;
+  const otherCount = diff / instance.replacementStep;
+  const remainCount = instance.totalParticipants - otherCount;
+  const part = instance.participantsLabel ?? "участников";
+  const assumePhrase = instance.assumeKindPhrase ?? instance.assumeKind;
+  const other = otherKind(instance);
+  const resultName = instance.resultName;
+
+  const lines: string[] = [];
+  if (instance.sceneIntro) {
+    lines.push(instance.sceneIntro, "");
+  }
+  if (instance.featureLines) {
+    lines.push(instance.featureLines[0], instance.featureLines[1], "");
+  }
+
+  lines.push(
+    `В классе ${instance.totalParticipants} ${part}.`,
+    "",
+    `Представим, что все были ${assumePhrase}.`,
+    "",
+    `Каждый ${instance.assumeKind.slice(0, -1) || instance.assumeKind} — ${feat} ${resultName}.`,
+    "",
+    `Тогда всего ${resultName} было бы:`,
+    "",
+    `${instance.totalParticipants} × ${feat} = ${trial}`,
+    "",
+    `По условию ${resultName} ${instance.totalResult}.`,
+    "",
+  );
+
+  if (diff > 0) {
+    lines.push(
+      `Не хватает:`,
+      "",
+      `${instance.totalResult} − ${trial} = ${diff}`,
+      "",
+      `Один ${other.slice(0, -1) || other} делает на ${instance.replacementStep} ${resultName} больше.`,
+      "",
+      `Значит, ${other}:`,
+      "",
+      `${diff} ÷ ${instance.replacementStep} = ${otherCount}`,
+    );
+    if (remainCount > 0) {
+      lines.push("", `${instance.assumeKind}:`, "", `${instance.totalParticipants} − ${otherCount} = ${remainCount}`);
+    }
+  }
+
+  lines.push("", `В этой задаче нужно найти: ${instance.questionAsks}.`);
+
+  if (instance.answerTransform?.type === "compare_results") {
+    lines.push(
+      "",
+      `После подсчёта участников сравни, кто ${instance.answerTransform.firstKind ?? "первый вид"} и кто ${instance.answerTransform.secondKind ?? "второй вид"} собрал больше ${instance.answerTransform.resultLabel ?? resultName}.`,
+    );
+  }
+
+  return lines;
+}
+
 /** Текст примера для экрана правила «Головы и ноги» */
 export function buildHeadsLegsRuleExample(instance: HeadsLegsMethodRuleInstance): string[] {
+  if (instance.ruleId === "heads-legs-production-base") {
+    return buildProductionRuleExample(instance);
+  }
+
   const feat = assumeFeature(instance);
   const trial = instance.totalObjects * feat;
   const diff = instance.totalFeature - trial;
@@ -255,5 +366,15 @@ export function headsLegsValueIntroTemplate(): string[] {
     "Раньше мы считали ноги и колёса. Тот же приём работает с карандашами, рублями, котлетами, сосисками и цветами.",
     "Сначала представим самый простой случай: будто все объекты одного вида.",
     "Посчитаем общий расход, сравним с условием — и не забудем проверить, что именно спрашивают в задаче.",
+  ];
+}
+
+/** Вводный экран для паттерна 3 «Кто сколько сделал» */
+export function headsLegsProductionIntroTemplate(): string[] {
+  return [
+    "Тот же метод — другой сюжет",
+    "Раньше мы считали ноги, колёса, карандаши и деньги. Тот же приём работает с задачами, конфетами, снежинками и яблоками.",
+    "Сначала представим, что все участники сделали одинаково.",
+    "Посчитаем общий результат, сравним с условием — и проверим, что именно спрашивают в задаче.",
   ];
 }

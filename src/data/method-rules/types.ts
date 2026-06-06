@@ -69,7 +69,51 @@ export interface HeadsLegsValueRuleInstance {
   showRuleScreen?: boolean;
 }
 
-export type HeadsLegsMethodRuleInstance = HeadsLegsRuleInstance | HeadsLegsValueRuleInstance;
+export type HeadsLegsMethodRuleInstance =
+  | HeadsLegsRuleInstance
+  | HeadsLegsValueRuleInstance
+  | HeadsLegsProductionRuleInstance;
+
+export type TaskCompletenessStatus =
+  | "complete_unique_answer"
+  | "complete_multiple_answers"
+  | "incomplete_condition"
+  | "requires_positive_participants_constraint";
+
+/** Доп. шаг для ответа (паттерн 3) */
+export interface HeadsLegsProductionAnswerTransform {
+  type: "compare_results" | "difference_between_results" | "none";
+  resultLabel?: string;
+  firstKind?: string;
+  secondKind?: string;
+}
+
+/** Числа из задачи «Кто сколько сделал» (паттерн 3) */
+export interface HeadsLegsProductionRuleInstance {
+  ruleId: "heads-legs-production-base";
+  totalParticipants?: number;
+  totalResult: number;
+  firstKind: string;
+  firstResult: number;
+  secondKind: string;
+  secondResult: number;
+  resultName: string;
+  assumeKind: string;
+  replacementStep: number;
+  questionAsks: string;
+  requiresPositiveBothKinds?: boolean;
+  completenessStatus: TaskCompletenessStatus;
+  assumeKindPhrase?: string;
+  participantsLabel?: string;
+  sceneIntro?: string;
+  featureLines?: [string, string];
+  answerTransform?: HeadsLegsProductionAnswerTransform;
+  showRuleScreen?: boolean;
+}
+
+export type HeadsLegsAnswerTransform =
+  | HeadsLegsValueAnswerTransform
+  | HeadsLegsProductionAnswerTransform;
 
 export type HeadsLegsProgressionProfile = 1 | 2 | 3 | 4;
 

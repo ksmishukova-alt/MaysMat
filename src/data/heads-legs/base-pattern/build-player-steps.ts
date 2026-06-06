@@ -2,9 +2,14 @@ import type { Task } from "@/data/tasks";
 import { buildPlayerSteps, type PlayerStep } from "@/lib/task-player-steps";
 import {
   headsLegsIntroTemplate,
+  headsLegsProductionIntroTemplate,
   headsLegsValueIntroTemplate,
 } from "@/data/method-rules";
-import type { HeadsLegsValueRuleInstance } from "@/data/method-rules/types";
+import type {
+  HeadsLegsAnswerTransform,
+  HeadsLegsProductionRuleInstance,
+  HeadsLegsValueRuleInstance,
+} from "@/data/method-rules/types";
 import {
   filterContentStepsByProfile,
   isCompactRuleScreen,
@@ -12,6 +17,10 @@ import {
 } from "../base-pattern/progression";
 import { resolveHeadsLegsPilot } from "../pilot/resolve";
 import { shouldInjectQuestionCheck } from "../value-pattern/progression";
+import {
+  filterMultipleAnswersSteps,
+  shouldInjectProductionQuestionCheck,
+} from "../production-pattern/progression";
 
 export type HeadsLegsExtendedPlayerStep =
   | PlayerStep
@@ -39,10 +48,10 @@ export type HeadsLegsExtendedPlayerStep =
       id: string;
       type: "hl_choose_method";
       title: string;
-      chooseMode: "base" | "value";
+      chooseMode: "base" | "value" | "production";
       sourceSteps: PlayerStep[];
       questionAsks?: string;
-      answerTransform?: HeadsLegsValueRuleInstance["answerTransform"];
+      answerTransform?: HeadsLegsAnswerTransform;
       screenPhaseId?: string;
       screenPhaseTitle?: string;
       screenPhaseIndex?: number;
@@ -53,7 +62,7 @@ export type HeadsLegsExtendedPlayerStep =
       type: "hl_question_check";
       title: string;
       questionAsks: string;
-      answerTransform?: HeadsLegsValueRuleInstance["answerTransform"];
+      answerTransform?: HeadsLegsAnswerTransform;
       screenPhaseId?: string;
       screenPhaseTitle?: string;
       screenPhaseIndex?: number;
@@ -85,7 +94,8 @@ function applyPhaseMeta(steps: HeadsLegsExtendedPlayerStep[]): HeadsLegsExtended
 function injectQuestionCheckBeforeWords(
   steps: HeadsLegsExtendedPlayerStep[],
   taskId: string,
-  ri: HeadsLegsValueRuleInstance,
+  questionAsks: string,
+  answerTransform?: HeadsLegsAnswerTransform,
 ): HeadsLegsExtendedPlayerStep[] {
   const out: HeadsLegsExtendedPlayerStep[] = [];
   for (const step of steps) {
@@ -94,8 +104,8 @@ function injectQuestionCheckBeforeWords(
         id: `${taskId}-hl-question`,
         type: "hl_question_check",
         title: "Проверь, что именно спрашивают",
-        questionAsks: ri.questionAsks,
-        answerTransform: ri.answerTransform,
+        questionAsks,
+        answerTransform,
         screenPhaseId: "question",
       });
     }
@@ -104,7 +114,18 @@ function injectQuestionCheckBeforeWords(
   return out;
 }
 
-/** Цепочка экранов для pilot-задач паттернов 1 и 2 */
+function filterStepsForPilot(
+  steps: PlayerStep[],
+  profile: 1 | 2 | 3 | 4,
+  flowMode?: "standard" | "enumeration" | "multiple_answers",
+): PlayerStep[] {
+  if (flowMode === "multiple_answers" && profile === 4) {
+    return filterMultipleAnswersSteps(steps);
+  }
+  return filterContentStepsByProfile(steps, profile);
+}
+
+/** Цепочка экранов для pilot-задач паттернов 1–3 */
 export function buildHeadsLegsPlayerSteps(task: Task): HeadsLegsExtendedPlayerStep[] {
   const meta = task.headsLegsMeta;
   const pilot = meta ? resolveHeadsLegsPilot(meta.methodTaskId) : undefined;
@@ -123,21 +144,26 @@ export function buildHeadsLegsPlayerSteps(task: Task): HeadsLegsExtendedPlayerSt
   });
 
   const readStep = base[0];
-  let contentSteps = filterContentStepsByProfile(base.slice(1), profile);
+  let contentSteps = filterStepsForPilot(base.slice(1), profile, pilot.flowMode);
 
   const prefix: HeadsLegsExtendedPlayerStep[] = [];
   const ruleTitle =
-    pilot.patternKind === "value"
-      ? "Представим, что все одного вида"
+    pilot.patternKind === "production"
+      ? "Представим, что все сделали одинаково"
       : "Представим, что все одного вида";
 
   if (profile === 1) {
+    const introTemplate =
+      pilot.patternKind === "production"
+        ? headsLegsProductionIntroTemplate()
+        : pilot.patternKind === "value"
+          ? headsLegsValueIntroTemplate()
+          : headsLegsIntroTemplate();
     prefix.push({
       id: `${task.id}-hl-intro`,
       type: "hl_intro",
       title: "Объяснение метода",
-      template:
-        pilot.patternKind === "value" ? headsLegsValueIntroTemplate() : headsLegsIntroTemplate(),
+      template: introTemplate,
       screenPhaseId: "intro",
     });
   }
@@ -154,12 +180,26 @@ export function buildHeadsLegsPlayerSteps(task: Task): HeadsLegsExtendedPlayerSt
 
   const valueRi =
     pilot.ruleInstance.ruleId === "heads-legs-value-base" ? pilot.ruleInstance : undefined;
+  const productionRi =
+    pilot.ruleInstance.ruleId === "heads-legs-production-base"
+      ? pilot.ruleInstance
+      : undefined;
 
-  if (valueRi && shouldInjectQuestionCheck(profile, pilot.patternKind)) {
+  if (valueRi && pilot.patternKind === "value" && shouldInjectQuestionCheck(profile, "value")) {
     contentSteps = injectQuestionCheckBeforeWords(
       contentSteps as HeadsLegsExtendedPlayerStep[],
       task.id,
-      valueRi,
+      valueRi.questionAsks,
+      valueRi.answerTransform,
+    ) as PlayerStep[];
+  }
+
+  if (productionRi && shouldInjectProductionQuestionCheck(profile)) {
+    contentSteps = injectQuestionCheckBeforeWords(
+      contentSteps as HeadsLegsExtendedPlayerStep[],
+      task.id,
+      productionRi.questionAsks,
+      productionRi.answerTransform,
     ) as PlayerStep[];
   }
 
@@ -171,6 +211,16 @@ export function buildHeadsLegsPlayerSteps(task: Task): HeadsLegsExtendedPlayerSt
       (s) => s.type === "auto_explanation" && s.id.includes("-preview"),
     );
 
+    const chooseMode =
+      pilot.patternKind === "production"
+        ? "production"
+        : pilot.patternKind === "value"
+          ? "value"
+          : "base";
+
+    const hubQuestionAsks = valueRi?.questionAsks ?? productionRi?.questionAsks;
+    const hubTransform = valueRi?.answerTransform ?? productionRi?.answerTransform;
+
     return applyPhaseMeta([
       ...prefix,
       readStep,
@@ -179,10 +229,10 @@ export function buildHeadsLegsPlayerSteps(task: Task): HeadsLegsExtendedPlayerSt
         id: `${task.id}-hl-choose`,
         type: "hl_choose_method",
         title: "Какой шаг сейчас нужно сделать?",
-        chooseMode: pilot.patternKind === "value" ? "value" : "base",
+        chooseMode,
         sourceSteps: base.slice(1),
-        questionAsks: valueRi?.questionAsks,
-        answerTransform: valueRi?.answerTransform,
+        questionAsks: hubQuestionAsks,
+        answerTransform: hubTransform,
         screenPhaseId: "choose",
       },
       ...preview,
@@ -197,3 +247,5 @@ export function isHeadsLegsProgressionTask(task: Task): boolean {
   if (!meta) return false;
   return Boolean(resolveHeadsLegsPilot(meta.methodTaskId));
 }
+
+export type { HeadsLegsProductionRuleInstance, HeadsLegsValueRuleInstance };

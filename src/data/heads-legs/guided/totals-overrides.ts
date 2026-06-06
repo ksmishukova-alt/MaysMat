@@ -4,4 +4,5 @@ export const TOTALS_OVERRIDES: Record<
   { totalObjects?: number; totalFeature?: number }
 > = {
   "2.1": { totalObjects: 11, totalFeature: 225 },
+  "3.2": { totalFeature: 18 },
 };

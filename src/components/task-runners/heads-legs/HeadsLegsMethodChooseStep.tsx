@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import type { HeadsLegsValueAnswerTransform } from "@/data/method-rules/types";
+import type { HeadsLegsAnswerTransform } from "@/data/method-rules/types";
 import type { PlayerStep } from "@/lib/task-player-steps";
 import {
   CHOOSE_METHOD_ACTIONS,
@@ -15,6 +15,12 @@ import {
   findValueSubStepsForAction,
   type ValueChooseMethodAction,
 } from "@/data/heads-legs/value-pattern/progression";
+import {
+  PRODUCTION_CHOOSE_METHOD_ACTIONS,
+  PRODUCTION_CHOOSE_METHOD_LABELS,
+  findProductionSubStepsForAction,
+  type ProductionChooseMethodAction,
+} from "@/data/heads-legs/production-pattern/progression";
 import { HeadsLegsQuestionCheckStep } from "./HeadsLegsQuestionCheckStep";
 import { STEP_SUCCESS_MS } from "@/components/task-steps/step-advance";
 import { StepSuccess } from "@/components/task-steps/StepSuccess";
@@ -23,14 +29,14 @@ import { SingleSelectStep } from "@/components/task-steps/SingleSelectStep";
 import { WorksheetTableStep } from "@/components/task-steps/WorksheetTableStep";
 import { WordSolutionStep } from "@/components/task-steps/WordSolutionStep";
 
-type HubAction = ChooseMethodAction | ValueChooseMethodAction;
+type HubAction = ChooseMethodAction | ValueChooseMethodAction | ProductionChooseMethodAction;
 
 interface HeadsLegsMethodChooseStepProps {
   stepId?: string;
-  chooseMode?: "base" | "value";
+  chooseMode?: "base" | "value" | "production";
   sourceSteps: PlayerStep[];
   questionAsks?: string;
-  answerTransform?: HeadsLegsValueAnswerTransform;
+  answerTransform?: HeadsLegsAnswerTransform;
   onComplete: () => void;
 }
 
@@ -89,9 +95,18 @@ export function HeadsLegsMethodChooseStep({
   answerTransform,
   onComplete,
 }: HeadsLegsMethodChooseStepProps) {
-  const actions = chooseMode === "value" ? VALUE_CHOOSE_METHOD_ACTIONS : CHOOSE_METHOD_ACTIONS;
+  const actions =
+    chooseMode === "production"
+      ? PRODUCTION_CHOOSE_METHOD_ACTIONS
+      : chooseMode === "value"
+        ? VALUE_CHOOSE_METHOD_ACTIONS
+        : CHOOSE_METHOD_ACTIONS;
   const labels =
-    chooseMode === "value" ? VALUE_CHOOSE_METHOD_LABELS : CHOOSE_METHOD_LABELS;
+    chooseMode === "production"
+      ? PRODUCTION_CHOOSE_METHOD_LABELS
+      : chooseMode === "value"
+        ? VALUE_CHOOSE_METHOD_LABELS
+        : CHOOSE_METHOD_LABELS;
 
   const [completed, setCompleted] = useState<Set<HubAction>>(new Set());
   const [active, setActive] = useState<HubAction | null>(null);
@@ -123,6 +138,9 @@ export function HeadsLegsMethodChooseStep({
   const allDone = actions.every((k) => completed.has(k));
 
   const findSubSteps = (action: HubAction): PlayerStep[] => {
+    if (chooseMode === "production") {
+      return findProductionSubStepsForAction(sourceSteps, action as ProductionChooseMethodAction);
+    }
     if (chooseMode === "value") {
       return findValueSubStepsForAction(sourceSteps, action as ValueChooseMethodAction);
     }
@@ -141,7 +159,7 @@ export function HeadsLegsMethodChooseStep({
     };
 
     if (
-      chooseMode === "value" &&
+      (chooseMode === "value" || chooseMode === "production") &&
       active === "check_question" &&
       questionAsks &&
       !questionGatePassed

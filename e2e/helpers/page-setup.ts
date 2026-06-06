@@ -1,12 +1,17 @@
 import type { Page } from "@playwright/test";
 
 /** Чистая сессия задачи без сохранённого прогресса */
-export async function openTaskFresh(page: Page, taskId: string) {
+export async function openTaskFresh(
+  page: Page,
+  taskId: string,
+  mode?: "child" | "methodist" | "archivePreview",
+) {
   await page.addInitScript(() => {
     localStorage.clear();
     sessionStorage.clear();
   });
-  await page.goto(`/tasks/${taskId}`);
+  const qs = mode ? `?mode=${mode}` : "";
+  await page.goto(`/tasks/${taskId}${qs}`);
   await page.waitForLoadState("networkidle");
 }
 

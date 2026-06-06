@@ -56,8 +56,26 @@ export function HeadsLegsMethodRuleScreen({
         </div>
       ) : (
         <p className="mb-6 text-sm text-gray-600">
-          В этой задаче {instance.totalObjects} {instance.objectsLabel ?? "объектов"} и{" "}
-          {instance.totalFeature} {instance.featureName} — представим, что все {instance.assumeKindPhrase ?? instance.assumeKind}.
+          {instance.ruleId === "heads-legs-production-base" ? (
+            <>
+              {instance.totalParticipants != null ? (
+                <>
+                  В этой задаче {instance.totalParticipants}{" "}
+                  {instance.participantsLabel ?? "участников"} и {instance.totalResult}{" "}
+                  {instance.resultName}
+                </>
+              ) : (
+                <>В этой задаче всего {instance.totalResult} {instance.resultName}</>
+              )}{" "}
+              — представим, что все {instance.assumeKindPhrase ?? instance.assumeKind}.
+            </>
+          ) : (
+            <>
+              В этой задаче {instance.totalObjects} {instance.objectsLabel ?? "объектов"} и{" "}
+              {instance.totalFeature} {instance.featureName} — представим, что все{" "}
+              {instance.assumeKindPhrase ?? instance.assumeKind}.
+            </>
+          )}
         </p>
       )}
 

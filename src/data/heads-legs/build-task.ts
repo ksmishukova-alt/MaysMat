@@ -128,6 +128,18 @@ export function catalogEntryToMeta(entry: HeadsLegsCatalogEntry): HeadsLegsTaskM
   const totalsOverride = TOTALS_OVERRIDES[entry.methodTaskId];
   const pilot = resolveHeadsLegsPilot(entry.methodTaskId);
 
+  const productionPilot =
+    pilot?.patternKind === "production" && pilot.ruleInstance.ruleId === "heads-legs-production-base"
+      ? pilot.ruleInstance
+      : undefined;
+
+  const totalsFromPilot = productionPilot
+    ? {
+        totalObjects: productionPilot.totalParticipants ?? null,
+        totalFeature: productionPilot.totalResult,
+      }
+    : undefined;
+
   return {
     ...entry,
 
@@ -142,18 +154,18 @@ export function catalogEntryToMeta(entry: HeadsLegsCatalogEntry): HeadsLegsTaskM
     entities,
 
     totals: {
-
       totalObjects:
+        totalsFromPilot?.totalObjects ??
         totalsOverride?.totalObjects ??
         (inferred.totalObjectsKnown
           ? inferred.slots.find((s) => s.id === "totalObjects")?.accept[0] ?? null
           : null),
 
       totalFeature:
+        totalsFromPilot?.totalFeature ??
         totalsOverride?.totalFeature ??
         inferred.slots.find((s) => s.id === "totalFeature")?.accept[0] ??
         null,
-
     },
 
     solutionLines: getSolutionLines(entry),

@@ -1,14 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import type { HeadsLegsValueAnswerTransform } from "@/data/method-rules/types";
+import type { HeadsLegsAnswerTransform } from "@/data/method-rules/types";
 import { STEP_SUCCESS_MS } from "@/components/task-steps/step-advance";
 import { StepSuccess } from "@/components/task-steps/StepSuccess";
 
 interface HeadsLegsQuestionCheckStepProps {
   stepId?: string;
   questionAsks: string;
-  answerTransform?: HeadsLegsValueAnswerTransform;
+  answerTransform?: HeadsLegsAnswerTransform;
   onComplete: () => void;
 }
 
@@ -47,6 +47,16 @@ export function HeadsLegsQuestionCheckStep({
             <span data-testid="answer-transform-multiplier">{answerTransform.multiplier}</span>, чтобы
             получить{" "}
             <span data-testid="answer-transform-result-label">{answerTransform.resultLabel}</span>.
+          </p>
+        ) : null}
+        {answerTransform?.type === "compare_results" ? (
+          <p className="mt-3 text-sky-900" data-testid="answer-transform-hint">
+            Сначала найди, сколько{" "}
+            <span data-testid="answer-transform-first-kind">{answerTransform.firstKind}</span> и{" "}
+            <span data-testid="answer-transform-second-kind">{answerTransform.secondKind}</span>. Потом
+            сравни, кто собрал больше{" "}
+            <span data-testid="answer-transform-result-label">{answerTransform.resultLabel}</span> и на
+            сколько.
           </p>
         ) : null}
       </div>

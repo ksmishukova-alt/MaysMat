@@ -236,6 +236,13 @@ async function completeWordSolution(page: Page, taskId: string): Promise<boolean
         }
       }
     }
+    const textarea = root.locator("textarea");
+    if (await textarea.isVisible().catch(() => false)) {
+      const current = await textarea.inputValue().catch(() => "");
+      if (!current.trim()) {
+        await textarea.fill(buildModeCText(taskId));
+      }
+    }
     await page.getByRole("button", { name: /Проверить решение/ }).click();
     await waitStepAdvance(page);
     return true;
@@ -323,11 +330,13 @@ export async function advanceOneStep(page: Page, taskId: string): Promise<boolea
 export async function advanceUntilVisible(
   page: Page,
   taskId: string,
-  testId: string,
+  testId?: string,
   maxSteps = 50,
+  text?: string | RegExp,
 ) {
   for (let i = 0; i < maxSteps; i++) {
-    if (await page.getByTestId(testId).isVisible().catch(() => false)) return;
+    if (testId && (await page.getByTestId(testId).isVisible().catch(() => false))) return;
+    if (text && (await page.getByText(text).first().isVisible().catch(() => false))) return;
     if (page.url().includes("/result")) return;
     const ok = await advanceOneStep(page, taskId);
     if (!ok) await page.waitForTimeout(400);

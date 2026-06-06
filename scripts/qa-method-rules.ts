@@ -10,6 +10,7 @@ import {
 import {
   headsLegsBaseRule,
   headsLegsValueBaseRule,
+  headsLegsProductionBaseRule,
   getMethodRule,
 } from "../src/data/method-rules";
 import { HEADS_LEGS_TASKS } from "../src/data/heads-legs/build-task";
@@ -21,6 +22,11 @@ import {
   VALUE_PATTERN_PILOT,
   VALUE_PATTERN_PILOT_METHOD_IDS,
 } from "../src/data/heads-legs/value-pattern/models";
+import {
+  PRODUCTION_PATTERN_PILOT,
+  PRODUCTION_PATTERN_PILOT_METHOD_IDS,
+} from "../src/data/heads-legs/production-pattern/models";
+import { isNonStandardProductionPilot } from "../src/data/heads-legs/production-pattern/completeness-audit";
 import { ALL_PILOT_METHOD_IDS } from "../src/data/heads-legs/pilot/resolve";
 import { buildHeadsLegsPlayerSteps, isHeadsLegsProgressionTask } from "../src/data/heads-legs/base-pattern/build-player-steps";
 import { isChildVisible } from "../src/data/task-publishing/resolve";
@@ -199,6 +205,10 @@ for (const methodId of BASE_PATTERN_PILOT_METHOD_IDS) {
   }
 
   const ri = meta.ruleInstance!;
+  if (ri.ruleId !== "heads-legs-base") {
+    fail(`${task.id}: ruleId !== heads-legs-base`);
+    continue;
+  }
   if (ri.totalObjects !== pilot.ruleInstance.totalObjects) {
     fail(`${task.id}: totalObjects не совпадает с эталоном`);
   }
@@ -275,14 +285,15 @@ function auditValuePilot(methodId: string) {
     return;
   }
   const valueRi = ri;
+  const pilotRi = pilot.ruleInstance as import("../src/data/method-rules/types").HeadsLegsValueRuleInstance;
   if (!meta.progressionProfile) fail(`${task.id}: нет progressionProfile`);
   if (meta.progressionProfile !== pilot.progressionProfile) {
     fail(`${task.id}: progressionProfile !== ${pilot.progressionProfile}`);
   }
-  if (valueRi.totalObjects !== pilot.ruleInstance.totalObjects) {
+  if (valueRi.totalObjects !== pilotRi.totalObjects) {
     fail(`${task.id}: totalObjects не совпадает`);
   }
-  if (valueRi.totalFeature !== pilot.ruleInstance.totalFeature) {
+  if (valueRi.totalFeature !== pilotRi.totalFeature) {
     fail(`${task.id}: totalFeature не совпадает`);
   }
   const expectedStep = Math.abs(valueRi.secondFeature - valueRi.firstFeature);
@@ -329,6 +340,138 @@ for (const methodId of VALUE_PATTERN_PILOT_METHOD_IDS) {
 }
 
 ok(`pilot value pattern: ${VALUE_PATTERN_PILOT_METHOD_IDS.length} задач (${VALUE_PATTERN_PILOT_METHOD_IDS.join(", ")})`);
+
+console.log("\n--- heads-legs production pattern ---\n");
+
+if (!getMethodRule("heads-legs-production-base")) {
+  fail("heads-legs-production-base rule не найдено");
+} else {
+  ok("heads-legs-production-base в registry");
+}
+
+for (const term of FORBIDDEN_UI_TERMS) {
+  const inProdRule = headsLegsProductionBaseRule.fullRule.some((l) => l.includes(term));
+  if (inProdRule) fail(`production fullRule содержит «${term}»`);
+}
+if (!headsLegsProductionBaseRule.fullRule.some((l) => l.includes("спрашивают"))) {
+  fail("production fullRule без шага про вопрос задачи");
+} else {
+  ok("production fullRule без служебных терминов");
+}
+
+function auditProductionPilot(methodId: string) {
+  const task = Object.values(HEADS_LEGS_TASKS).find((t) => t.headsLegsMeta?.methodTaskId === methodId);
+  if (!task) {
+    fail(`pilot ${methodId}: задача не найдена`);
+    return;
+  }
+  const meta = task.headsLegsMeta!;
+  const pilot = PRODUCTION_PATTERN_PILOT[methodId];
+  const ri = meta.ruleInstance;
+
+  if (!ri || ri.ruleId !== "heads-legs-production-base") {
+    fail(`${task.id}: ruleId !== heads-legs-production-base`);
+    return;
+  }
+  const prodRi = ri;
+  if (!meta.progressionProfile) fail(`${task.id}: нет progressionProfile`);
+  if (meta.progressionProfile !== pilot.progressionProfile) {
+    fail(`${task.id}: progressionProfile !== ${pilot.progressionProfile}`);
+  }
+  const expectedStep = Math.abs(prodRi.secondResult - prodRi.firstResult);
+  if (prodRi.replacementStep !== expectedStep) {
+    fail(`${task.id}: replacementStep !== ${expectedStep}`);
+  }
+  if (!prodRi.questionAsks?.trim()) {
+    fail(`${task.id}: нет questionAsks`);
+  }
+  if (prodRi.requiresPositiveBothKinds !== true) {
+    fail(`${task.id}: requiresPositiveBothKinds !== true`);
+  }
+  if (
+    task.publishing &&
+    isChildVisible(task.publishing) &&
+    prodRi.completenessStatus !== "complete_unique_answer" &&
+    prodRi.completenessStatus !== "complete_multiple_answers"
+  ) {
+    fail(`${task.id}: childRoute с неполным completenessStatus`);
+  }
+  if (
+    !prodRi.totalParticipants &&
+    pilot.flowMode === "standard" &&
+    prodRi.completenessStatus === "complete_unique_answer"
+  ) {
+    fail(`${task.id}: standard childRoute без totalParticipants`);
+  }
+
+  const steps = buildHeadsLegsPlayerSteps(task);
+
+  if (methodId === "3.3") {
+    if (!steps.some((s) => s.type === "hl_method_rule")) fail("heads-legs-3-03: нет экрана правила");
+    if (!steps.some((s) => s.type === "hl_intro")) fail("heads-legs-3-03: нет intro");
+    else ok("heads-legs-3-03: полный экран правила (profile 1)");
+  }
+
+  if (pilot.flowMode === "enumeration") {
+    if (!steps.some((s) => s.id.includes("-diag-"))) {
+      fail(`${task.id}: enumeration без диагностических/переборных шагов`);
+    } else {
+      ok(`${task.id}: enumeration-flow`);
+    }
+  }
+
+  if (pilot.progressionProfile === 3) {
+    const hub = steps.find((s) => s.type === "hl_choose_method");
+    if (!hub || hub.type !== "hl_choose_method" || hub.chooseMode !== "production") {
+      fail(`${task.id}: нет production hub (профиль 3)`);
+    } else {
+      ok(`${task.id}: hub выбора шага (production)`);
+    }
+  }
+
+  if (pilot.progressionProfile === 4) {
+    const types = steps.map((s) => s.type);
+    if (!types.includes("word_solution")) fail(`${task.id}: нет word_solution`);
+    if (types.includes("drag_select") && pilot.flowMode !== "multiple_answers") {
+      fail(`${task.id}: профиль 4 содержит drag_select`);
+    } else {
+      ok(`${task.id}: профиль 4 — текстовое решение`);
+    }
+  }
+
+  if (methodId === "3.5" && prodRi.answerTransform?.type !== "compare_results") {
+    fail("heads-legs-3-05: нет compare_results answerTransform");
+  } else if (methodId === "3.5") {
+    ok("heads-legs-3-05: compare_results для сравнения мышей");
+  }
+
+  if (methodId === "3.7") {
+    if (meta.acceptedAnswers.kind !== "multi_set") {
+      fail("heads-legs-3-07: acceptedAnswers !== multi_set");
+    } else {
+      ok("heads-legs-3-07: multiple_answers mode");
+    }
+  }
+}
+
+for (const methodId of PRODUCTION_PATTERN_PILOT_METHOD_IDS) {
+  auditProductionPilot(methodId);
+}
+
+ok(
+  `pilot production pattern: ${PRODUCTION_PATTERN_PILOT_METHOD_IDS.length} задач (${PRODUCTION_PATTERN_PILOT_METHOD_IDS.join(", ")})`,
+);
+
+const diag31 = HEADS_LEGS_TASKS["heads-legs-3-01"];
+if (diag31 && isHeadsLegsProgressionTask(diag31)) {
+  fail("heads-legs-3-01: diagnostic, не progression-runner");
+} else {
+  ok("heads-legs-3-01: diagnostic (DigitalTaskPlayer)");
+}
+
+if (isNonStandardProductionPilot("3.1") !== true) {
+  fail("3.1: должен быть non-standard production pilot");
+}
 
 const legacy = HEADS_LEGS_TASKS["heads-legs-1-10"];
 if (legacy && isHeadsLegsProgressionTask(legacy)) {
