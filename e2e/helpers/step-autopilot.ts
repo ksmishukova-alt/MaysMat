@@ -178,7 +178,31 @@ async function completeDragSelect(page: Page, task: Task): Promise<boolean> {
   return true;
 }
 
+async function completeAssumeSelect(page: Page): Promise<boolean> {
+  const assumePrompt = page.getByText(/Выбери предположение|Представим, что все \d+ объектов были/);
+  if (!(await assumePrompt.first().isVisible().catch(() => false))) return false;
+
+  const candidates = [
+    /Неверные ответы/i,
+    /с двойкой/i,
+    /По 2 открытки/i,
+    /без ничьих|не вничью/i,
+    /неправильными/i,
+  ];
+  for (const pattern of candidates) {
+    const btn = page.getByRole("button", { name: pattern }).first();
+    if (await btn.isVisible().catch(() => false)) {
+      await btn.click();
+      await clickIfVisible(page, "Проверить");
+      return true;
+    }
+  }
+  return false;
+}
+
 async function completeSingleSelect(page: Page, task: Task): Promise<boolean> {
+  if (await completeAssumeSelect(page)) return true;
+
   const cards = page.locator("button:has(span.text-5xl)");
   if ((await cards.count()) === 0) return false;
 
@@ -272,6 +296,7 @@ async function completeMethodHub(page: Page, task: Task): Promise<boolean> {
     if (await fillWorksheetTable(page, task)) return true;
     if (await completeSingleSelect(page, task)) return true;
     if (await completeDragSelect(page, task)) return true;
+    if (await clickIfVisible(page, "Понятно, считаю дальше")) return true;
     if (await clickIfVisible(page, "Понятно, записываю ответ")) return true;
     return false;
   }
@@ -312,6 +337,15 @@ async function completeGenericStep(page: Page, task: Task): Promise<boolean> {
   }
   if (await page.getByTestId("question-check-step").isVisible().catch(() => false)) {
     return clickIfVisible(page, "Понятно, записываю ответ");
+  }
+  if (await page.getByTestId("score-question-check-step").isVisible().catch(() => false)) {
+    return clickIfVisible(page, "Понятно, записываю ответ");
+  }
+  if (await page.getByTestId("score-replacement-step").isVisible().catch(() => false)) {
+    return clickIfVisible(page, "Понятно, считаю дальше");
+  }
+  if (await page.getByTestId("match-total-step").isVisible().catch(() => false)) {
+    return clickIfVisible(page, "Понятно, решаю");
   }
 
   if (await clickIfVisible(page, "Понятно, дальше →")) return true;

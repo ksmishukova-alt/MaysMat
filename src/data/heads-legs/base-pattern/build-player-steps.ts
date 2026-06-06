@@ -3,12 +3,15 @@ import { buildPlayerSteps, type PlayerStep } from "@/lib/task-player-steps";
 import {
   headsLegsIntroTemplate,
   headsLegsProductionIntroTemplate,
+  headsLegsScoreIntroTemplate,
   headsLegsValueIntroTemplate,
 } from "@/data/method-rules";
 import type {
   HeadsLegsAnswerTransform,
   HeadsLegsProductionRuleInstance,
+  HeadsLegsScoreRuleInstance,
   HeadsLegsValueRuleInstance,
+  ScoreMode,
 } from "@/data/method-rules/types";
 import {
   filterContentStepsByProfile,
@@ -21,6 +24,7 @@ import {
   filterMultipleAnswersSteps,
   shouldInjectProductionQuestionCheck,
 } from "../production-pattern/progression";
+import { shouldInjectScoreQuestionCheck } from "../score-pattern/progression";
 
 export type HeadsLegsExtendedPlayerStep =
   | PlayerStep
@@ -48,10 +52,12 @@ export type HeadsLegsExtendedPlayerStep =
       id: string;
       type: "hl_choose_method";
       title: string;
-      chooseMode: "base" | "value" | "production";
+      chooseMode: "base" | "value" | "production" | "score";
       sourceSteps: PlayerStep[];
       questionAsks?: string;
       answerTransform?: HeadsLegsAnswerTransform;
+      scoreMode?: ScoreMode;
+      scoreRuleInstance?: HeadsLegsScoreRuleInstance;
       screenPhaseId?: string;
       screenPhaseTitle?: string;
       screenPhaseIndex?: number;
@@ -63,6 +69,38 @@ export type HeadsLegsExtendedPlayerStep =
       title: string;
       questionAsks: string;
       answerTransform?: HeadsLegsAnswerTransform;
+      screenPhaseId?: string;
+      screenPhaseTitle?: string;
+      screenPhaseIndex?: number;
+      screenPhaseCount?: number;
+    }
+  | {
+      id: string;
+      type: "hl_score_question_check";
+      title: string;
+      questionAsks: string;
+      questionCheckNote?: string;
+      scoreMode?: ScoreMode;
+      screenPhaseId?: string;
+      screenPhaseTitle?: string;
+      screenPhaseIndex?: number;
+      screenPhaseCount?: number;
+    }
+  | {
+      id: string;
+      type: "hl_score_replacement";
+      title: string;
+      scoreRuleInstance: HeadsLegsScoreRuleInstance;
+      screenPhaseId?: string;
+      screenPhaseTitle?: string;
+      screenPhaseIndex?: number;
+      screenPhaseCount?: number;
+    }
+  | {
+      id: string;
+      type: "hl_match_total";
+      title: string;
+      scoreRuleInstance: HeadsLegsScoreRuleInstance;
       screenPhaseId?: string;
       screenPhaseTitle?: string;
       screenPhaseIndex?: number;
@@ -81,14 +119,41 @@ function applyPhaseMeta(steps: HeadsLegsExtendedPlayerStep[]): HeadsLegsExtended
         ? "Объяснение метода"
         : step.type === "hl_method_rule"
           ? "Правило"
-          : step.type === "read_condition"
-            ? "Понимаем задачу"
-            : step.type === "hl_choose_method"
-              ? "Выбираем шаг"
-              : step.type === "hl_question_check"
-                ? "Проверяем вопрос"
-                : "Решаем"),
+          : step.type === "hl_score_replacement"
+            ? "Шаг замены"
+            : step.type === "hl_match_total"
+              ? "Очки за матч"
+              : step.type === "read_condition"
+                ? "Понимаем задачу"
+                : step.type === "hl_choose_method"
+                  ? "Выбираем шаг"
+                  : step.type === "hl_question_check" || step.type === "hl_score_question_check"
+                    ? "Проверяем вопрос"
+                    : "Решаем"),
   }));
+}
+
+function injectScoreQuestionCheckBeforeWords(
+  steps: HeadsLegsExtendedPlayerStep[],
+  taskId: string,
+  scoreRi: HeadsLegsScoreRuleInstance,
+): HeadsLegsExtendedPlayerStep[] {
+  const out: HeadsLegsExtendedPlayerStep[] = [];
+  for (const step of steps) {
+    if (step.type === "word_solution") {
+      out.push({
+        id: `${taskId}-hl-score-question`,
+        type: "hl_score_question_check",
+        title: "Проверь, что именно спрашивают",
+        questionAsks: scoreRi.questionAsks,
+        questionCheckNote: scoreRi.questionCheckNote,
+        scoreMode: scoreRi.scoreMode,
+        screenPhaseId: "question",
+      });
+    }
+    out.push(step);
+  }
+  return out;
 }
 
 function injectQuestionCheckBeforeWords(
@@ -125,7 +190,34 @@ function filterStepsForPilot(
   return filterContentStepsByProfile(steps, profile);
 }
 
-/** Цепочка экранов для pilot-задач паттернов 1–3 */
+function scoreSpecialPrefix(
+  taskId: string,
+  scoreRi: HeadsLegsScoreRuleInstance,
+  profile: 1 | 2 | 3 | 4,
+): HeadsLegsExtendedPlayerStep[] {
+  const extra: HeadsLegsExtendedPlayerStep[] = [];
+  if (scoreRi.scoreMode === "match_total" && profile <= 2) {
+    extra.push({
+      id: `${taskId}-hl-match-total`,
+      type: "hl_match_total",
+      title: "Сколько очков за матч вместе?",
+      scoreRuleInstance: scoreRi,
+      screenPhaseId: "match-total",
+    });
+  }
+  if (scoreRi.scoreMode === "plus_minus" && profile === 1) {
+    extra.push({
+      id: `${taskId}-hl-score-repl`,
+      type: "hl_score_replacement",
+      title: "Шаг замены с отрицательными баллами",
+      scoreRuleInstance: scoreRi,
+      screenPhaseId: "score-replacement",
+    });
+  }
+  return extra;
+}
+
+/** Цепочка экранов для pilot-задач паттернов 1–4 */
 export function buildHeadsLegsPlayerSteps(task: Task): HeadsLegsExtendedPlayerStep[] {
   const meta = task.headsLegsMeta;
   const pilot = meta ? resolveHeadsLegsPilot(meta.methodTaskId) : undefined;
@@ -148,17 +240,21 @@ export function buildHeadsLegsPlayerSteps(task: Task): HeadsLegsExtendedPlayerSt
 
   const prefix: HeadsLegsExtendedPlayerStep[] = [];
   const ruleTitle =
-    pilot.patternKind === "production"
-      ? "Представим, что все сделали одинаково"
-      : "Представим, что все одного вида";
+    pilot.patternKind === "score"
+      ? "Представим, что все одного типа"
+      : pilot.patternKind === "production"
+        ? "Представим, что все сделали одинаково"
+        : "Представим, что все одного вида";
 
   if (profile === 1) {
     const introTemplate =
-      pilot.patternKind === "production"
-        ? headsLegsProductionIntroTemplate()
-        : pilot.patternKind === "value"
-          ? headsLegsValueIntroTemplate()
-          : headsLegsIntroTemplate();
+      pilot.patternKind === "score"
+        ? headsLegsScoreIntroTemplate()
+        : pilot.patternKind === "production"
+          ? headsLegsProductionIntroTemplate()
+          : pilot.patternKind === "value"
+            ? headsLegsValueIntroTemplate()
+            : headsLegsIntroTemplate();
     prefix.push({
       id: `${task.id}-hl-intro`,
       type: "hl_intro",
@@ -184,6 +280,12 @@ export function buildHeadsLegsPlayerSteps(task: Task): HeadsLegsExtendedPlayerSt
     pilot.ruleInstance.ruleId === "heads-legs-production-base"
       ? pilot.ruleInstance
       : undefined;
+  const scoreRi =
+    pilot.ruleInstance.ruleId === "heads-legs-score-base" ? pilot.ruleInstance : undefined;
+
+  if (scoreRi) {
+    prefix.push(...scoreSpecialPrefix(task.id, scoreRi, profile));
+  }
 
   if (valueRi && pilot.patternKind === "value" && shouldInjectQuestionCheck(profile, "value")) {
     contentSteps = injectQuestionCheckBeforeWords(
@@ -203,6 +305,14 @@ export function buildHeadsLegsPlayerSteps(task: Task): HeadsLegsExtendedPlayerSt
     ) as PlayerStep[];
   }
 
+  if (scoreRi && shouldInjectScoreQuestionCheck(profile, pilot.patternKind)) {
+    contentSteps = injectScoreQuestionCheckBeforeWords(
+      contentSteps as HeadsLegsExtendedPlayerStep[],
+      task.id,
+      scoreRi,
+    ) as PlayerStep[];
+  }
+
   if (profile === 3) {
     const setup = contentSteps.filter(
       (s) => s.type !== "word_solution" && !(s.type === "auto_explanation" && s.id.includes("-preview")),
@@ -212,19 +322,33 @@ export function buildHeadsLegsPlayerSteps(task: Task): HeadsLegsExtendedPlayerSt
     );
 
     const chooseMode =
-      pilot.patternKind === "production"
-        ? "production"
-        : pilot.patternKind === "value"
-          ? "value"
-          : "base";
+      pilot.patternKind === "score"
+        ? "score"
+        : pilot.patternKind === "production"
+          ? "production"
+          : pilot.patternKind === "value"
+            ? "value"
+            : "base";
 
-    const hubQuestionAsks = valueRi?.questionAsks ?? productionRi?.questionAsks;
+    const hubQuestionAsks = valueRi?.questionAsks ?? productionRi?.questionAsks ?? scoreRi?.questionAsks;
     const hubTransform = valueRi?.answerTransform ?? productionRi?.answerTransform;
+
+    const scoreReplacementStep: HeadsLegsExtendedPlayerStep | null =
+      scoreRi?.scoreMode === "plus_minus"
+        ? {
+            id: `${task.id}-hl-score-repl`,
+            type: "hl_score_replacement",
+            title: "Шаг замены с отрицательными баллами",
+            scoreRuleInstance: scoreRi,
+            screenPhaseId: "score-replacement",
+          }
+        : null;
 
     return applyPhaseMeta([
       ...prefix,
       readStep,
       ...setup,
+      ...(scoreReplacementStep ? [scoreReplacementStep] : []),
       {
         id: `${task.id}-hl-choose`,
         type: "hl_choose_method",
@@ -233,6 +357,8 @@ export function buildHeadsLegsPlayerSteps(task: Task): HeadsLegsExtendedPlayerSt
         sourceSteps: base.slice(1),
         questionAsks: hubQuestionAsks,
         answerTransform: hubTransform,
+        scoreMode: scoreRi?.scoreMode,
+        scoreRuleInstance: scoreRi,
         screenPhaseId: "choose",
       },
       ...preview,
@@ -248,4 +374,4 @@ export function isHeadsLegsProgressionTask(task: Task): boolean {
   return Boolean(resolveHeadsLegsPilot(meta.methodTaskId));
 }
 
-export type { HeadsLegsProductionRuleInstance, HeadsLegsValueRuleInstance };
+export type { HeadsLegsProductionRuleInstance, HeadsLegsScoreRuleInstance, HeadsLegsValueRuleInstance };

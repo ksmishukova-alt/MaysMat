@@ -21,7 +21,16 @@ import {
   findProductionSubStepsForAction,
   type ProductionChooseMethodAction,
 } from "@/data/heads-legs/production-pattern/progression";
+import {
+  SCORE_CHOOSE_METHOD_LABELS,
+  findScoreSubStepsForAction,
+  scoreHubActionsForMode,
+  type ScoreChooseMethodAction,
+} from "@/data/heads-legs/score-pattern/progression";
+import type { HeadsLegsScoreRuleInstance, ScoreMode } from "@/data/method-rules/types";
 import { HeadsLegsQuestionCheckStep } from "./HeadsLegsQuestionCheckStep";
+import { ScoreQuestionCheckStep } from "./ScoreQuestionCheckStep";
+import { ScoreReplacementStep } from "./ScoreReplacementStep";
 import { STEP_SUCCESS_MS } from "@/components/task-steps/step-advance";
 import { StepSuccess } from "@/components/task-steps/StepSuccess";
 import { DragSelectStep } from "@/components/task-steps/DragSelectStep";
@@ -29,14 +38,16 @@ import { SingleSelectStep } from "@/components/task-steps/SingleSelectStep";
 import { WorksheetTableStep } from "@/components/task-steps/WorksheetTableStep";
 import { WordSolutionStep } from "@/components/task-steps/WordSolutionStep";
 
-type HubAction = ChooseMethodAction | ValueChooseMethodAction | ProductionChooseMethodAction;
+type HubAction = ChooseMethodAction | ValueChooseMethodAction | ProductionChooseMethodAction | ScoreChooseMethodAction;
 
 interface HeadsLegsMethodChooseStepProps {
   stepId?: string;
-  chooseMode?: "base" | "value" | "production";
+  chooseMode?: "base" | "value" | "production" | "score";
   sourceSteps: PlayerStep[];
   questionAsks?: string;
   answerTransform?: HeadsLegsAnswerTransform;
+  scoreMode?: ScoreMode;
+  scoreRuleInstance?: HeadsLegsScoreRuleInstance;
   onComplete: () => void;
 }
 
@@ -93,20 +104,26 @@ export function HeadsLegsMethodChooseStep({
   sourceSteps,
   questionAsks,
   answerTransform,
+  scoreMode,
+  scoreRuleInstance,
   onComplete,
 }: HeadsLegsMethodChooseStepProps) {
-  const actions =
-    chooseMode === "production"
-      ? PRODUCTION_CHOOSE_METHOD_ACTIONS
-      : chooseMode === "value"
-        ? VALUE_CHOOSE_METHOD_ACTIONS
-        : CHOOSE_METHOD_ACTIONS;
+  const actions: HubAction[] =
+    chooseMode === "score"
+      ? scoreHubActionsForMode(scoreMode ?? "ordinary")
+      : chooseMode === "production"
+        ? PRODUCTION_CHOOSE_METHOD_ACTIONS
+        : chooseMode === "value"
+          ? VALUE_CHOOSE_METHOD_ACTIONS
+          : CHOOSE_METHOD_ACTIONS;
   const labels =
-    chooseMode === "production"
-      ? PRODUCTION_CHOOSE_METHOD_LABELS
-      : chooseMode === "value"
-        ? VALUE_CHOOSE_METHOD_LABELS
-        : CHOOSE_METHOD_LABELS;
+    chooseMode === "score"
+      ? SCORE_CHOOSE_METHOD_LABELS
+      : chooseMode === "production"
+        ? PRODUCTION_CHOOSE_METHOD_LABELS
+        : chooseMode === "value"
+          ? VALUE_CHOOSE_METHOD_LABELS
+          : CHOOSE_METHOD_LABELS;
 
   const [completed, setCompleted] = useState<Set<HubAction>>(new Set());
   const [active, setActive] = useState<HubAction | null>(null);
@@ -138,6 +155,9 @@ export function HeadsLegsMethodChooseStep({
   const allDone = actions.every((k) => completed.has(k));
 
   const findSubSteps = (action: HubAction): PlayerStep[] => {
+    if (chooseMode === "score") {
+      return findScoreSubStepsForAction(sourceSteps, action as ScoreChooseMethodAction);
+    }
     if (chooseMode === "production") {
       return findProductionSubStepsForAction(sourceSteps, action as ProductionChooseMethodAction);
     }
@@ -157,6 +177,48 @@ export function HeadsLegsMethodChooseStep({
       setSubIndex(0);
       setQuestionGatePassed(false);
     };
+
+    if (
+      chooseMode === "score" &&
+      active === "plus_minus_step" &&
+      scoreRuleInstance &&
+      !questionGatePassed
+    ) {
+      return (
+        <div>
+          <button type="button" onClick={backToHub} className="mb-4 text-sm text-brand-purple hover:underline">
+            ← Назад к выбору
+          </button>
+          <ScoreReplacementStep
+            stepId={`${stepId}-plus-minus`}
+            instance={scoreRuleInstance}
+            onComplete={() => setQuestionGatePassed(true)}
+          />
+        </div>
+      );
+    }
+
+    if (
+      chooseMode === "score" &&
+      active === "check_question" &&
+      questionAsks &&
+      !questionGatePassed
+    ) {
+      return (
+        <div>
+          <button type="button" onClick={backToHub} className="mb-4 text-sm text-brand-purple hover:underline">
+            ← Назад к выбору
+          </button>
+          <ScoreQuestionCheckStep
+            stepId={`${stepId}-qcheck`}
+            questionAsks={questionAsks}
+            questionCheckNote={scoreRuleInstance?.questionCheckNote}
+            scoreMode={scoreMode}
+            onComplete={() => setQuestionGatePassed(true)}
+          />
+        </div>
+      );
+    }
 
     if (
       (chooseMode === "value" || chooseMode === "production") &&
@@ -182,6 +244,17 @@ export function HeadsLegsMethodChooseStep({
     const subSteps = findSubSteps(active);
     const sub = subSteps[subIndex];
     if (!sub) {
+      if (chooseMode === "score" && active === "plus_minus_step" && questionGatePassed) {
+        markDone(active);
+        return null;
+      }
+      if (chooseMode === "score" && active === "check_question" && questionGatePassed) {
+        const wordSteps = findSubSteps("check_question");
+        if (wordSteps.length === 0) {
+          markDone(active);
+          return null;
+        }
+      }
       markDone(active);
       return null;
     }

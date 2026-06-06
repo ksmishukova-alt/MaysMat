@@ -69,10 +69,41 @@ export interface HeadsLegsValueRuleInstance {
   showRuleScreen?: boolean;
 }
 
+export type ScoreMode = "ordinary" | "plus_minus" | "match_total";
+
+/** Числа из задачи «Баллы / оценки / плюс-минус очки» (паттерн 4) */
+export interface HeadsLegsScoreRuleInstance {
+  ruleId: "heads-legs-score-base";
+  totalObjects: number;
+  totalScore: number;
+  firstKind: string;
+  firstScore: number;
+  secondKind: string;
+  secondScore: number;
+  scoreName: string;
+  assumeKind: string;
+  replacementStep: number;
+  questionAsks: string;
+  scoreMode: ScoreMode;
+  /** Только для match_total (4.4) */
+  decisiveMatchTotal?: number;
+  drawMatchTotal?: number;
+  completenessStatus: TaskCompletenessStatus;
+  assumeKindPhrase?: string;
+  objectsLabel?: string;
+  sceneIntro?: string;
+  featureLines?: [string, string];
+  /** Подсказка на шаге «что спрашивают» (напр. 4.2: не перепутать 3 и 7) */
+  questionCheckNote?: string;
+  explanationNote?: string;
+  showRuleScreen?: boolean;
+}
+
 export type HeadsLegsMethodRuleInstance =
   | HeadsLegsRuleInstance
   | HeadsLegsValueRuleInstance
-  | HeadsLegsProductionRuleInstance;
+  | HeadsLegsProductionRuleInstance
+  | HeadsLegsScoreRuleInstance;
 
 export type TaskCompletenessStatus =
   | "complete_unique_answer"

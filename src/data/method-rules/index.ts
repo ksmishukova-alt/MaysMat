@@ -11,6 +11,8 @@ export type {
   HeadsLegsRuleInstance,
   HeadsLegsValueRuleInstance,
   HeadsLegsProductionRuleInstance,
+  HeadsLegsScoreRuleInstance,
+  ScoreMode,
   HeadsLegsMethodRuleInstance,
   HeadsLegsValueAnswerTransform,
   HeadsLegsProductionAnswerTransform,
@@ -98,11 +100,32 @@ export const headsLegsProductionBaseRule: MethodRule = {
   ],
 };
 
+export const headsLegsScoreBaseRule: MethodRule = {
+  id: "heads-legs-score-base",
+  title: "Баллы: прибавили или вычли",
+  childTitle: "Представим, что все ответы одного типа",
+  anchorPhrase: "Сначала представим самый простой вариант: будто все ответы были одного типа.",
+  helpButtonLabel: "Запутался? Вспомни правило",
+  fullRule: [
+    "Найдём, сколько всего попыток / учеников / матчей.",
+    "Представим, что все были одного типа.",
+    "Посчитаем, сколько баллов / очков / открыток получилось бы.",
+    "Сравним с условием.",
+    "Найдём разницу.",
+    "Поймём, на сколько меняется результат при одной замене.",
+    "Разделим разницу на шаг замены.",
+    "Найдём количество объектов второго типа.",
+    "Найдём количество объектов первого типа.",
+    "Проверим, что именно спрашивают в задаче.",
+  ],
+};
+
 export const METHOD_RULES: Record<string, MethodRule> = {
   "remainders-houses": remaindersHousesRule,
   "heads-legs-base": headsLegsBaseRule,
   "heads-legs-value-base": headsLegsValueBaseRule,
   "heads-legs-production-base": headsLegsProductionBaseRule,
+  "heads-legs-score-base": headsLegsScoreBaseRule,
 };
 
 export function getMethodRule(ruleId: string): MethodRule | undefined {
@@ -184,9 +207,19 @@ function assumeFeature(instance: HeadsLegsMethodRuleInstance): number {
       ? instance.firstResult
       : instance.secondResult;
   }
+  if (instance.ruleId === "heads-legs-score-base") {
+    return instance.assumeKind === instance.firstKind
+      ? instance.firstScore
+      : instance.secondScore;
+  }
   return instance.assumeKind === instance.firstKind
     ? instance.firstFeature
     : instance.secondFeature;
+}
+
+function formatSignedScore(n: number): string {
+  if (n > 0) return `+${n}`;
+  return String(n);
 }
 
 function otherKind(instance: HeadsLegsMethodRuleInstance): string {
@@ -271,10 +304,116 @@ function buildProductionRuleExample(instance: import("./types").HeadsLegsProduct
   return lines;
 }
 
+function buildScoreRuleExample(instance: import("./types").HeadsLegsScoreRuleInstance): string[] {
+  const lines: string[] = [];
+  if (instance.sceneIntro) {
+    lines.push(instance.sceneIntro, "");
+  }
+  if (instance.featureLines) {
+    lines.push(instance.featureLines[0], instance.featureLines[1], "");
+  }
+
+  const obj = instance.objectsLabel ?? "объектов";
+  const assumePhrase = instance.assumeKindPhrase ?? instance.assumeKind;
+  const assumeScore = assumeFeature(instance);
+  const other = otherKind(instance);
+  const otherScore =
+    instance.assumeKind === instance.firstKind ? instance.secondScore : instance.firstScore;
+  const trial = instance.totalObjects * assumeScore;
+  const diff = instance.totalScore - trial;
+  const otherCount = diff / instance.replacementStep;
+  const scoreName = instance.scoreName;
+
+  if (instance.scoreMode === "match_total") {
+    const decisive = instance.decisiveMatchTotal ?? instance.firstScore;
+    const draw = instance.drawMatchTotal ?? instance.secondScore;
+    lines.push(
+      `Если матч закончился победой одной команды, вместе команды получают ${decisive} очков (4 + 1).`,
+      "",
+      `Если матч закончился ничьей, вместе команды получают ${draw} очка (2 + 2).`,
+      "",
+      `Всего ${instance.totalObjects} матчей.`,
+      "",
+      `Если бы все матчи были без ничьих, очков было бы:`,
+      "",
+      `${instance.totalObjects} × ${decisive} = ${instance.totalObjects * decisive}`,
+      "",
+      `По условию набрали ${instance.totalScore} очков.`,
+      "",
+      `Разница: ${instance.totalObjects * decisive} − ${instance.totalScore} = ${instance.totalObjects * decisive - instance.totalScore}`,
+      "",
+      `Каждая ничья уменьшает общую сумму на ${decisive - draw}.`,
+      "",
+      `Ничьих: ${otherCount}.`,
+      "",
+      `В этой задаче нужно найти: ${instance.questionAsks}.`,
+    );
+    return lines;
+  }
+
+  lines.push(
+    `Всего ${instance.totalObjects} ${obj}.`,
+    "",
+    `Представим, что все — ${assumePhrase}.`,
+    "",
+    `Тогда ${scoreName} было бы:`,
+    "",
+    `${instance.totalObjects} × (${formatSignedScore(assumeScore)}) = ${trial}`,
+    "",
+    `По условию ${scoreName} ${instance.totalScore}.`,
+    "",
+  );
+
+  if (instance.scoreMode === "plus_minus") {
+    lines.push(
+      `Разница:`,
+      "",
+      `${instance.totalScore} − (${trial}) = ${diff}`,
+      "",
+      `Один вариант даёт ${formatSignedScore(otherScore)} ${scoreName}, другой — ${formatSignedScore(assumeScore)} ${scoreName}.`,
+      "",
+      `Одна замена меняет результат на:`,
+      "",
+      `${otherScore} − (${assumeScore}) = ${instance.replacementStep}`,
+      "",
+      `${other}:`,
+      "",
+      `${diff} ÷ ${instance.replacementStep} = ${otherCount}`,
+    );
+  } else if (diff > 0) {
+    lines.push(
+      `Не хватает:`,
+      "",
+      `${instance.totalScore} − ${trial} = ${diff}`,
+      "",
+      `Один ${other.slice(0, -1) || other} добавляет ${instance.replacementStep} к сумме.`,
+      "",
+      `${other}:`,
+      "",
+      `${diff} ÷ ${instance.replacementStep} = ${otherCount}`,
+    );
+    const remainCount = instance.totalObjects - otherCount;
+    if (remainCount > 0 && instance.questionAsks.includes(instance.firstKind.split(" ").slice(-1)[0] ?? "")) {
+      lines.push("", `${instance.assumeKind}:`, "", `${instance.totalObjects} − ${otherCount} = ${remainCount}`);
+    }
+  }
+
+  lines.push("", `В этой задаче нужно найти: ${instance.questionAsks}.`);
+
+  if (instance.questionCheckNote) {
+    lines.push("", instance.questionCheckNote);
+  }
+
+  return lines;
+}
+
 /** Текст примера для экрана правила «Головы и ноги» */
 export function buildHeadsLegsRuleExample(instance: HeadsLegsMethodRuleInstance): string[] {
   if (instance.ruleId === "heads-legs-production-base") {
     return buildProductionRuleExample(instance);
+  }
+  if (instance.ruleId === "heads-legs-score-base") {
+    return buildScoreRuleExample(instance);
   }
 
   const feat = assumeFeature(instance);
@@ -376,5 +515,15 @@ export function headsLegsProductionIntroTemplate(): string[] {
     "Раньше мы считали ноги, колёса, карандаши и деньги. Тот же приём работает с задачами, конфетами, снежинками и яблоками.",
     "Сначала представим, что все участники сделали одинаково.",
     "Посчитаем общий результат, сравним с условием — и проверим, что именно спрашивают в задаче.",
+  ];
+}
+
+/** Вводный экран для паттерна 4 «Баллы / оценки / плюс-минус очки» */
+export function headsLegsScoreIntroTemplate(): string[] {
+  return [
+    "Когда за одно дают больше, а за другое меньше",
+    "Тот же метод замены работает с баллами, оценками и очками за матчи.",
+    "Сначала представим самый простой вариант: будто все ответы были одного типа.",
+    "Если за ошибку вычитают баллы, шаг замены считаем особенно внимательно — например, 7 − (−12) = 19.",
   ];
 }

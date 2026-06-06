@@ -69,6 +69,12 @@ export function HeadsLegsMethodRuleScreen({
               )}{" "}
               — представим, что все {instance.assumeKindPhrase ?? instance.assumeKind}.
             </>
+          ) : instance.ruleId === "heads-legs-score-base" ? (
+            <>
+              В этой задаче {instance.totalObjects} {instance.objectsLabel ?? "объектов"} и{" "}
+              {instance.totalScore} {instance.scoreName} — представим, что все{" "}
+              {instance.assumeKindPhrase ?? instance.assumeKind}.
+            </>
           ) : (
             <>
               В этой задаче {instance.totalObjects} {instance.objectsLabel ?? "объектов"} и{" "}

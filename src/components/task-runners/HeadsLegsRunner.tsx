@@ -16,6 +16,9 @@ import {
 } from "@/components/method/HeadsLegsMethodRuleScreen";
 import { HeadsLegsMethodChooseStep } from "@/components/task-runners/heads-legs/HeadsLegsMethodChooseStep";
 import { HeadsLegsQuestionCheckStep } from "@/components/task-runners/heads-legs/HeadsLegsQuestionCheckStep";
+import { MatchTotalStep } from "@/components/task-runners/heads-legs/MatchTotalStep";
+import { ScoreQuestionCheckStep } from "@/components/task-runners/heads-legs/ScoreQuestionCheckStep";
+import { ScoreReplacementStep } from "@/components/task-runners/heads-legs/ScoreReplacementStep";
 import { DigitalTaskPlayer } from "@/components/TaskPlayer";
 import { AutoExplanationStep } from "@/components/task-steps/AutoExplanationStep";
 import { ReadConditionStep } from "@/components/task-steps/ReadConditionStep";
@@ -140,7 +143,9 @@ function HeadsLegsProgressionPlayer({
   const hideHeaderCondition =
     step.type === "read_condition" ||
     step.type === "hl_method_rule" ||
-    step.type === "hl_intro";
+    step.type === "hl_intro" ||
+    step.type === "hl_score_replacement" ||
+    step.type === "hl_match_total";
   const showPhaseHeader =
     step.screenPhaseTitle != null && step.screenPhaseTitle !== prevStep?.screenPhaseTitle;
   const isReadStep = step.type === "read_condition";
@@ -149,6 +154,9 @@ function HeadsLegsProgressionPlayer({
     step.type !== "hl_method_rule" &&
     step.type !== "hl_choose_method" &&
     step.type !== "hl_question_check" &&
+    step.type !== "hl_score_question_check" &&
+    step.type !== "hl_score_replacement" &&
+    step.type !== "hl_match_total" &&
     step.type !== "read_condition" &&
     "hint" in step
       ? step.hint
@@ -205,9 +213,9 @@ function HeadsLegsProgressionPlayer({
           phaseIndex={step.screenPhaseIndex}
           phaseCount={step.screenPhaseCount}
           showPhaseHeader={showPhaseHeader}
-          stepTitle={!isReadStep && step.type !== "hl_intro" && step.type !== "hl_method_rule" && step.type !== "hl_question_check" ? step.title : undefined}
+          stepTitle={!isReadStep && step.type !== "hl_intro" && step.type !== "hl_method_rule" && step.type !== "hl_question_check" && step.type !== "hl_score_question_check" && step.type !== "hl_score_replacement" && step.type !== "hl_match_total" ? step.title : undefined}
           hint={stepHintText && !isReadStep ? stepHintText : undefined}
-          showStepTitle={!isReadStep && step.type !== "hl_intro" && step.type !== "hl_method_rule" && step.type !== "hl_question_check"}
+          showStepTitle={!isReadStep && step.type !== "hl_intro" && step.type !== "hl_method_rule" && step.type !== "hl_question_check" && step.type !== "hl_score_question_check" && step.type !== "hl_score_replacement" && step.type !== "hl_match_total"}
         >
           <HeadsLegsStepBody
             step={step}
@@ -273,6 +281,34 @@ function HeadsLegsStepBody({
           sourceSteps={step.sourceSteps}
           questionAsks={step.questionAsks}
           answerTransform={step.answerTransform}
+          scoreMode={step.scoreMode}
+          scoreRuleInstance={step.scoreRuleInstance}
+          onComplete={onAdvance}
+        />
+      );
+    case "hl_score_question_check":
+      return (
+        <ScoreQuestionCheckStep
+          stepId={step.id}
+          questionAsks={step.questionAsks}
+          questionCheckNote={step.questionCheckNote}
+          scoreMode={step.scoreMode}
+          onComplete={onAdvance}
+        />
+      );
+    case "hl_score_replacement":
+      return (
+        <ScoreReplacementStep
+          stepId={step.id}
+          instance={step.scoreRuleInstance}
+          onComplete={onAdvance}
+        />
+      );
+    case "hl_match_total":
+      return (
+        <MatchTotalStep
+          stepId={step.id}
+          instance={step.scoreRuleInstance}
           onComplete={onAdvance}
         />
       );

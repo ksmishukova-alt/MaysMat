@@ -133,12 +133,22 @@ export function catalogEntryToMeta(entry: HeadsLegsCatalogEntry): HeadsLegsTaskM
       ? pilot.ruleInstance
       : undefined;
 
+  const scorePilot =
+    pilot?.patternKind === "score" && pilot.ruleInstance.ruleId === "heads-legs-score-base"
+      ? pilot.ruleInstance
+      : undefined;
+
   const totalsFromPilot = productionPilot
     ? {
         totalObjects: productionPilot.totalParticipants ?? null,
         totalFeature: productionPilot.totalResult,
       }
-    : undefined;
+    : scorePilot
+      ? {
+          totalObjects: scorePilot.totalObjects,
+          totalFeature: scorePilot.totalScore,
+        }
+      : undefined;
 
   return {
     ...entry,
