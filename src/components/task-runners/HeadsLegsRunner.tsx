@@ -15,6 +15,7 @@ import {
   HeadsLegsMethodRuleScreen,
 } from "@/components/method/HeadsLegsMethodRuleScreen";
 import { HeadsLegsMethodChooseStep } from "@/components/task-runners/heads-legs/HeadsLegsMethodChooseStep";
+import { HeadsLegsQuestionCheckStep } from "@/components/task-runners/heads-legs/HeadsLegsQuestionCheckStep";
 import { DigitalTaskPlayer } from "@/components/TaskPlayer";
 import { AutoExplanationStep } from "@/components/task-steps/AutoExplanationStep";
 import { ReadConditionStep } from "@/components/task-steps/ReadConditionStep";
@@ -147,6 +148,7 @@ function HeadsLegsProgressionPlayer({
     step.type !== "hl_intro" &&
     step.type !== "hl_method_rule" &&
     step.type !== "hl_choose_method" &&
+    step.type !== "hl_question_check" &&
     step.type !== "read_condition" &&
     "hint" in step
       ? step.hint
@@ -202,9 +204,9 @@ function HeadsLegsProgressionPlayer({
           phaseIndex={step.screenPhaseIndex}
           phaseCount={step.screenPhaseCount}
           showPhaseHeader={showPhaseHeader}
-          stepTitle={!isReadStep && step.type !== "hl_intro" && step.type !== "hl_method_rule" ? step.title : undefined}
+          stepTitle={!isReadStep && step.type !== "hl_intro" && step.type !== "hl_method_rule" && step.type !== "hl_question_check" ? step.title : undefined}
           hint={stepHintText && !isReadStep ? stepHintText : undefined}
-          showStepTitle={!isReadStep && step.type !== "hl_intro" && step.type !== "hl_method_rule"}
+          showStepTitle={!isReadStep && step.type !== "hl_intro" && step.type !== "hl_method_rule" && step.type !== "hl_question_check"}
         >
           <HeadsLegsStepBody
             step={step}
@@ -266,7 +268,19 @@ function HeadsLegsStepBody({
       return (
         <HeadsLegsMethodChooseStep
           stepId={step.id}
+          chooseMode={step.chooseMode}
           sourceSteps={step.sourceSteps}
+          questionAsks={step.questionAsks}
+          answerTransform={step.answerTransform}
+          onComplete={onAdvance}
+        />
+      );
+    case "hl_question_check":
+      return (
+        <HeadsLegsQuestionCheckStep
+          stepId={step.id}
+          questionAsks={step.questionAsks}
+          answerTransform={step.answerTransform}
           onComplete={onAdvance}
         />
       );

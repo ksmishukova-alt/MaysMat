@@ -1,11 +1,11 @@
 "use client";
 
-import type { HeadsLegsRuleInstance, MethodRule } from "@/data/method-rules/types";
+import type { HeadsLegsMethodRuleInstance, MethodRule } from "@/data/method-rules/types";
 import { buildHeadsLegsRuleExample } from "@/data/method-rules";
 
 interface HeadsLegsMethodRuleScreenProps {
   rule: MethodRule;
-  instance: HeadsLegsRuleInstance;
+  instance: HeadsLegsMethodRuleInstance;
   variant?: "step" | "modal";
   compact?: boolean;
   onComplete?: () => void;
@@ -104,7 +104,7 @@ export function HeadsLegsMethodRuleModal({
 }: {
   open: boolean;
   rule: MethodRule;
-  instance: HeadsLegsRuleInstance;
+  instance: HeadsLegsMethodRuleInstance;
   onClose: () => void;
 }) {
   if (!open) return null;

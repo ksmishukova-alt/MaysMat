@@ -1,12 +1,17 @@
 import type { Task } from "@/data/tasks";
 import { buildPlayerSteps, type PlayerStep } from "@/lib/task-player-steps";
-import { headsLegsIntroTemplate } from "@/data/method-rules";
+import {
+  headsLegsIntroTemplate,
+  headsLegsValueIntroTemplate,
+} from "@/data/method-rules";
+import type { HeadsLegsValueRuleInstance } from "@/data/method-rules/types";
 import {
   filterContentStepsByProfile,
   isCompactRuleScreen,
   shouldShowRuleScreen,
-} from "./progression";
-import { resolveBasePatternPilot } from "./models";
+} from "../base-pattern/progression";
+import { resolveHeadsLegsPilot } from "../pilot/resolve";
+import { shouldInjectQuestionCheck } from "../value-pattern/progression";
 
 export type HeadsLegsExtendedPlayerStep =
   | PlayerStep
@@ -34,7 +39,21 @@ export type HeadsLegsExtendedPlayerStep =
       id: string;
       type: "hl_choose_method";
       title: string;
+      chooseMode: "base" | "value";
       sourceSteps: PlayerStep[];
+      questionAsks?: string;
+      answerTransform?: HeadsLegsValueRuleInstance["answerTransform"];
+      screenPhaseId?: string;
+      screenPhaseTitle?: string;
+      screenPhaseIndex?: number;
+      screenPhaseCount?: number;
+    }
+  | {
+      id: string;
+      type: "hl_question_check";
+      title: string;
+      questionAsks: string;
+      answerTransform?: HeadsLegsValueRuleInstance["answerTransform"];
       screenPhaseId?: string;
       screenPhaseTitle?: string;
       screenPhaseIndex?: number;
@@ -57,14 +76,38 @@ function applyPhaseMeta(steps: HeadsLegsExtendedPlayerStep[]): HeadsLegsExtended
             ? "Понимаем задачу"
             : step.type === "hl_choose_method"
               ? "Выбираем шаг"
-              : "Решаем"),
+              : step.type === "hl_question_check"
+                ? "Проверяем вопрос"
+                : "Решаем"),
   }));
 }
 
-/** Цепочка экранов для pilot-задач первого паттерна */
+function injectQuestionCheckBeforeWords(
+  steps: HeadsLegsExtendedPlayerStep[],
+  taskId: string,
+  ri: HeadsLegsValueRuleInstance,
+): HeadsLegsExtendedPlayerStep[] {
+  const out: HeadsLegsExtendedPlayerStep[] = [];
+  for (const step of steps) {
+    if (step.type === "word_solution") {
+      out.push({
+        id: `${taskId}-hl-question`,
+        type: "hl_question_check",
+        title: "Проверь, что именно спрашивают",
+        questionAsks: ri.questionAsks,
+        answerTransform: ri.answerTransform,
+        screenPhaseId: "question",
+      });
+    }
+    out.push(step);
+  }
+  return out;
+}
+
+/** Цепочка экранов для pilot-задач паттернов 1 и 2 */
 export function buildHeadsLegsPlayerSteps(task: Task): HeadsLegsExtendedPlayerStep[] {
   const meta = task.headsLegsMeta;
-  const pilot = meta ? resolveBasePatternPilot(meta.methodTaskId) : undefined;
+  const pilot = meta ? resolveHeadsLegsPilot(meta.methodTaskId) : undefined;
 
   if (!pilot || !meta) {
     return buildPlayerSteps(task, {
@@ -80,16 +123,21 @@ export function buildHeadsLegsPlayerSteps(task: Task): HeadsLegsExtendedPlayerSt
   });
 
   const readStep = base[0];
-  const contentSteps = filterContentStepsByProfile(base.slice(1), profile);
+  let contentSteps = filterContentStepsByProfile(base.slice(1), profile);
 
   const prefix: HeadsLegsExtendedPlayerStep[] = [];
+  const ruleTitle =
+    pilot.patternKind === "value"
+      ? "Представим, что все одного вида"
+      : "Представим, что все одного вида";
 
   if (profile === 1) {
     prefix.push({
       id: `${task.id}-hl-intro`,
       type: "hl_intro",
       title: "Объяснение метода",
-      template: headsLegsIntroTemplate(),
+      template:
+        pilot.patternKind === "value" ? headsLegsValueIntroTemplate() : headsLegsIntroTemplate(),
       screenPhaseId: "intro",
     });
   }
@@ -98,10 +146,21 @@ export function buildHeadsLegsPlayerSteps(task: Task): HeadsLegsExtendedPlayerSt
     prefix.push({
       id: `${task.id}-hl-rule`,
       type: "hl_method_rule",
-      title: "Представим, что все одного вида",
+      title: ruleTitle,
       compact: isCompactRuleScreen(profile),
       screenPhaseId: "rule",
     });
+  }
+
+  const valueRi =
+    pilot.ruleInstance.ruleId === "heads-legs-value-base" ? pilot.ruleInstance : undefined;
+
+  if (valueRi && shouldInjectQuestionCheck(profile, pilot.patternKind)) {
+    contentSteps = injectQuestionCheckBeforeWords(
+      contentSteps as HeadsLegsExtendedPlayerStep[],
+      task.id,
+      valueRi,
+    ) as PlayerStep[];
   }
 
   if (profile === 3) {
@@ -120,7 +179,10 @@ export function buildHeadsLegsPlayerSteps(task: Task): HeadsLegsExtendedPlayerSt
         id: `${task.id}-hl-choose`,
         type: "hl_choose_method",
         title: "Какой шаг сейчас нужно сделать?",
+        chooseMode: pilot.patternKind === "value" ? "value" : "base",
         sourceSteps: base.slice(1),
+        questionAsks: valueRi?.questionAsks,
+        answerTransform: valueRi?.answerTransform,
         screenPhaseId: "choose",
       },
       ...preview,
@@ -133,5 +195,5 @@ export function buildHeadsLegsPlayerSteps(task: Task): HeadsLegsExtendedPlayerSt
 export function isHeadsLegsProgressionTask(task: Task): boolean {
   const meta = task.headsLegsMeta;
   if (!meta) return false;
-  return Boolean(resolveBasePatternPilot(meta.methodTaskId));
+  return Boolean(resolveHeadsLegsPilot(meta.methodTaskId));
 }

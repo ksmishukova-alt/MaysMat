@@ -21,7 +21,7 @@ export interface RemaindersRuleInstance {
   showRuleScreen?: boolean;
 }
 
-/** Числа из задачи «Головы и ноги» для экрана правила */
+/** Числа из задачи «Головы и ноги» для экрана правила (паттерн 1) */
 export interface HeadsLegsRuleInstance {
   ruleId: "heads-legs-base";
   totalObjects: number;
@@ -33,15 +33,46 @@ export interface HeadsLegsRuleInstance {
   featureName: string;
   assumeKind: string;
   replacementStep: number;
-  /** Склонение для фразы «все N … — …» */
   assumeKindPhrase?: string;
-  /** «30 животных», «120 детёнышей» */
   objectsLabel?: string;
-  /** «В задаче есть звери и птицы.» */
   sceneIntro?: string;
-  /** «У птицы 2 ноги.» / «У зверя 4 ноги.» */
   featureLines?: [string, string];
   showRuleScreen?: boolean;
 }
 
-export type MethodRuleInstance = RemaindersRuleInstance | HeadsLegsRuleInstance;
+/** Дополнительное действие для ответа (паттерн 2) */
+export interface HeadsLegsValueAnswerTransform {
+  type: "multiply_found_objects";
+  multiplier: number;
+  resultLabel: string;
+  foundObjectLabel?: string;
+}
+
+/** Числа из задачи «Цена / количество / расход» (паттерн 2) */
+export interface HeadsLegsValueRuleInstance {
+  ruleId: "heads-legs-value-base";
+  totalObjects: number;
+  totalFeature: number;
+  firstKind: string;
+  firstFeature: number;
+  secondKind: string;
+  secondFeature: number;
+  featureName: string;
+  assumeKind: string;
+  replacementStep: number;
+  questionAsks: string;
+  assumeKindPhrase?: string;
+  objectsLabel?: string;
+  sceneIntro?: string;
+  featureLines?: [string, string];
+  answerTransform?: HeadsLegsValueAnswerTransform;
+  showRuleScreen?: boolean;
+}
+
+export type HeadsLegsMethodRuleInstance = HeadsLegsRuleInstance | HeadsLegsValueRuleInstance;
+
+export type HeadsLegsProgressionProfile = 1 | 2 | 3 | 4;
+
+export type MethodRuleInstance =
+  | RemaindersRuleInstance
+  | HeadsLegsMethodRuleInstance;

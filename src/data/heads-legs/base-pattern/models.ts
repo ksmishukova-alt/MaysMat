@@ -1,6 +1,6 @@
 import type { HeadsLegsRuleInstance } from "@/data/method-rules/types";
 
-/** Профиль снятия опоры для первого паттерна «Головы и ноги» */
+/** @deprecated импортируйте HeadsLegsProgressionProfile из @/data/method-rules/types */
 export type HeadsLegsProgressionProfile = 1 | 2 | 3 | 4;
 
 export interface BasePatternPilotMeta {

@@ -21,7 +21,7 @@ import { resolveTaskPublishing } from "@/data/task-publishing/resolve";
 
 import { normalizeSolutionMode } from "./solution-modes";
 
-import { resolveBasePatternPilot } from "./base-pattern/models";
+import { resolveHeadsLegsPilot } from "./pilot/resolve";
 
 import type { HeadsLegsCatalogEntry, HeadsLegsTaskMeta, SolutionLine } from "./types";
 
@@ -126,7 +126,7 @@ export function catalogEntryToMeta(entry: HeadsLegsCatalogEntry): HeadsLegsTaskM
   const inferred = inferModelFromCondition(entry.condition);
   const entities = inferTaskEntities(entry.condition, entry.methodTaskId, getSolutionLines(entry));
   const totalsOverride = TOTALS_OVERRIDES[entry.methodTaskId];
-  const pilot = resolveBasePatternPilot(entry.methodTaskId);
+  const pilot = resolveHeadsLegsPilot(entry.methodTaskId);
 
   return {
     ...entry,

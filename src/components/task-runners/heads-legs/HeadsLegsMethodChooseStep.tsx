@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import type { HeadsLegsValueAnswerTransform } from "@/data/method-rules/types";
 import type { PlayerStep } from "@/lib/task-player-steps";
 import {
   CHOOSE_METHOD_ACTIONS,
@@ -8,6 +9,13 @@ import {
   findSubStepsForAction,
   type ChooseMethodAction,
 } from "@/data/heads-legs/base-pattern/progression";
+import {
+  VALUE_CHOOSE_METHOD_ACTIONS,
+  VALUE_CHOOSE_METHOD_LABELS,
+  findValueSubStepsForAction,
+  type ValueChooseMethodAction,
+} from "@/data/heads-legs/value-pattern/progression";
+import { HeadsLegsQuestionCheckStep } from "./HeadsLegsQuestionCheckStep";
 import { STEP_SUCCESS_MS } from "@/components/task-steps/step-advance";
 import { StepSuccess } from "@/components/task-steps/StepSuccess";
 import { DragSelectStep } from "@/components/task-steps/DragSelectStep";
@@ -15,9 +23,14 @@ import { SingleSelectStep } from "@/components/task-steps/SingleSelectStep";
 import { WorksheetTableStep } from "@/components/task-steps/WorksheetTableStep";
 import { WordSolutionStep } from "@/components/task-steps/WordSolutionStep";
 
+type HubAction = ChooseMethodAction | ValueChooseMethodAction;
+
 interface HeadsLegsMethodChooseStepProps {
   stepId?: string;
+  chooseMode?: "base" | "value";
   sourceSteps: PlayerStep[];
+  questionAsks?: string;
+  answerTransform?: HeadsLegsValueAnswerTransform;
   onComplete: () => void;
 }
 
@@ -70,18 +83,27 @@ function renderSubStep(step: PlayerStep, onSubComplete: () => void) {
 /** Профиль 3: ребёнок выбирает следующий шаг метода */
 export function HeadsLegsMethodChooseStep({
   stepId,
+  chooseMode = "base",
   sourceSteps,
+  questionAsks,
+  answerTransform,
   onComplete,
 }: HeadsLegsMethodChooseStepProps) {
-  const [completed, setCompleted] = useState<Set<ChooseMethodAction>>(new Set());
-  const [active, setActive] = useState<ChooseMethodAction | null>(null);
+  const actions = chooseMode === "value" ? VALUE_CHOOSE_METHOD_ACTIONS : CHOOSE_METHOD_ACTIONS;
+  const labels =
+    chooseMode === "value" ? VALUE_CHOOSE_METHOD_LABELS : CHOOSE_METHOD_LABELS;
+
+  const [completed, setCompleted] = useState<Set<HubAction>>(new Set());
+  const [active, setActive] = useState<HubAction | null>(null);
   const [subIndex, setSubIndex] = useState(0);
+  const [questionGatePassed, setQuestionGatePassed] = useState(false);
   const [success, setSuccess] = useState(false);
 
   useEffect(() => {
     setCompleted(new Set());
     setActive(null);
     setSubIndex(0);
+    setQuestionGatePassed(false);
     setSuccess(false);
   }, [stepId]);
 
@@ -91,20 +113,55 @@ export function HeadsLegsMethodChooseStep({
     return () => window.clearTimeout(timer);
   }, [success, onComplete]);
 
-  const markDone = (action: ChooseMethodAction) => {
+  const markDone = (action: HubAction) => {
     setCompleted((prev) => new Set(prev).add(action));
     setActive(null);
     setSubIndex(0);
+    setQuestionGatePassed(false);
   };
 
-  const allDone = CHOOSE_METHOD_ACTIONS.every((k) => completed.has(k));
+  const allDone = actions.every((k) => completed.has(k));
+
+  const findSubSteps = (action: HubAction): PlayerStep[] => {
+    if (chooseMode === "value") {
+      return findValueSubStepsForAction(sourceSteps, action as ValueChooseMethodAction);
+    }
+    return findSubStepsForAction(sourceSteps, action as ChooseMethodAction);
+  };
 
   if (success) {
     return <StepSuccess message="Отлично! Ты прошёл все шаги метода." />;
   }
 
   if (active) {
-    const subSteps = findSubStepsForAction(sourceSteps, active);
+    const backToHub = () => {
+      setActive(null);
+      setSubIndex(0);
+      setQuestionGatePassed(false);
+    };
+
+    if (
+      chooseMode === "value" &&
+      active === "check_question" &&
+      questionAsks &&
+      !questionGatePassed
+    ) {
+      return (
+        <div>
+          <button type="button" onClick={backToHub} className="mb-4 text-sm text-brand-purple hover:underline">
+            ← Назад к выбору
+          </button>
+          <HeadsLegsQuestionCheckStep
+            stepId={`${stepId}-qcheck`}
+            questionAsks={questionAsks}
+            answerTransform={answerTransform}
+            onComplete={() => setQuestionGatePassed(true)}
+          />
+        </div>
+      );
+    }
+
+    const subSteps = findSubSteps(active);
     const sub = subSteps[subIndex];
     if (!sub) {
       markDone(active);
@@ -121,14 +178,7 @@ export function HeadsLegsMethodChooseStep({
 
     return (
       <div>
-        <button
-          type="button"
-          onClick={() => {
-            setActive(null);
-            setSubIndex(0);
-          }}
-          className="mb-4 text-sm text-brand-purple hover:underline"
-        >
+        <button type="button" onClick={backToHub} className="mb-4 text-sm text-brand-purple hover:underline">
           ← Назад к выбору
         </button>
         {renderSubStep(sub, onSubComplete)}
@@ -140,7 +190,7 @@ export function HeadsLegsMethodChooseStep({
     <div>
       <p className="mb-4 text-sm font-medium text-gray-800">Какой шаг сейчас нужно сделать?</p>
       <div className="mb-6 space-y-2">
-        {CHOOSE_METHOD_ACTIONS.map((action) => {
+        {actions.map((action) => {
           const done = completed.has(action);
           return (
             <button
@@ -160,7 +210,7 @@ export function HeadsLegsMethodChooseStep({
               >
                 {done ? "✓" : "?"}
               </span>
-              {CHOOSE_METHOD_LABELS[action]}
+              {labels[action as keyof typeof labels]}
             </button>
           );
         })}
@@ -175,7 +225,7 @@ export function HeadsLegsMethodChooseStep({
         </button>
       ) : (
         <p className="text-xs text-gray-500">
-          Осталось шагов: {CHOOSE_METHOD_ACTIONS.length - completed.size}
+          Осталось шагов: {actions.length - completed.size}
         </p>
       )}
     </div>

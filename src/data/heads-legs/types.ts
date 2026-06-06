@@ -1,4 +1,5 @@
 import type { SolutionMode } from "@/data/heads-legs/solution-modes";
+import type { HeadsLegsMethodRuleInstance } from "@/data/method-rules/types";
 
 export type { SolutionMode };
 
@@ -67,8 +68,8 @@ export interface HeadsLegsTaskMeta extends HeadsLegsCatalogEntry {
   acceptedAnswers: AcceptedAnswer;
   solutionLines?: SolutionLine[];
   hintLevels?: [string?, string?, string?];
-  /** Pilot первого паттерна: методическое правило с числами задачи */
-  ruleInstance?: import("@/data/method-rules/types").HeadsLegsRuleInstance;
+  /** Pilot: методическое правило с числами задачи */
+  ruleInstance?: HeadsLegsMethodRuleInstance;
   /** Профиль снятия опоры (1 — полная, 4 — только запись решения) */
   progressionProfile?: 1 | 2 | 3 | 4;
 }

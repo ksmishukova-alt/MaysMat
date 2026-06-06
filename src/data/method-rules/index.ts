@@ -1,7 +1,18 @@
-import type { HeadsLegsRuleInstance, MethodRule, RemaindersRuleInstance } from "./types";
+import type {
+  HeadsLegsMethodRuleInstance,
+  MethodRule,
+  RemaindersRuleInstance,
+} from "./types";
 import type { RemaindersModel } from "@/data/dirichlet/remainders/types";
 
-export type { MethodRule, RemaindersRuleInstance, HeadsLegsRuleInstance } from "./types";
+export type {
+  MethodRule,
+  RemaindersRuleInstance,
+  HeadsLegsRuleInstance,
+  HeadsLegsValueRuleInstance,
+  HeadsLegsMethodRuleInstance,
+  HeadsLegsValueAnswerTransform,
+} from "./types";
 
 export const remaindersHousesRule: MethodRule = {
   id: "remainders-houses",
@@ -42,9 +53,30 @@ export const headsLegsBaseRule: MethodRule = {
   ],
 };
 
+export const headsLegsValueBaseRule: MethodRule = {
+  id: "heads-legs-value-base",
+  title: "Головы и ноги",
+  childTitle: "Представим, что все одного вида",
+  anchorPhrase: "Сначала представим самый простой случай: будто все объекты одного вида.",
+  helpButtonLabel: "Запутался? Вспомни правило",
+  fullRule: [
+    "Найдём, сколько всего объектов.",
+    "Выберем простой вариант: будто все объекты одного вида.",
+    "Посчитаем, сколько получилось бы всего.",
+    "Сравним с тем, что дано в условии.",
+    "Найдём разницу.",
+    "Поймём, на сколько один объект второго вида отличается от первого.",
+    "Разделим разницу на шаг замены.",
+    "Найдём количество объектов второго вида.",
+    "Найдём количество объектов первого вида.",
+    "Проверим, что именно спрашивают в задаче.",
+  ],
+};
+
 export const METHOD_RULES: Record<string, MethodRule> = {
   "remainders-houses": remaindersHousesRule,
   "heads-legs-base": headsLegsBaseRule,
+  "heads-legs-value-base": headsLegsValueBaseRule,
 };
 
 export function getMethodRule(ruleId: string): MethodRule | undefined {
@@ -120,20 +152,20 @@ export function localizeRuleLines(rule: MethodRule, modulus: number): string[] {
   return rule.fullRule.map((line) => line.replace(/\bm\b/g, String(modulus)));
 }
 
-function assumeFeature(instance: HeadsLegsRuleInstance): number {
+function assumeFeature(instance: HeadsLegsMethodRuleInstance): number {
   return instance.assumeKind === instance.firstKind
     ? instance.firstFeature
     : instance.secondFeature;
 }
 
-function otherKind(instance: HeadsLegsRuleInstance): string {
+function otherKind(instance: HeadsLegsMethodRuleInstance): string {
   return instance.assumeKind === instance.firstKind
     ? instance.secondKind
     : instance.firstKind;
 }
 
 /** Текст примера для экрана правила «Головы и ноги» */
-export function buildHeadsLegsRuleExample(instance: HeadsLegsRuleInstance): string[] {
+export function buildHeadsLegsRuleExample(instance: HeadsLegsMethodRuleInstance): string[] {
   const feat = assumeFeature(instance);
   const trial = instance.totalObjects * feat;
   const diff = instance.totalFeature - trial;
@@ -193,15 +225,35 @@ export function buildHeadsLegsRuleExample(instance: HeadsLegsRuleInstance): stri
     );
   }
 
+  if (instance.ruleId === "heads-legs-value-base") {
+    lines.push("", `В этой задаче нужно найти: ${instance.questionAsks}.`);
+    if (instance.answerTransform?.type === "multiply_found_objects") {
+      lines.push(
+        "",
+        `После подсчёта ${instance.answerTransform.foundObjectLabel ?? "объектов"} умножь на ${instance.answerTransform.multiplier}, чтобы получить ${instance.answerTransform.resultLabel}.`,
+      );
+    }
+  }
+
   return lines;
 }
 
-/** Вводный экран метода для профиля 1 */
+/** Вводный экран метода для паттерна 1 (профиль 1) */
 export function headsLegsIntroTemplate(): string[] {
   return [
     "Метод «Представим, что все одного вида»",
     "В задаче бывают объекты двух видов — у каждого вида своё число ног, колёс или другого признака.",
     "Сначала представим самый простой случай: будто все объекты одного вида.",
     "Посчитаем, сколько признаков получилось бы, и сравним с условием — так найдём, сколько объектов каждого вида.",
+  ];
+}
+
+/** Вводный экран для паттерна 2 «Цена / количество / расход» */
+export function headsLegsValueIntroTemplate(): string[] {
+  return [
+    "Тот же метод — другие величины",
+    "Раньше мы считали ноги и колёса. Тот же приём работает с карандашами, рублями, котлетами, сосисками и цветами.",
+    "Сначала представим самый простой случай: будто все объекты одного вида.",
+    "Посчитаем общий расход, сравним с условием — и не забудем проверить, что именно спрашивают в задаче.",
   ];
 }

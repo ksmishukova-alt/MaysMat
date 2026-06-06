@@ -9,6 +9,7 @@ import {
 } from "../src/data/dirichlet/remainders/models";
 import {
   headsLegsBaseRule,
+  headsLegsValueBaseRule,
   getMethodRule,
 } from "../src/data/method-rules";
 import { HEADS_LEGS_TASKS } from "../src/data/heads-legs/build-task";
@@ -16,7 +17,12 @@ import {
   BASE_PATTERN_PILOT,
   BASE_PATTERN_PILOT_METHOD_IDS,
 } from "../src/data/heads-legs/base-pattern/models";
-import { buildHeadsLegsPlayerSteps } from "../src/data/heads-legs/base-pattern/build-player-steps";
+import {
+  VALUE_PATTERN_PILOT,
+  VALUE_PATTERN_PILOT_METHOD_IDS,
+} from "../src/data/heads-legs/value-pattern/models";
+import { ALL_PILOT_METHOD_IDS } from "../src/data/heads-legs/pilot/resolve";
+import { buildHeadsLegsPlayerSteps, isHeadsLegsProgressionTask } from "../src/data/heads-legs/base-pattern/build-player-steps";
 import { isChildVisible } from "../src/data/task-publishing/resolve";
 import { resolveRunnerKind } from "../src/lib/resolve-runner-kind";
 
@@ -170,13 +176,11 @@ const childHeadsLegs = Object.values(HEADS_LEGS_TASKS).filter(
 
 for (const task of childHeadsLegs) {
   const methodId = task.headsLegsMeta?.methodTaskId;
-  if (!methodId || !BASE_PATTERN_PILOT[methodId]) continue;
+  if (!methodId || !ALL_PILOT_METHOD_IDS.includes(methodId)) continue;
   const ri = task.headsLegsMeta?.ruleInstance;
   if (!ri) {
     fail(`${task.id}: pilot childRoute без ruleInstance`);
-    continue;
   }
-  if (ri.ruleId !== "heads-legs-base") fail(`${task.id}: ruleId !== heads-legs-base`);
 }
 
 for (const methodId of BASE_PATTERN_PILOT_METHOD_IDS) {
@@ -237,6 +241,101 @@ for (const methodId of BASE_PATTERN_PILOT_METHOD_IDS) {
 }
 
 ok(`pilot base pattern: ${BASE_PATTERN_PILOT_METHOD_IDS.length} задач (${BASE_PATTERN_PILOT_METHOD_IDS.join(", ")})`);
+
+console.log("\n--- heads-legs value pattern ---\n");
+
+if (!getMethodRule("heads-legs-value-base")) {
+  fail("heads-legs-value-base rule не найдено");
+} else {
+  ok("heads-legs-value-base в registry");
+}
+
+for (const term of FORBIDDEN_UI_TERMS) {
+  const inValRule = headsLegsValueBaseRule.fullRule.some((l) => l.includes(term));
+  if (inValRule) fail(`headsLegs value fullRule содержит «${term}»`);
+}
+if (!headsLegsValueBaseRule.fullRule.some((l) => l.includes("спрашивают"))) {
+  fail("value fullRule без шага про вопрос задачи");
+} else {
+  ok("value fullRule без служебных терминов");
+}
+
+function auditValuePilot(methodId: string) {
+  const task = Object.values(HEADS_LEGS_TASKS).find((t) => t.headsLegsMeta?.methodTaskId === methodId);
+  if (!task) {
+    fail(`pilot ${methodId}: задача не найдена`);
+    return;
+  }
+  const meta = task.headsLegsMeta!;
+  const pilot = VALUE_PATTERN_PILOT[methodId];
+  const ri = meta.ruleInstance;
+
+  if (!ri || ri.ruleId !== "heads-legs-value-base") {
+    fail(`${task.id}: ruleId !== heads-legs-value-base`);
+    return;
+  }
+  const valueRi = ri;
+  if (!meta.progressionProfile) fail(`${task.id}: нет progressionProfile`);
+  if (meta.progressionProfile !== pilot.progressionProfile) {
+    fail(`${task.id}: progressionProfile !== ${pilot.progressionProfile}`);
+  }
+  if (valueRi.totalObjects !== pilot.ruleInstance.totalObjects) {
+    fail(`${task.id}: totalObjects не совпадает`);
+  }
+  if (valueRi.totalFeature !== pilot.ruleInstance.totalFeature) {
+    fail(`${task.id}: totalFeature не совпадает`);
+  }
+  const expectedStep = Math.abs(valueRi.secondFeature - valueRi.firstFeature);
+  if (valueRi.replacementStep !== expectedStep) {
+    fail(`${task.id}: replacementStep !== ${expectedStep}`);
+  }
+  if (!valueRi.questionAsks?.trim()) {
+    fail(`${task.id}: нет questionAsks`);
+  }
+
+  const steps = buildHeadsLegsPlayerSteps(task);
+
+  if (methodId === "2.1") {
+    if (!steps.some((s) => s.type === "hl_method_rule")) fail("heads-legs-2-01: нет экрана правила");
+    if (!steps.some((s) => s.type === "hl_intro")) fail("heads-legs-2-01: нет intro");
+    else ok("heads-legs-2-01: полный экран правила");
+  }
+
+  if (pilot.progressionProfile === 3) {
+    const hub = steps.find((s) => s.type === "hl_choose_method");
+    if (!hub || hub.type !== "hl_choose_method" || hub.chooseMode !== "value") {
+      fail(`${task.id}: нет value hub (профиль 3)`);
+    } else {
+      ok(`${task.id}: hub выбора шага (value)`);
+    }
+  }
+
+  if (pilot.progressionProfile === 4) {
+    const types = steps.map((s) => s.type);
+    if (!types.includes("word_solution")) fail(`${task.id}: нет word_solution`);
+    if (types.includes("drag_select")) fail(`${task.id}: профиль 4 содержит drag_select`);
+    else ok(`${task.id}: профиль 4 — текстовое решение`);
+  }
+
+  if (methodId === "2.5" && !valueRi.answerTransform) {
+    fail("heads-legs-2-05: нет answerTransform");
+  } else if (methodId === "2.5") {
+    ok("heads-legs-2-05: answerTransform для простых карандашей");
+  }
+}
+
+for (const methodId of VALUE_PATTERN_PILOT_METHOD_IDS) {
+  auditValuePilot(methodId);
+}
+
+ok(`pilot value pattern: ${VALUE_PATTERN_PILOT_METHOD_IDS.length} задач (${VALUE_PATTERN_PILOT_METHOD_IDS.join(", ")})`);
+
+const legacy = HEADS_LEGS_TASKS["heads-legs-1-10"];
+if (legacy && isHeadsLegsProgressionTask(legacy)) {
+  fail("heads-legs-1-10: не должна быть progression-runner");
+} else {
+  ok("heads-legs-1-10: старый DigitalTaskPlayer");
+}
 
 console.log(`\n=== Итого: ${errors} ошибок ===`);
 process.exit(errors > 0 ? 1 : 0);
