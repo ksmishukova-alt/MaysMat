@@ -23,6 +23,7 @@ import {
 import { PaperTaskScreen } from "@/components/PaperTaskScreen";
 import { UnluckyRunner } from "@/components/task-runners/unlucky/UnluckyRunner";
 import { RemaindersRunner } from "@/components/task-runners/remainders/RemaindersRunner";
+import { HeadsLegsRunner } from "@/components/task-runners/HeadsLegsRunner";
 import { TaskUnavailableScreen } from "@/components/TaskUnavailableScreen";
 import { resolveRunnerKind } from "@/lib/resolve-runner-kind";
 import { migrateHeadsLegsBranch } from "@/lib/heads-legs-migration";
@@ -67,6 +68,7 @@ export function TaskPlayer(props: TaskPlayerProps) {
     case "paper-construction":
       return <PaperTaskScreen task={props.task} />;
     case "heads-legs-guided":
+      return <HeadsLegsRunner task={props.task} totalTasksInBranch={props.totalTasksInBranch} />;
     case "dirichlet-guided":
       return <DigitalTaskPlayer {...props} />;
     case "unsupported":

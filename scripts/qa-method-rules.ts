@@ -7,7 +7,16 @@ import { buildRemaindersSteps } from "../src/data/dirichlet/remainders/build-rem
 import {
   REMAINDERS_CHILD_ROUTE_METHOD_IDS,
 } from "../src/data/dirichlet/remainders/models";
-import { remaindersHousesRule, getMethodRule } from "../src/data/method-rules";
+import {
+  headsLegsBaseRule,
+  getMethodRule,
+} from "../src/data/method-rules";
+import { HEADS_LEGS_TASKS } from "../src/data/heads-legs/build-task";
+import {
+  BASE_PATTERN_PILOT,
+  BASE_PATTERN_PILOT_METHOD_IDS,
+} from "../src/data/heads-legs/base-pattern/models";
+import { buildHeadsLegsPlayerSteps } from "../src/data/heads-legs/base-pattern/build-player-steps";
 import { isChildVisible } from "../src/data/task-publishing/resolve";
 import { resolveRunnerKind } from "../src/lib/resolve-runner-kind";
 
@@ -17,6 +26,8 @@ const FORBIDDEN_UI_TERMS = [
   "screenSequence",
   "qaStatus",
   "publishTier",
+  "progressionProfile",
+  "ruleInstance",
   "домики-остатки",
   "домиков-остатков",
   "домиках-остатках",
@@ -41,6 +52,8 @@ function ok(msg: string) {
 }
 
 console.log("=== QA: method-rules ===\n");
+
+const remaindersHousesRule = getMethodRule("remainders-houses")!;
 
 if (!getMethodRule("remainders-houses")) {
   fail("remainders-houses rule не найдено");
@@ -129,6 +142,101 @@ for (const id of ["dirichlet-t3-11", "dirichlet-t3-18", "dirichlet-t3-22", "diri
   }
 }
 ok("childRoute-заголовки с «остатки» (кириллица)");
+
+console.log("\n--- heads-legs base pattern ---\n");
+
+if (!getMethodRule("heads-legs-base")) {
+  fail("heads-legs-base rule не найдено");
+} else {
+  ok("heads-legs-base в registry");
+}
+
+for (const term of FORBIDDEN_UI_TERMS) {
+  const inHlRule = headsLegsBaseRule.fullRule.some((l) => l.includes(term));
+  if (inHlRule) fail(`headsLegs fullRule содержит «${term}»`);
+}
+if (!headsLegsBaseRule.anchorPhrase.includes("одного вида")) {
+  fail("headsLegs anchorPhrase некорректна");
+} else {
+  ok("headsLegs fullRule без служебных терминов");
+}
+
+const childHeadsLegs = Object.values(HEADS_LEGS_TASKS).filter(
+  (t) =>
+    resolveRunnerKind(t) === "heads-legs-guided" &&
+    t.publishing &&
+    isChildVisible(t.publishing),
+);
+
+for (const task of childHeadsLegs) {
+  const methodId = task.headsLegsMeta?.methodTaskId;
+  if (!methodId || !BASE_PATTERN_PILOT[methodId]) continue;
+  const ri = task.headsLegsMeta?.ruleInstance;
+  if (!ri) {
+    fail(`${task.id}: pilot childRoute без ruleInstance`);
+    continue;
+  }
+  if (ri.ruleId !== "heads-legs-base") fail(`${task.id}: ruleId !== heads-legs-base`);
+}
+
+for (const methodId of BASE_PATTERN_PILOT_METHOD_IDS) {
+  const task = Object.values(HEADS_LEGS_TASKS).find((t) => t.headsLegsMeta?.methodTaskId === methodId);
+  if (!task) {
+    fail(`pilot ${methodId}: задача не найдена`);
+    continue;
+  }
+  const meta = task.headsLegsMeta!;
+  const pilot = BASE_PATTERN_PILOT[methodId];
+
+  if (!meta.ruleInstance) fail(`${task.id}: нет ruleInstance`);
+  if (!meta.progressionProfile) fail(`${task.id}: нет progressionProfile`);
+  if (meta.progressionProfile !== pilot.progressionProfile) {
+    fail(`${task.id}: progressionProfile !== ${pilot.progressionProfile}`);
+  }
+
+  const ri = meta.ruleInstance!;
+  if (ri.totalObjects !== pilot.ruleInstance.totalObjects) {
+    fail(`${task.id}: totalObjects не совпадает с эталоном`);
+  }
+  if (ri.totalFeature !== pilot.ruleInstance.totalFeature) {
+    fail(`${task.id}: totalFeature не совпадает с эталоном`);
+  }
+
+  const steps = buildHeadsLegsPlayerSteps(task);
+
+  if (methodId === "1.1") {
+    if (!steps.some((s) => s.type === "hl_method_rule")) {
+      fail("heads-legs-1-01: нет экрана правила (профиль 1)");
+    } else {
+      ok("heads-legs-1-01: полный экран правила");
+    }
+    if (!steps.some((s) => s.type === "hl_intro")) {
+      fail("heads-legs-1-01: нет intro (профиль 1)");
+    }
+  }
+
+  if (pilot.progressionProfile === 3) {
+    if (!steps.some((s) => s.type === "hl_choose_method")) {
+      fail(`${task.id}: нет hl_choose_method (профиль 3)`);
+    } else {
+      ok(`${task.id}: экран выбора шага метода`);
+    }
+  }
+
+  if (pilot.progressionProfile === 4) {
+    const contentTypes = steps.map((s) => s.type);
+    if (!contentTypes.includes("word_solution")) {
+      fail(`${task.id}: нет word_solution (профиль 4)`);
+    }
+    if (contentTypes.includes("drag_select")) {
+      fail(`${task.id}: профиль 4 не должен содержать drag_select`);
+    } else {
+      ok(`${task.id}: профиль 4 — решение с пропусками`);
+    }
+  }
+}
+
+ok(`pilot base pattern: ${BASE_PATTERN_PILOT_METHOD_IDS.length} задач (${BASE_PATTERN_PILOT_METHOD_IDS.join(", ")})`);
 
 console.log(`\n=== Итого: ${errors} ошибок ===`);
 process.exit(errors > 0 ? 1 : 0);

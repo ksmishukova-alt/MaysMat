@@ -1,7 +1,7 @@
-import type { MethodRule, RemaindersRuleInstance } from "./types";
+import type { HeadsLegsRuleInstance, MethodRule, RemaindersRuleInstance } from "./types";
 import type { RemaindersModel } from "@/data/dirichlet/remainders/types";
 
-export type { MethodRule, RemaindersRuleInstance } from "./types";
+export type { MethodRule, RemaindersRuleInstance, HeadsLegsRuleInstance } from "./types";
 
 export const remaindersHousesRule: MethodRule = {
   id: "remainders-houses",
@@ -22,8 +22,29 @@ export const remaindersHousesRule: MethodRule = {
   ],
 };
 
+export const headsLegsBaseRule: MethodRule = {
+  id: "heads-legs-base",
+  title: "Головы и ноги",
+  childTitle: "Представим, что все одного вида",
+  anchorPhrase: "Сначала представим самый простой случай: будто все объекты одного вида.",
+  helpButtonLabel: "Запутался? Вспомни правило",
+  fullRule: [
+    "Найдём, сколько всего объектов.",
+    "Представим, что все объекты одного вида.",
+    "Посчитаем, сколько признаков получилось бы.",
+    "Сравним с тем, что дано в условии.",
+    "Найдём разницу.",
+    "Поймём, на сколько один объект отличается от другого.",
+    "Разделим разницу на шаг замены.",
+    "Найдём количество объектов второго вида.",
+    "Найдём количество объектов первого вида.",
+    "Проверим, что спрашивали в задаче.",
+  ],
+};
+
 export const METHOD_RULES: Record<string, MethodRule> = {
   "remainders-houses": remaindersHousesRule,
+  "heads-legs-base": headsLegsBaseRule,
 };
 
 export function getMethodRule(ruleId: string): MethodRule | undefined {
@@ -97,4 +118,90 @@ export function buildWhyRemaindersRangeBlock(instance: RemaindersRuleInstance): 
 /** Подставить m в fullRule для конкретного модуля */
 export function localizeRuleLines(rule: MethodRule, modulus: number): string[] {
   return rule.fullRule.map((line) => line.replace(/\bm\b/g, String(modulus)));
+}
+
+function assumeFeature(instance: HeadsLegsRuleInstance): number {
+  return instance.assumeKind === instance.firstKind
+    ? instance.firstFeature
+    : instance.secondFeature;
+}
+
+function otherKind(instance: HeadsLegsRuleInstance): string {
+  return instance.assumeKind === instance.firstKind
+    ? instance.secondKind
+    : instance.firstKind;
+}
+
+/** Текст примера для экрана правила «Головы и ноги» */
+export function buildHeadsLegsRuleExample(instance: HeadsLegsRuleInstance): string[] {
+  const feat = assumeFeature(instance);
+  const trial = instance.totalObjects * feat;
+  const diff = instance.totalFeature - trial;
+  const otherCount = diff / instance.replacementStep;
+  const remainCount = instance.totalObjects - otherCount;
+  const obj = instance.objectsLabel ?? "объектов";
+  const assumePhrase = instance.assumeKindPhrase ?? instance.assumeKind;
+  const featName = instance.featureName;
+  const other = otherKind(instance);
+
+  const lines: string[] = [];
+  if (instance.sceneIntro) {
+    lines.push(instance.sceneIntro, "");
+  }
+  if (instance.featureLines) {
+    lines.push(instance.featureLines[0], instance.featureLines[1], "");
+  }
+
+  lines.push(
+    `Сначала представим, что все ${instance.totalObjects} ${obj} — ${assumePhrase}.`,
+    "",
+    `Тогда ${featName} было бы:`,
+    "",
+    `${instance.totalObjects} × ${feat} = ${trial}`,
+    "",
+    `Но по условию ${featName} ${instance.totalFeature}.`,
+    "",
+  );
+
+  if (diff > 0) {
+    lines.push(
+      `Значит, ${featName} не хватает:`,
+      "",
+      `${instance.totalFeature} − ${trial} = ${diff}`,
+      "",
+      `Каждая замена «${assumePhrase} → ${other}» добавляет ${instance.replacementStep} ${featName}.`,
+      "",
+      `Значит, ${other}:`,
+      "",
+      `${diff} ÷ ${instance.replacementStep} = ${otherCount}`,
+    );
+    if (remainCount > 0) {
+      lines.push("", `А ${assumePhrase}:`, "", `${instance.totalObjects} − ${otherCount} = ${remainCount}`);
+    }
+  } else if (diff < 0) {
+    const excess = -diff;
+    lines.push(
+      `Значит, ${featName} лишних:`,
+      "",
+      `${trial} − ${instance.totalFeature} = ${excess}`,
+      "",
+      `Один ${assumePhrase} добавляет ${instance.replacementStep} ${featName}.`,
+      "",
+      `${other}:`,
+      "",
+      `${excess} ÷ ${instance.replacementStep} = ${otherCount}`,
+    );
+  }
+
+  return lines;
+}
+
+/** Вводный экран метода для профиля 1 */
+export function headsLegsIntroTemplate(): string[] {
+  return [
+    "Метод «Представим, что все одного вида»",
+    "В задаче бывают объекты двух видов — у каждого вида своё число ног, колёс или другого признака.",
+    "Сначала представим самый простой случай: будто все объекты одного вида.",
+    "Посчитаем, сколько признаков получилось бы, и сравним с условием — так найдём, сколько объектов каждого вида.",
+  ];
 }

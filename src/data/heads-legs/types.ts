@@ -67,6 +67,10 @@ export interface HeadsLegsTaskMeta extends HeadsLegsCatalogEntry {
   acceptedAnswers: AcceptedAnswer;
   solutionLines?: SolutionLine[];
   hintLevels?: [string?, string?, string?];
+  /** Pilot первого паттерна: методическое правило с числами задачи */
+  ruleInstance?: import("@/data/method-rules/types").HeadsLegsRuleInstance;
+  /** Профиль снятия опоры (1 — полная, 4 — только запись решения) */
+  progressionProfile?: 1 | 2 | 3 | 4;
 }
 
 export type PaperReviewStatus = "not_started" | "pending" | "approved" | "redo";

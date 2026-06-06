@@ -21,9 +21,9 @@ import { resolveTaskPublishing } from "@/data/task-publishing/resolve";
 
 import { normalizeSolutionMode } from "./solution-modes";
 
+import { resolveBasePatternPilot } from "./base-pattern/models";
+
 import type { HeadsLegsCatalogEntry, HeadsLegsTaskMeta, SolutionLine } from "./types";
-
-
 
 const BRANCH_ID = "modeling-heads-legs";
 
@@ -122,17 +122,13 @@ function inferConstraints(
 
 
 export function catalogEntryToMeta(entry: HeadsLegsCatalogEntry): HeadsLegsTaskMeta {
-
   const acceptedAnswers = getAcceptedAnswer(entry.methodTaskId);
-
   const inferred = inferModelFromCondition(entry.condition);
-
   const entities = inferTaskEntities(entry.condition, entry.methodTaskId, getSolutionLines(entry));
-
   const totalsOverride = TOTALS_OVERRIDES[entry.methodTaskId];
+  const pilot = resolveBasePatternPilot(entry.methodTaskId);
 
   return {
-
     ...entry,
 
     solutionMode: normalizeSolutionMode(entry.solutionMode),
@@ -164,8 +160,13 @@ export function catalogEntryToMeta(entry: HeadsLegsCatalogEntry): HeadsLegsTaskM
 
     hintLevels: getHintLevels(entry),
 
+    ...(pilot
+      ? {
+          ruleInstance: pilot.ruleInstance,
+          progressionProfile: pilot.progressionProfile,
+        }
+      : {}),
   };
-
 }
 
 
