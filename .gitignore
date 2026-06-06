@@ -43,3 +43,7 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 .vercel
+
+# временные audit-материалы для разработки (не для runtime)
+content/import/audit-*
+content/import/hidden_archive_task_promotion_audit.json
