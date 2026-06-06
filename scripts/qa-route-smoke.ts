@@ -162,7 +162,8 @@ if (!branchViaAlias || branchViaAlias.id !== "proof-constructions") {
   const listed = filterBranchTasksForList(tasks, { methodologyBank: true, showArchive: false });
   const t311 = listed.find((t) => t.id === "dirichlet-t3-11");
   if (!t311) fail("arith-remainders: dirichlet-t3-11 не в childRoute списке");
-  else ok(`arith-remainders: ${listed.length} child-route задач(а), включая t3-11`);
+  else if (listed.length !== 4) fail(`arith-remainders: ожидалось 4 child-route задач, найдено ${listed.length}`);
+  else ok(`arith-remainders: ${listed.length} child-route задач (t3-11, t3-22, t3-18, t3-24)`);
 }
 
 // 3c. remainders pilot — dirichlet-t3-18
@@ -175,11 +176,14 @@ if (!branchViaAlias || branchViaAlias.id !== "proof-constructions") {
       fail("dirichlet-t3-18: runnerKind !== dirichlet-remainders");
     }
     const steps = buildRemaindersSteps(pilot.dirichletMeta!);
-    if (!steps.some((s) => s.kind === "houses_count_quiz")) {
-      fail("dirichlet-t3-18: нет houses_count_quiz");
+    if (steps.some((s) => s.kind === "houses_count_quiz")) {
+      fail("dirichlet-t3-18: houses_count_quiz не нужен (профиль 3)");
     }
     if (steps.some((s) => s.kind === "method_rule")) {
       fail("dirichlet-t3-18: лишний method_rule");
+    }
+    if (!pilot.publishing || !isChildVisible(pilot.publishing)) {
+      fail("dirichlet-t3-18: должна быть в childRoute");
     }
     const m = pilot.dirichletMeta!.remaindersModel!;
     if (!m.compactHouses) fail("dirichlet-t3-18: нужен compactHouses");
@@ -256,7 +260,9 @@ const directCases: Array<{
   { id: "dirichlet-t4-26", child: false, archivePreview: false, methodist: true },
   { id: "dirichlet-t4-14", child: false, archivePreview: false, methodist: true },
   { id: "dirichlet-t3-11", child: true, archivePreview: false, methodist: true },
-  { id: "dirichlet-t3-18", child: false, archivePreview: false, methodist: true },
+  { id: "dirichlet-t3-22", child: true, archivePreview: false, methodist: true },
+  { id: "dirichlet-t3-18", child: true, archivePreview: false, methodist: true },
+  { id: "dirichlet-t3-24", child: true, archivePreview: false, methodist: true },
 ];
 
 for (const c of directCases) {

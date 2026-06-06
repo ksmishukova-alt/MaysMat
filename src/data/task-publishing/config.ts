@@ -15,6 +15,9 @@ export const DIRICHLET_CHILD_ROUTE: Record<string, number> = {
   "M2.2": 8,
   "M3.2": 9,
   "M4.11": 10,
+  "M4.22": 11,
+  "M4.18": 12,
+  "M4.24": 13,
 };
 
 /** P0 — блокеры: visual без ассета */
@@ -34,17 +37,23 @@ export const CONDITION_PATCHES: Record<string, string> = {
     "В прямоугольнике 3×4 расположено 6 точек. Докажите, что среди них найдутся две точки, расстояние между которыми не превосходит √2.",
   "M4.18":
     "Доказать, что из любых 2001 целых чисел найдутся два, разность которых делится на 2000.",
+  "M4.22":
+    "Среди любых шести целых чисел найдутся два, разность которых кратна 5.",
 };
 
 /** Человекочитаемые заголовки вместо обрезанного condition в catalog */
 export const TITLE_PATCHES: Record<string, string> = {
   "M4.11": "12 чисел и остатки по модулю 11",
   "M4.18": "2001 число и остатки по модулю 2000",
+  "M4.22": "6 чисел и остатки по модулю 5",
+  "M4.24": "8 чисел и остатки по модулю 7",
 };
 
 /** Краткий заголовок для карточки в списке задач */
 export const SHORT_TITLE_PATCHES: Record<string, string> = {
   "M4.18": "2001 число и 2000 остатков",
+  "M4.22": "6 чисел и 5 остатков",
+  "M4.24": "8 чисел и 7 остатков",
 };
 
 /** Ручные эталоны вместо мусора / «см. задачу» */
@@ -53,6 +62,10 @@ export const ANSWER_REFERENCE_PATCHES: Record<string, string> = {
     "Ответ: нельзя. Ключ: у скобки «П» три единичных отрезка — на каждом из 12 рёбер каркаса куба 2×2×2 нужны оба конца, но у одной детали только два конца; проволочный каркас из таких скобок невозможен.",
   "M5.15":
     "Ключ: разрежем прямоугольник на 5 частей (как на схеме). В одной части — минимум 2 точки; в каждой части любые две точки не дальше √2.",
+  "M4.18":
+    "Ключ: При делении на 2000 возможны остатки 0–1999. Чисел 2001 больше, чем домиков, значит, два числа попадут в один домик — у них одинаковый остаток, разность делится на 2000.",
+  "M4.22":
+    "Ключ: При делении на 5 возможны остатки 0–4. Шесть целых чисел больше, чем домиков, значит, два числа попадут в один домик — у них одинаковый остаток, разность делится на 5.",
 };
 
 export type ManualPublishingOverride = Partial<TaskPublishingMeta> & {
@@ -76,7 +89,9 @@ export const MANUAL_PUBLISHING: Record<string, ManualPublishingOverride> = {
   "dirichlet-t1-15": { publishTier: "childRoute", qaStatus: "ready", routeOrder: 107 },
   "dirichlet-t2-02": { publishTier: "childRoute", qaStatus: "ready", routeOrder: 108 },
   "dirichlet-t3-11": { publishTier: "childRoute", qaStatus: "ready", routeOrder: 110 },
-  "dirichlet-t3-18": { publishTier: "methodistOnly", qaStatus: "ready" },
+  "dirichlet-t3-22": { publishTier: "childRoute", qaStatus: "ready", routeOrder: 111, clearIssues: ["contains_external_reference"] },
+  "dirichlet-t3-18": { publishTier: "childRoute", qaStatus: "ready", routeOrder: 112, clearIssues: ["contains_external_reference"] },
+  "dirichlet-t3-24": { publishTier: "childRoute", qaStatus: "ready", routeOrder: 113 },
   "dirichlet-t1-10": { publishTier: "childRoute", qaStatus: "ready", routeOrder: 109, clearIssues: ["contains_N_equals_N"] },
   "dirichlet-t4-14": { publishTier: "methodistOnly", qaStatus: "ready", clearIssues: ["incomplete_condition"] },
   "dirichlet-t4-31": { publishTier: "methodistOnly", qaStatus: "ready", clearIssues: ["contains_external_reference", "missing_answer_key"] },

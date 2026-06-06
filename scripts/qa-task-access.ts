@@ -64,7 +64,9 @@ const samples: Array<{ id: string; child: boolean; archivePreview: boolean; meth
     { id: "dirichlet-t9-01", child: false, archivePreview: true, methodist: true },
     { id: "dirichlet-t4-26", child: false, archivePreview: false, methodist: true },
     { id: "dirichlet-t3-11", child: true, archivePreview: false, methodist: true },
-    { id: "dirichlet-t3-18", child: false, archivePreview: false, methodist: true },
+    { id: "dirichlet-t3-22", child: true, archivePreview: false, methodist: true },
+    { id: "dirichlet-t3-18", child: true, archivePreview: false, methodist: true },
+    { id: "dirichlet-t3-24", child: true, archivePreview: false, methodist: true },
   ];
 
 console.log("=== QA: доступ к задачам ===\n");

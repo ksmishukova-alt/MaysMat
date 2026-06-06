@@ -2,6 +2,10 @@
 import type { SolutionLine } from "@/data/heads-legs/types";
 import type { RemaindersRuleInstance } from "@/data/method-rules/types";
 
+import type { RemaindersProgressionProfile } from "./progression";
+
+export type { RemaindersProgressionProfile };
+
 export type RemaindersStepKind =
   | "intro_video"
   | "method_rule"
@@ -13,6 +17,7 @@ export type RemaindersStepKind =
   | "find_collision"
   | "divisibility_example"
   | "explain_divisibility"
+  | "choose_method"
   | "write_solution"
   | "finish";
 
@@ -32,6 +37,8 @@ export interface RemaindersModel {
   compactHouses?: boolean;
   /** Методическое правило с числами задачи */
   ruleInstance?: RemaindersRuleInstance;
+  /** Снятие опоры в детском маршруте (1 — полное объяснение … 4 — выбор шага) */
+  progressionProfile?: RemaindersProgressionProfile;
 }
 
 export interface RemaindersStep {

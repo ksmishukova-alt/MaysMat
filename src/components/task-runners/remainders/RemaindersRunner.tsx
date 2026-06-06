@@ -34,6 +34,8 @@ import { highlightConditionText } from "@/lib/highlight-condition";
 import { resolveChildRouteDisplayNumber } from "@/lib/branch-task-filter";
 import { useResolvedTasksForBranch } from "@/lib/use-task-store";
 import { RemainderDivisibilityExampleStep } from "./RemainderDivisibilityExampleStep";
+import { RemainderMethodChooseStep } from "./RemainderMethodChooseStep";
+import { isCompactRuleScreen } from "@/data/dirichlet/remainders/progression";
 
 interface RemaindersRunnerProps {
   task: Task;
@@ -119,7 +121,8 @@ export function RemaindersRunner({ task, totalTasksInBranch = 1 }: RemaindersRun
 
   if (!step) return null;
 
-  const showHelpRule = methodRule && ruleInstance;
+  const profile = model.progressionProfile ?? 1;
+  const showHelpRule = methodRule && ruleInstance && profile <= 2;
   const hideHeaderCondition = step.kind === "read_condition" || step.kind === "method_rule";
 
   return (
@@ -238,6 +241,7 @@ function RemaindersStepBody({
           rule={methodRule}
           instance={ruleInstance}
           variant="step"
+          compact={isCompactRuleScreen(model.progressionProfile ?? 1)}
           onComplete={onAdvance}
         />
       );
@@ -271,6 +275,15 @@ function RemaindersStepBody({
     case "explain_divisibility":
       return (
         <RemainderDivisibilityExplainStep stepId={step.id} model={model} onComplete={onAdvance} />
+      );
+    case "choose_method":
+      return (
+        <RemainderMethodChooseStep
+          stepId={step.id}
+          task={task}
+          model={model}
+          onComplete={onAdvance}
+        />
       );
     case "write_solution":
       return (

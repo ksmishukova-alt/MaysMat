@@ -3,6 +3,10 @@
  * npm run qa:method-rules
  */
 import { DIRICHLET_TASKS } from "../src/data/dirichlet/build-task";
+import { buildRemaindersSteps } from "../src/data/dirichlet/remainders/build-remainders-steps";
+import {
+  REMAINDERS_CHILD_ROUTE_METHOD_IDS,
+} from "../src/data/dirichlet/remainders/models";
 import { remaindersHousesRule, getMethodRule } from "../src/data/method-rules";
 import { isChildVisible } from "../src/data/task-publishing/resolve";
 import { resolveRunnerKind } from "../src/lib/resolve-runner-kind";
@@ -18,6 +22,13 @@ const FORBIDDEN_UI_TERMS = [
   "домиках-остатках",
 ];
 
+const EXPECTED_CHILD_IDS = [
+  "dirichlet-t3-11",
+  "dirichlet-t3-22",
+  "dirichlet-t3-18",
+  "dirichlet-t3-24",
+] as const;
+
 let errors = 0;
 
 function fail(msg: string) {
@@ -31,7 +42,6 @@ function ok(msg: string) {
 
 console.log("=== QA: method-rules ===\n");
 
-// Registry
 if (!getMethodRule("remainders-houses")) {
   fail("remainders-houses rule не найдено");
 } else {
@@ -48,7 +58,6 @@ if (!remaindersHousesRule.anchorPhrase.includes("Остаток")) {
   ok("fullRule без служебных терминов");
 }
 
-// ChildRoute remainders
 const childRemainders = Object.values(DIRICHLET_TASKS).filter(
   (t) =>
     resolveRunnerKind(t) === "dirichlet-remainders" &&
@@ -57,64 +66,69 @@ const childRemainders = Object.values(DIRICHLET_TASKS).filter(
 );
 
 for (const task of childRemainders) {
-  const ri = task.dirichletMeta?.remaindersModel?.ruleInstance;
+  const m = task.dirichletMeta?.remaindersModel;
+  const ri = m?.ruleInstance;
   if (!ri) {
     fail(`${task.id}: childRoute без ruleInstance`);
     continue;
   }
-  if (ri.firstRemainder !== 0) {
-    fail(`${task.id}: firstRemainder !== 0`);
-  }
-  if (ri.lastRemainder !== ri.modulus - 1) {
-    fail(`${task.id}: lastRemainder !== modulus - 1`);
-  }
-  if (ri.housesCount !== ri.modulus) {
-    fail(`${task.id}: housesCount !== modulus`);
-  }
-  if (!ri.showRuleScreen) {
-    fail(`${task.id}: первая childRoute-задача должна показывать экран правила`);
-  }
+  if (ri.firstRemainder !== 0) fail(`${task.id}: firstRemainder !== 0`);
+  if (ri.lastRemainder !== ri.modulus - 1) fail(`${task.id}: lastRemainder !== modulus - 1`);
+  if (ri.housesCount !== ri.modulus) fail(`${task.id}: housesCount !== modulus`);
+  if (!m?.writeSolutionLines?.length) fail(`${task.id}: нет writeSolutionLines`);
+  if (!m?.progressionProfile) fail(`${task.id}: нет progressionProfile`);
 }
 
-if (childRemainders.length === 1 && childRemainders[0]?.id === "dirichlet-t3-11") {
-  ok("childRoute remainders: dirichlet-t3-11 с ruleInstance и showRuleScreen");
-} else {
-  fail(`ожидалась 1 childRoute remainders (t3-11), найдено ${childRemainders.length}`);
-}
-
-// t3-18 не в childRoute
-{
-  const t18 = DIRICHLET_TASKS["dirichlet-t3-18"];
-  if (!t18) {
-    fail("dirichlet-t3-18 не найдена");
-  } else if (t18.publishing && isChildVisible(t18.publishing)) {
-    fail("dirichlet-t3-18 не должна быть в childRoute");
-  } else {
-    ok("dirichlet-t3-18: methodistOnly (не childRoute)");
-  }
-  const ri = t18?.dirichletMeta?.remaindersModel?.ruleInstance;
-  if (ri?.showRuleScreen) {
-    fail("dirichlet-t3-18: showRuleScreen должен быть false");
-  }
-}
-
-// Pilot ruleInstance fields
-for (const id of ["dirichlet-t3-11", "dirichlet-t3-18"] as const) {
+for (const id of EXPECTED_CHILD_IDS) {
   const task = DIRICHLET_TASKS[id];
-  const ri = task?.dirichletMeta?.remaindersModel?.ruleInstance;
-  if (!ri || ri.ruleId !== "remainders-houses") {
-    fail(`${id}: нет ruleInstance remainders-houses`);
+  if (!task?.publishing || !isChildVisible(task.publishing)) {
+    fail(`${id}: должна быть в childRoute`);
   }
 }
 
-// Кириллица «остатки» в заголовках pilot
-for (const id of ["dirichlet-t3-11", "dirichlet-t3-18"] as const) {
+if (childRemainders.length === EXPECTED_CHILD_IDS.length) {
+  ok(`childRoute remainders: ${childRemainders.length} задач (${EXPECTED_CHILD_IDS.join(", ")})`);
+} else {
+  fail(
+    `ожидалось ${EXPECTED_CHILD_IDS.length} childRoute remainders, найдено ${childRemainders.length}`,
+  );
+}
+
+const t11 = DIRICHLET_TASKS["dirichlet-t3-11"];
+if (!t11?.dirichletMeta?.remaindersModel?.ruleInstance?.showRuleScreen) {
+  fail("dirichlet-t3-11: showRuleScreen (профиль 1)");
+} else {
+  ok("dirichlet-t3-11: полный экран правила");
+}
+
+const t22 = DIRICHLET_TASKS["dirichlet-t3-22"];
+if (t22?.dirichletMeta?.remaindersModel?.progressionProfile !== 2) {
+  fail("dirichlet-t3-22: progressionProfile !== 2");
+}
+if (!t22?.dirichletMeta?.remaindersModel?.ruleInstance?.showRuleScreen) {
+  fail("dirichlet-t3-22: showRuleScreen (профиль 2)");
+}
+
+const t24 = DIRICHLET_TASKS["dirichlet-t3-24"];
+const steps24 = t24?.dirichletMeta ? buildRemaindersSteps(t24.dirichletMeta) : [];
+if (!steps24.some((s) => s.kind === "choose_method")) {
+  fail("dirichlet-t3-24: нет choose_method (профиль 4)");
+} else {
+  ok("dirichlet-t3-24: самостоятельный выбор шага метода");
+}
+
+for (const methodId of REMAINDERS_CHILD_ROUTE_METHOD_IDS) {
+  const task = Object.values(DIRICHLET_TASKS).find((t) => t.dirichletMeta?.methodTaskId === methodId);
+  if (!task) fail(`childRoute model ${methodId} не найдена в каталоге`);
+}
+
+for (const id of ["dirichlet-t3-11", "dirichlet-t3-18", "dirichlet-t3-22", "dirichlet-t3-24"] as const) {
   const task = DIRICHLET_TASKS[id];
   if (!task?.title.includes("остатки")) {
     fail(`${id}: title без кириллического «остатки»`);
   }
 }
-ok("pilot-заголовки с «остатки» (кириллица)");
+ok("childRoute-заголовки с «остатки» (кириллица)");
 
 console.log(`\n=== Итого: ${errors} ошибок ===`);
 process.exit(errors > 0 ? 1 : 0);

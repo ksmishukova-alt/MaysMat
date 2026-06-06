@@ -183,8 +183,8 @@ const f4Tasks = Object.values(DIRICHLET_TASKS).filter(
   (t) => t.dirichletMeta?.flowId === "F4_REMAINDERS",
 );
 
-if (f4Tasks.length !== 23) {
-  fail(`ожидалось 23 F4-задач, найдено ${f4Tasks.length}`);
+if (f4Tasks.length !== 24) {
+  fail(`ожидалось 24 F4-задач, найдено ${f4Tasks.length}`);
 } else {
   ok(`F4 задач в каталоге: ${f4Tasks.length}`);
 }
@@ -222,24 +222,55 @@ for (const task of f4Tasks) {
     }
     try {
       const steps = buildRemaindersSteps(task.dirichletMeta!);
-      if (steps.length < 7) {
-        fail(`${id}: buildRemaindersSteps вернул ${steps.length} шагов`);
+      const profile = model.progressionProfile ?? 1;
+      const stepKinds = steps.map((s) => s.kind);
+
+      const requiredByProfile: Record<number, readonly string[]> = {
+        1: [
+          "read_condition",
+          "find_modulus",
+          "build_houses",
+          "houses_count_quiz",
+          "identify_objects",
+          "find_collision",
+          "divisibility_example",
+          "explain_divisibility",
+          "write_solution",
+          "finish",
+        ],
+        2: [
+          "read_condition",
+          "method_rule",
+          "find_modulus",
+          "build_houses",
+          "houses_count_quiz",
+          "identify_objects",
+          "find_collision",
+          "divisibility_example",
+          "explain_divisibility",
+          "write_solution",
+          "finish",
+        ],
+        3: [
+          "read_condition",
+          "find_modulus",
+          "build_houses",
+          "identify_objects",
+          "find_collision",
+          "explain_divisibility",
+          "write_solution",
+          "finish",
+        ],
+        4: ["read_condition", "choose_method", "write_solution", "finish"],
+      };
+
+      const required = requiredByProfile[profile] ?? requiredByProfile[1];
+      if (steps.length < required.length) {
+        fail(`${id}: buildRemaindersSteps вернул ${steps.length} шагов (профиль ${profile})`);
       }
-      const required = [
-        "read_condition",
-        "find_modulus",
-        "build_houses",
-        "houses_count_quiz",
-        "identify_objects",
-        "find_collision",
-        "divisibility_example",
-        "explain_divisibility",
-        "write_solution",
-        "finish",
-      ] as const;
       for (const k of required) {
-        if (!steps.some((s) => s.kind === k)) {
-          fail(`${id}: нет шага ${k}`);
+        if (!stepKinds.includes(k as (typeof stepKinds)[number])) {
+          fail(`${id}: нет шага ${k} (профиль ${profile})`);
         }
       }
       if (model.compactHouses && model.modulus < 20) {
@@ -293,11 +324,26 @@ for (const methodId of REMAINDERS_PILOT_METHOD_IDS) {
   if (methodId === "M4.11" && !ri?.showRuleScreen) {
     fail(`${pilot.id}: M4.11 должна показывать экран правила`);
   }
+  if (methodId === "M4.22" && !ri?.showRuleScreen) {
+    fail(`${pilot.id}: M4.22 должна показывать экран правила (профиль 2)`);
+  }
   if (methodId === "M4.18" && ri?.showRuleScreen) {
     fail(`${pilot.id}: M4.18 не должна требовать экран правила`);
   }
+  if (methodId === "M4.24" && ri?.showRuleScreen) {
+    fail(`${pilot.id}: M4.24 не должна требовать экран правила`);
+  }
+  const expectedProfile: Record<string, number> = {
+    "M4.11": 1,
+    "M4.22": 2,
+    "M4.18": 3,
+    "M4.24": 4,
+  };
+  if (m.progressionProfile !== expectedProfile[methodId]) {
+    fail(`${pilot.id}: progressionProfile=${m.progressionProfile}, ожидалось ${expectedProfile[methodId]}`);
+  }
 }
-ok(`pilot F4 (M4.11, M4.18): ${REMAINDERS_PILOT_METHOD_IDS.length} задач с полной моделью`);
+ok(`pilot F4: ${REMAINDERS_PILOT_METHOD_IDS.length} задач с полной моделью и progressionProfile`);
 
 // Smoke: dirichlet-t3-11 pipeline
 {
@@ -358,10 +404,10 @@ ok(`pilot F4 (M4.11, M4.18): ${REMAINDERS_PILOT_METHOD_IDS.length} задач с
       fail("dirichlet-t3-18: condition неполное");
     }
     if (steps.some((s) => s.kind === "method_rule")) {
-      fail("dirichlet-t3-18: не должно быть method_rule");
+      fail("dirichlet-t3-18: не должно быть method_rule (профиль 3)");
     }
-    if (demo.publishing && isChildVisible(demo.publishing)) {
-      fail("dirichlet-t3-18: не должна быть в childRoute");
+    if (demo.publishing && !isChildVisible(demo.publishing)) {
+      fail("dirichlet-t3-18: должна быть в childRoute");
     }
     const m = demo.dirichletMeta!.remaindersModel!;
     const chipCheck = validateBlankChipConfiguration(m.writeSolutionLines ?? [], "reusable");

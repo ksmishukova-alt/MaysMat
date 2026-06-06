@@ -1,12 +1,12 @@
 {
-  "generatedAt": "2026-06-06T10:20:59.981Z",
-  "totalTasks": 269,
-  "ready": 178,
-  "needsReview": 87,
+  "generatedAt": "2026-06-06T12:33:41.188Z",
+  "totalTasks": 270,
+  "ready": 181,
+  "needsReview": 85,
   "blocked": 4,
-  "childRouteVisible": 37,
+  "childRouteVisible": 41,
   "issuesByType": {
-    "contains_external_reference": 27,
+    "contains_external_reference": 25,
     "contains_N_equals_N": 4,
     "missing_visual_asset": 4,
     "requires_manual_review": 4,
@@ -384,6 +384,46 @@
       "childVisible": true
     },
     {
+      "id": "dirichlet-t3-11",
+      "branchId": "arith-remainders",
+      "methodTaskId": "M4.11",
+      "publishTier": "childRoute",
+      "qaStatus": "ready",
+      "issues": [],
+      "routeOrder": 110,
+      "childVisible": true
+    },
+    {
+      "id": "dirichlet-t3-22",
+      "branchId": "arith-remainders",
+      "methodTaskId": "M4.22",
+      "publishTier": "childRoute",
+      "qaStatus": "ready",
+      "issues": [],
+      "routeOrder": 111,
+      "childVisible": true
+    },
+    {
+      "id": "dirichlet-t3-18",
+      "branchId": "arith-remainders",
+      "methodTaskId": "M4.18",
+      "publishTier": "childRoute",
+      "qaStatus": "ready",
+      "issues": [],
+      "routeOrder": 112,
+      "childVisible": true
+    },
+    {
+      "id": "dirichlet-t3-24",
+      "branchId": "arith-remainders",
+      "methodTaskId": "M4.24",
+      "publishTier": "childRoute",
+      "qaStatus": "ready",
+      "issues": [],
+      "routeOrder": 113,
+      "childVisible": true
+    },
+    {
       "id": "heads-legs-4-03",
       "branchId": "modeling-heads-legs",
       "methodTaskId": "4.3",
@@ -717,15 +757,6 @@
       "childVisible": false
     },
     {
-      "id": "dirichlet-t3-11",
-      "branchId": "arith-remainders",
-      "methodTaskId": "M4.11",
-      "publishTier": "methodistOnly",
-      "qaStatus": "ready",
-      "issues": [],
-      "childVisible": false
-    },
-    {
       "id": "dirichlet-t3-12",
       "branchId": "arith-remainders",
       "methodTaskId": "M4.12",
@@ -875,17 +906,6 @@
       "childVisible": false
     },
     {
-      "id": "dirichlet-t3-18",
-      "branchId": "arith-remainders",
-      "methodTaskId": "M4.18",
-      "publishTier": "methodistOnly",
-      "qaStatus": "needsReview",
-      "issues": [
-        "contains_external_reference"
-      ],
-      "childVisible": false
-    },
-    {
       "id": "dirichlet-t3-19",
       "branchId": "arith-remainders",
       "methodTaskId": "M4.19",
@@ -903,17 +923,6 @@
       "publishTier": "methodistOnly",
       "qaStatus": "ready",
       "issues": [],
-      "childVisible": false
-    },
-    {
-      "id": "dirichlet-t3-22",
-      "branchId": "arith-remainders",
-      "methodTaskId": "M4.22",
-      "publishTier": "methodistOnly",
-      "qaStatus": "needsReview",
-      "issues": [
-        "contains_external_reference"
-      ],
       "childVisible": false
     },
     {

@@ -2,6 +2,10 @@ import type { DirichletTaskMeta } from "@/data/dirichlet/types";
 
 import { REMAINDERS_SCREEN_SEQUENCE } from "./screen-sequence";
 import type { RemaindersStep, RemaindersStepKind } from "./types";
+import {
+  filterSequenceByProfile,
+  shouldShowRuleScreen,
+} from "./progression";
 
 const KIND_BY_STEP: Record<number, RemaindersStepKind> = {
   1: "intro_video",
@@ -20,12 +24,13 @@ const KIND_BY_STEP: Record<number, RemaindersStepKind> = {
 
 function filterSequence(meta: DirichletTaskMeta) {
   const raw = meta.screenSequence?.length ? meta.screenSequence : REMAINDERS_SCREEN_SEQUENCE;
-  const showRule = meta.remaindersModel?.ruleInstance?.showRuleScreen ?? false;
+  const model = meta.remaindersModel;
+  if (!model) return raw;
 
-  return raw.filter((spec) => {
-    if (spec.stepKind === "method_rule") return showRule;
-    return true;
-  });
+  const profile = model.progressionProfile ?? 1;
+  const showRule = shouldShowRuleScreen(profile) && (model.ruleInstance?.showRuleScreen ?? false);
+
+  return filterSequenceByProfile(raw, profile, showRule);
 }
 
 /** Строит цепочку экранов «Остатки как домики» */
@@ -44,7 +49,7 @@ export function buildRemaindersSteps(meta: DirichletTaskMeta): RemaindersStep[] 
       "read_condition";
 
     return {
-      id: `${meta.id}-remainders-${spec.screen}`,
+      id: `${meta.id}-remainders-${spec.screen || kind}-${index}`,
       kind,
       title: spec.title,
       screenPhaseIndex: index + 1,

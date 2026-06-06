@@ -12,6 +12,8 @@ interface MethodRuleScreenProps {
   instance: RemaindersRuleInstance;
   /** step — в цепочке задачи; modal — из кнопки помощи */
   variant?: "step" | "modal";
+  /** Профиль 2: короткий экран правила без длинного примера */
+  compact?: boolean;
   onComplete?: () => void;
   onClose?: () => void;
 }
@@ -20,6 +22,7 @@ export function MethodRuleScreen({
   rule,
   instance,
   variant = "step",
+  compact = false,
   onComplete,
   onClose,
 }: MethodRuleScreenProps) {
@@ -58,31 +61,40 @@ export function MethodRuleScreen({
         )}
       </div>
 
-      <div className="mb-6 space-y-3">
-        <p className="text-sm font-medium text-gray-700">Пример из этой задачи</p>
-        <div className="rounded-xl border border-sky-200 bg-sky-50 px-4 py-4 text-sm leading-relaxed text-sky-950">
-          {example.map((line, i) =>
-            line === "" ? (
-              <div key={i} className="h-2" />
-            ) : (
-              <p key={i} className={line.startsWith("Почему") ? "font-medium" : undefined}>
-                {line}
-              </p>
-            ),
-          )}
+      {!compact ? (
+        <div className="mb-6 space-y-3">
+          <p className="text-sm font-medium text-gray-700">Пример из этой задачи</p>
+          <div className="rounded-xl border border-sky-200 bg-sky-50 px-4 py-4 text-sm leading-relaxed text-sky-950">
+            {example.map((line, i) =>
+              line === "" ? (
+                <div key={i} className="h-2" />
+              ) : (
+                <p key={i} className={line.startsWith("Почему") ? "font-medium" : undefined}>
+                  {line}
+                </p>
+              ),
+            )}
+          </div>
         </div>
-      </div>
+      ) : (
+        <p className="mb-6 text-sm text-gray-600">
+          В этой задаче {instance.objectsCount} {instance.objectsLabel} и {instance.housesCount}{" "}
+          домиков для остатков — чисел больше, чем домиков.
+        </p>
+      )}
 
-      <details className="mb-6 rounded-xl border border-lavender-200 bg-lavender-50/50 px-4 py-3">
-        <summary className="cursor-pointer text-sm font-medium text-brand-purple">
-          Полное правило
-        </summary>
-        <ul className="mt-3 list-disc space-y-2 pl-5 text-sm leading-relaxed text-gray-700">
-          {localized.map((line) => (
-            <li key={line}>{line}</li>
-          ))}
-        </ul>
-      </details>
+      {!compact ? (
+        <details className="mb-6 rounded-xl border border-lavender-200 bg-lavender-50/50 px-4 py-3">
+          <summary className="cursor-pointer text-sm font-medium text-brand-purple">
+            Полное правило
+          </summary>
+          <ul className="mt-3 list-disc space-y-2 pl-5 text-sm leading-relaxed text-gray-700">
+            {localized.map((line) => (
+              <li key={line}>{line}</li>
+            ))}
+          </ul>
+        </details>
+      ) : null}
 
       <div className="flex flex-wrap gap-3">
         <button
