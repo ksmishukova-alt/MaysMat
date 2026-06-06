@@ -134,6 +134,11 @@ export const THINKING_TYPES: ThinkingType[] = [
   },
 ];
 
+/** Алиасы slug → канонический slug ветки */
+const BRANCH_SLUG_ALIASES: Record<string, string> = {
+  "proof-constructions": "constructions",
+};
+
 export function getAllBranches(): Branch[] {
   return THINKING_TYPES.flatMap((t) => t.branches);
 }
@@ -142,6 +147,11 @@ export function getBranchById(id: string): Branch | undefined {
   return getAllBranches().find((b) => b.id === id);
 }
 
+export function resolveBranchSlug(slug: string): string {
+  return BRANCH_SLUG_ALIASES[slug] ?? slug;
+}
+
 export function getBranchBySlug(slug: string): Branch | undefined {
-  return getAllBranches().find((b) => b.slug === slug);
+  const normalized = resolveBranchSlug(slug);
+  return getAllBranches().find((b) => b.slug === normalized);
 }

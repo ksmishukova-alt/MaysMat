@@ -150,18 +150,18 @@ export function applyDirichletScreenPhases(
   const writtenSteps = byModule.get("written") ?? [];
 
   return steps.map((step) => {
-    const module = moduleForStep(step);
-    let pool = byModule.get(module) ?? [];
-    if (module === "intro") pool = introSteps;
-    if (module === "entities") pool = entitySteps;
-    if (module === "model" || module === "conclusion") pool = modelSteps;
-    if (module === "written") pool = writtenSteps;
+    const phaseModule = moduleForStep(step);
+    let pool = byModule.get(phaseModule) ?? [];
+    if (phaseModule === "intro") pool = introSteps;
+    if (phaseModule === "entities") pool = entitySteps;
+    if (phaseModule === "model" || phaseModule === "conclusion") pool = modelSteps;
+    if (phaseModule === "written") pool = writtenSteps;
 
     return {
       ...step,
-      screenPhaseId: module,
-      screenPhaseTitle: phaseTitle(module),
-      screenPhaseIndex: phaseIndex(module),
+      screenPhaseId: phaseModule,
+      screenPhaseTitle: phaseTitle(phaseModule),
+      screenPhaseIndex: phaseIndex(phaseModule),
       screenPhaseCount: phases.length,
       screenSubStep: subStepLabel(step, pool),
     };

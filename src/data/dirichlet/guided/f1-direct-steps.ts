@@ -12,7 +12,7 @@ import {
   inferMinInCell,
   isBooleanQuestion,
 } from "./count-patterns";
-import { buildCustomF1Steps, buildCustomFlowModelSteps, hasCustomF1Steps, hasCustomFlowModelSteps, skipsDefaultEntityDrag } from "./custom";
+import { buildCustomF1Steps, hasCustomF1Steps } from "./custom";
 
 function buildCountsStep(meta: DirichletTaskMeta, model: DirichletInferredModel): DiscriminatedTaskStep {
   return {

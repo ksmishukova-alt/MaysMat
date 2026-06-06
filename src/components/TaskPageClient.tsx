@@ -1,11 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, useSearchParams } from "next/navigation";
 import { AppShell } from "@/components/AppShell";
 import { TaskPlayer } from "@/components/TaskPlayer";
+import { TaskUnavailableScreen } from "@/components/TaskUnavailableScreen";
 import { getBranchById } from "@/data/thinking-map";
 import type { Task } from "@/data/tasks";
+import { canAccessTask, parseTaskAccessMode } from "@/lib/task-access-mode";
 import { useResolvedTask } from "@/lib/use-task-store";
 
 interface TaskPageClientProps {
@@ -14,6 +16,8 @@ interface TaskPageClientProps {
 }
 
 export function TaskPageClient({ taskId, fallbackTask }: TaskPageClientProps) {
+  const searchParams = useSearchParams();
+  const accessMode = parseTaskAccessMode(searchParams.get("mode"));
   const resolved = useResolvedTask(taskId);
   const task = resolved ?? fallbackTask;
 
@@ -23,6 +27,18 @@ export function TaskPageClient({ taskId, fallbackTask }: TaskPageClientProps) {
 
   const branch = getBranchById(task.branchId);
   const branchHref = branch ? `/branch/${branch.slug}` : "/tasks";
+
+  if (!canAccessTask(task, accessMode)) {
+    return (
+      <AppShell>
+        <TaskUnavailableScreen
+          taskTitle={task.title}
+          branchId={task.branchId}
+          publishing={task.publishing}
+        />
+      </AppShell>
+    );
+  }
 
   return (
     <AppShell>

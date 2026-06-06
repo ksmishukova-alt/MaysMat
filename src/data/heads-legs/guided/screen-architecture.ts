@@ -119,7 +119,7 @@ export function applyScreenPhases(
   const diagnosticSteps = steps.filter((s) => s.type === "worksheet_table" && s.id.includes("-diag-"));
 
   return steps.map((step) => {
-    const module = moduleForStep(step, meta.methodTaskId);
+    const phaseModule = moduleForStep(step, meta.methodTaskId);
     let subStep = solverSubStep(step, solverSteps);
     if (step.type === "worksheet_table" && step.id.includes("-struct-")) {
       const idx = structuralSteps.findIndex((s) => s.id === step.id);
@@ -136,9 +136,9 @@ export function applyScreenPhases(
 
     return {
       ...step,
-      screenPhaseId: module,
-      screenPhaseTitle: phaseTitle(module),
-      screenPhaseIndex: phaseIndex(module),
+      screenPhaseId: phaseModule,
+      screenPhaseTitle: phaseTitle(phaseModule),
+      screenPhaseIndex: phaseIndex(phaseModule),
       screenPhaseCount: phases.length,
       screenSubStep: subStep,
     };

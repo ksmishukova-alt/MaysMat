@@ -166,7 +166,7 @@ export function resolveTaskPublishing(task: Task): TaskPublishingMeta {
   const issues = scanIssues(patchedTask);
   const visual = defaultVisual(patchedTask, issues);
   let publishTier = defaultTier(patchedTask, issues);
-  let qaStatus = defaultQaStatus(issues, publishTier);
+  const qaStatus = defaultQaStatus(issues, publishTier);
 
   let routeOrder: number | undefined;
   if (task.headsLegsMeta && publishTier === "childRoute") {

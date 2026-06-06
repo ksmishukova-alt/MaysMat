@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint src --quiet",
     "generate:heads-legs": "node scripts/generate-heads-legs-content.mjs",
     "generate:dirichlet": "node scripts/generate-dirichlet-content.mjs",
     "qa:dirichlet": "npx tsx scripts/qa-dirichlet-guided.ts",
@@ -14,7 +14,9 @@
     "qa:task-quality": "npx tsx scripts/scan-task-quality.ts",
     "qa:entity-emojis": "npx tsx scripts/audit-entity-emojis.ts",
     "qa:task-audit": "npx tsx scripts/audit-all-tasks-report.ts",
-    "qa:categories": "node scripts/audit-categories.mjs"
+    "qa:categories": "node scripts/audit-categories.mjs",
+    "qa:task-access": "npx tsx scripts/qa-task-access.ts",
+    "qa:smoke": "npx tsx scripts/qa-route-smoke.ts"
   },
   "dependencies": {
     "next": "^15.1.0",
@@ -22,6 +24,7 @@
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
+    "@eslint/eslintrc": "^3.3.1",
     "@types/node": "^22.10.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",

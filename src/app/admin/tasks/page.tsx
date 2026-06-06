@@ -14,6 +14,7 @@ import {
   setTaskOverride,
   type TaskStoreData,
 } from "@/lib/task-store";
+import { taskPlayHref } from "@/lib/task-access-mode";
 import { migrateLegacyModeratorStore } from "@/lib/task-moderator";
 import { buildPlayerSteps } from "@/lib/task-player-steps";
 import { notifyTaskStoreUpdated, useTaskStore } from "@/lib/use-task-store";
@@ -89,7 +90,7 @@ function TaskRow({
           <Link href={`/admin/tasks/${task.id}`} className="text-brand-purple hover:underline">
             Редактировать
           </Link>
-          <Link href={`/tasks/${task.id}`} className="text-gray-500 hover:underline">
+          <Link href={taskPlayHref(task.id, "methodist")} className="text-gray-500 hover:underline">
             Игра
           </Link>
         </div>

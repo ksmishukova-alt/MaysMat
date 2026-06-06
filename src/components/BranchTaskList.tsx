@@ -11,7 +11,12 @@ import {
   PAPER_STATUS_LABEL,
   type PaperReviewStatus,
 } from "@/lib/paper-task-review";
-import { isArchiveVisible, isChildVisible } from "@/data/task-publishing/resolve";
+import {
+  countArchiveTasks,
+  countChildVisibleTasks,
+  filterBranchTasksForList,
+} from "@/lib/branch-task-filter";
+import { taskPlayHref } from "@/lib/task-access-mode";
 
 interface BranchTaskListProps {
   branchId: string;
@@ -30,26 +35,13 @@ export function BranchTaskList({
   const allTasks = useResolvedTasksForBranch(branchId);
   const [showArchive, setShowArchive] = useState(false);
 
-  const tasks = useMemo(() => {
-    const filtered = allTasks.filter((task) => {
-      const pub = task.publishing;
-      if (!pub) return true;
-      if (isChildVisible(pub)) return true;
-      if (methodologyBank && showArchive && isArchiveVisible(pub)) return true;
-      return false;
-    });
+  const tasks = useMemo(
+    () => filterBranchTasksForList(allTasks, { methodologyBank, showArchive }),
+    [allTasks, methodologyBank, showArchive],
+  );
 
-    return filtered.sort((a, b) => {
-      const ra = a.publishing?.routeOrder ?? a.number;
-      const rb = b.publishing?.routeOrder ?? b.number;
-      return ra - rb;
-    });
-  }, [allTasks, methodologyBank, showArchive]);
-
-  const childCount = allTasks.filter((t) => t.publishing && isChildVisible(t.publishing)).length;
-  const archiveCount = allTasks.filter(
-    (t) => t.publishing && t.publishing.publishTier === "archive",
-  ).length;
+  const childCount = countChildVisibleTasks(allTasks);
+  const archiveCount = countArchiveTasks(allTasks);
 
   const customCount = Object.values(store.customTasks).filter((t) => t.branchId === branchId).length;
 
@@ -88,6 +80,10 @@ export function BranchTaskList({
             tier === "archive" ? (
               <span className="ml-2 text-xs font-normal text-violet-600">архив</span>
             ) : null;
+          const playHref = taskPlayHref(
+            task.id,
+            tier === "archive" && showArchive ? "archivePreview" : undefined,
+          );
 
           if (done) {
             return (
@@ -113,7 +109,7 @@ export function BranchTaskList({
                 </div>
                 <TaskCompletionStampById stampId={done.stampId} stars={done.stars} size="sm" />
                 <Link
-                  href={`/tasks/${task.id}`}
+                  href={playHref}
                   className="rounded-lg border border-lavender-200 bg-white px-3 py-2 text-xs text-gray-600 hover:border-brand-purple"
                 >
                   Ещё раз
@@ -136,7 +132,7 @@ export function BranchTaskList({
                   <div className="mt-1 text-sm text-sky-800">{PAPER_STATUS_LABEL.pending}</div>
                 </div>
                 <Link
-                  href={`/tasks/${task.id}`}
+                  href={playHref}
                   className="rounded-lg border border-sky-300 bg-white px-3 py-2 text-xs text-sky-900"
                 >
                   Открыть
@@ -149,7 +145,7 @@ export function BranchTaskList({
             return (
               <Link
                 key={task.id}
-                href={`/tasks/${task.id}`}
+                href={playHref}
                 className="flex items-center justify-between rounded-xl border border-amber-200 bg-amber-50 p-4 hover:border-amber-400"
               >
                 <div>
@@ -169,7 +165,7 @@ export function BranchTaskList({
           return (
             <Link
               key={task.id}
-              href={`/tasks/${task.id}`}
+              href={playHref}
               className="flex items-center justify-between rounded-xl border border-lavender-100 p-4 hover:border-brand-purple hover:bg-lavender-50"
             >
               <div>

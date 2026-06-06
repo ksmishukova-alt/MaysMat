@@ -1,12 +1,11 @@
 {
-  "generatedAt": "2026-06-05T23:23:03.365Z",
+  "generatedAt": "2026-06-06T07:33:51.390Z",
   "totalTasks": 269,
-  "ready": 146,
+  "ready": 178,
   "needsReview": 87,
-  "blocked": 36,
-  "childRouteVisible": 23,
+  "blocked": 4,
+  "childRouteVisible": 37,
   "issuesByType": {
-    "missing_answer_key": 32,
     "contains_external_reference": 27,
     "contains_N_equals_N": 4,
     "missing_visual_asset": 4,
@@ -22,6 +21,16 @@
       "qaStatus": "ready",
       "issues": [],
       "routeOrder": 1,
+      "childVisible": true
+    },
+    {
+      "id": "heads-legs-1-02",
+      "branchId": "modeling-heads-legs",
+      "methodTaskId": "1.2",
+      "publishTier": "childRoute",
+      "qaStatus": "ready",
+      "issues": [],
+      "routeOrder": 2,
       "childVisible": true
     },
     {
@@ -45,6 +54,26 @@
       "childVisible": true
     },
     {
+      "id": "heads-legs-1-06",
+      "branchId": "modeling-heads-legs",
+      "methodTaskId": "1.6",
+      "publishTier": "childRoute",
+      "qaStatus": "ready",
+      "issues": [],
+      "routeOrder": 5,
+      "childVisible": true
+    },
+    {
+      "id": "heads-legs-1-07",
+      "branchId": "modeling-heads-legs",
+      "methodTaskId": "1.7",
+      "publishTier": "childRoute",
+      "qaStatus": "ready",
+      "issues": [],
+      "routeOrder": 6,
+      "childVisible": true
+    },
+    {
       "id": "heads-legs-1-10",
       "branchId": "modeling-heads-legs",
       "methodTaskId": "1.10",
@@ -62,6 +91,16 @@
       "qaStatus": "ready",
       "issues": [],
       "routeOrder": 8,
+      "childVisible": true
+    },
+    {
+      "id": "heads-legs-1-08",
+      "branchId": "modeling-heads-legs",
+      "methodTaskId": "1.8",
+      "publishTier": "childRoute",
+      "qaStatus": "ready",
+      "issues": [],
+      "routeOrder": 9,
       "childVisible": true
     },
     {
@@ -105,6 +144,36 @@
       "childVisible": true
     },
     {
+      "id": "heads-legs-2-04",
+      "branchId": "modeling-heads-legs",
+      "methodTaskId": "2.4",
+      "publishTier": "childRoute",
+      "qaStatus": "ready",
+      "issues": [],
+      "routeOrder": 14,
+      "childVisible": true
+    },
+    {
+      "id": "heads-legs-2-05",
+      "branchId": "modeling-heads-legs",
+      "methodTaskId": "2.5",
+      "publishTier": "childRoute",
+      "qaStatus": "ready",
+      "issues": [],
+      "routeOrder": 15,
+      "childVisible": true
+    },
+    {
+      "id": "heads-legs-2-06",
+      "branchId": "modeling-heads-legs",
+      "methodTaskId": "2.6",
+      "publishTier": "childRoute",
+      "qaStatus": "ready",
+      "issues": [],
+      "routeOrder": 16,
+      "childVisible": true
+    },
+    {
       "id": "heads-legs-2-07",
       "branchId": "modeling-heads-legs",
       "methodTaskId": "2.7",
@@ -112,6 +181,26 @@
       "qaStatus": "ready",
       "issues": [],
       "routeOrder": 17,
+      "childVisible": true
+    },
+    {
+      "id": "heads-legs-1-09",
+      "branchId": "modeling-heads-legs",
+      "methodTaskId": "1.9",
+      "publishTier": "childRoute",
+      "qaStatus": "ready",
+      "issues": [],
+      "routeOrder": 18,
+      "childVisible": true
+    },
+    {
+      "id": "heads-legs-1-11",
+      "branchId": "modeling-heads-legs",
+      "methodTaskId": "1.11",
+      "publishTier": "childRoute",
+      "qaStatus": "ready",
+      "issues": [],
+      "routeOrder": 19,
       "childVisible": true
     },
     {
@@ -135,6 +224,16 @@
       "childVisible": true
     },
     {
+      "id": "heads-legs-3-03",
+      "branchId": "modeling-heads-legs",
+      "methodTaskId": "3.3",
+      "publishTier": "childRoute",
+      "qaStatus": "ready",
+      "issues": [],
+      "routeOrder": 22,
+      "childVisible": true
+    },
+    {
       "id": "heads-legs-3-04",
       "branchId": "modeling-heads-legs",
       "methodTaskId": "3.4",
@@ -145,6 +244,16 @@
       "childVisible": true
     },
     {
+      "id": "heads-legs-3-05",
+      "branchId": "modeling-heads-legs",
+      "methodTaskId": "3.5",
+      "publishTier": "childRoute",
+      "qaStatus": "ready",
+      "issues": [],
+      "routeOrder": 24,
+      "childVisible": true
+    },
+    {
       "id": "heads-legs-3-06",
       "branchId": "modeling-heads-legs",
       "methodTaskId": "3.6",
@@ -152,6 +261,36 @@
       "qaStatus": "ready",
       "issues": [],
       "routeOrder": 25,
+      "childVisible": true
+    },
+    {
+      "id": "heads-legs-3-07",
+      "branchId": "modeling-heads-legs",
+      "methodTaskId": "3.7",
+      "publishTier": "childRoute",
+      "qaStatus": "ready",
+      "issues": [],
+      "routeOrder": 26,
+      "childVisible": true
+    },
+    {
+      "id": "heads-legs-4-01",
+      "branchId": "modeling-heads-legs",
+      "methodTaskId": "4.1",
+      "publishTier": "childRoute",
+      "qaStatus": "ready",
+      "issues": [],
+      "routeOrder": 27,
+      "childVisible": true
+    },
+    {
+      "id": "heads-legs-4-02",
+      "branchId": "modeling-heads-legs",
+      "methodTaskId": "4.2",
+      "publishTier": "childRoute",
+      "qaStatus": "ready",
+      "issues": [],
+      "routeOrder": 28,
       "childVisible": true
     },
     {
@@ -245,212 +384,48 @@
       "childVisible": true
     },
     {
-      "id": "heads-legs-1-02",
-      "branchId": "modeling-heads-legs",
-      "methodTaskId": "1.2",
-      "publishTier": "hidden",
-      "qaStatus": "blocked",
-      "issues": [
-        "missing_answer_key"
-      ],
-      "childVisible": false
-    },
-    {
-      "id": "heads-legs-1-06",
-      "branchId": "modeling-heads-legs",
-      "methodTaskId": "1.6",
-      "publishTier": "hidden",
-      "qaStatus": "blocked",
-      "issues": [
-        "missing_answer_key"
-      ],
-      "childVisible": false
-    },
-    {
-      "id": "heads-legs-1-07",
-      "branchId": "modeling-heads-legs",
-      "methodTaskId": "1.7",
-      "publishTier": "hidden",
-      "qaStatus": "blocked",
-      "issues": [
-        "missing_answer_key"
-      ],
-      "childVisible": false
-    },
-    {
-      "id": "heads-legs-1-08",
-      "branchId": "modeling-heads-legs",
-      "methodTaskId": "1.8",
-      "publishTier": "hidden",
-      "qaStatus": "blocked",
-      "issues": [
-        "missing_answer_key"
-      ],
-      "childVisible": false
-    },
-    {
-      "id": "heads-legs-2-04",
-      "branchId": "modeling-heads-legs",
-      "methodTaskId": "2.4",
-      "publishTier": "hidden",
-      "qaStatus": "blocked",
-      "issues": [
-        "missing_answer_key"
-      ],
-      "childVisible": false
-    },
-    {
-      "id": "heads-legs-2-05",
-      "branchId": "modeling-heads-legs",
-      "methodTaskId": "2.5",
-      "publishTier": "hidden",
-      "qaStatus": "blocked",
-      "issues": [
-        "missing_answer_key"
-      ],
-      "childVisible": false
-    },
-    {
-      "id": "heads-legs-2-06",
-      "branchId": "modeling-heads-legs",
-      "methodTaskId": "2.6",
-      "publishTier": "hidden",
-      "qaStatus": "blocked",
-      "issues": [
-        "missing_answer_key"
-      ],
-      "childVisible": false
-    },
-    {
-      "id": "heads-legs-1-09",
-      "branchId": "modeling-heads-legs",
-      "methodTaskId": "1.9",
-      "publishTier": "hidden",
-      "qaStatus": "blocked",
-      "issues": [
-        "missing_answer_key"
-      ],
-      "childVisible": false
-    },
-    {
-      "id": "heads-legs-1-11",
-      "branchId": "modeling-heads-legs",
-      "methodTaskId": "1.11",
-      "publishTier": "hidden",
-      "qaStatus": "blocked",
-      "issues": [
-        "missing_answer_key"
-      ],
-      "childVisible": false
-    },
-    {
-      "id": "heads-legs-3-03",
-      "branchId": "modeling-heads-legs",
-      "methodTaskId": "3.3",
-      "publishTier": "hidden",
-      "qaStatus": "blocked",
-      "issues": [
-        "missing_answer_key"
-      ],
-      "childVisible": false
-    },
-    {
-      "id": "heads-legs-3-05",
-      "branchId": "modeling-heads-legs",
-      "methodTaskId": "3.5",
-      "publishTier": "hidden",
-      "qaStatus": "blocked",
-      "issues": [
-        "missing_answer_key"
-      ],
-      "childVisible": false
-    },
-    {
-      "id": "heads-legs-3-07",
-      "branchId": "modeling-heads-legs",
-      "methodTaskId": "3.7",
-      "publishTier": "hidden",
-      "qaStatus": "blocked",
-      "issues": [
-        "missing_answer_key"
-      ],
-      "childVisible": false
-    },
-    {
-      "id": "heads-legs-4-01",
-      "branchId": "modeling-heads-legs",
-      "methodTaskId": "4.1",
-      "publishTier": "hidden",
-      "qaStatus": "blocked",
-      "issues": [
-        "missing_answer_key"
-      ],
-      "childVisible": false
-    },
-    {
-      "id": "heads-legs-4-02",
-      "branchId": "modeling-heads-legs",
-      "methodTaskId": "4.2",
-      "publishTier": "hidden",
-      "qaStatus": "blocked",
-      "issues": [
-        "missing_answer_key"
-      ],
-      "childVisible": false
-    },
-    {
       "id": "heads-legs-4-03",
       "branchId": "modeling-heads-legs",
       "methodTaskId": "4.3",
-      "publishTier": "hidden",
-      "qaStatus": "blocked",
-      "issues": [
-        "missing_answer_key"
-      ],
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
       "childVisible": false
     },
     {
       "id": "heads-legs-4-04",
       "branchId": "modeling-heads-legs",
       "methodTaskId": "4.4",
-      "publishTier": "hidden",
-      "qaStatus": "blocked",
-      "issues": [
-        "missing_answer_key"
-      ],
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
       "childVisible": false
     },
     {
       "id": "heads-legs-4-05",
       "branchId": "modeling-heads-legs",
       "methodTaskId": "4.5",
-      "publishTier": "hidden",
-      "qaStatus": "blocked",
-      "issues": [
-        "missing_answer_key"
-      ],
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
       "childVisible": false
     },
     {
       "id": "heads-legs-5-01",
       "branchId": "modeling-heads-legs",
       "methodTaskId": "5.1",
-      "publishTier": "hidden",
-      "qaStatus": "blocked",
-      "issues": [
-        "missing_answer_key"
-      ],
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
       "childVisible": false
     },
     {
       "id": "heads-legs-5-02",
       "branchId": "modeling-heads-legs",
       "methodTaskId": "5.2",
-      "publishTier": "hidden",
-      "qaStatus": "blocked",
-      "issues": [
-        "missing_answer_key"
-      ],
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
       "childVisible": false
     },
     {
@@ -466,33 +441,27 @@
       "id": "heads-legs-5-04",
       "branchId": "modeling-heads-legs",
       "methodTaskId": "5.4",
-      "publishTier": "hidden",
-      "qaStatus": "blocked",
-      "issues": [
-        "missing_answer_key"
-      ],
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
       "childVisible": false
     },
     {
       "id": "heads-legs-5-05",
       "branchId": "modeling-heads-legs",
       "methodTaskId": "5.5",
-      "publishTier": "hidden",
-      "qaStatus": "blocked",
-      "issues": [
-        "missing_answer_key"
-      ],
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
       "childVisible": false
     },
     {
       "id": "heads-legs-5-06",
       "branchId": "modeling-heads-legs",
       "methodTaskId": "5.6",
-      "publishTier": "hidden",
-      "qaStatus": "blocked",
-      "issues": [
-        "missing_answer_key"
-      ],
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
       "childVisible": false
     },
     {
@@ -508,11 +477,9 @@
       "id": "heads-legs-6-01",
       "branchId": "modeling-heads-legs",
       "methodTaskId": "6.1",
-      "publishTier": "hidden",
-      "qaStatus": "blocked",
-      "issues": [
-        "missing_answer_key"
-      ],
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
       "childVisible": false
     },
     {
@@ -528,55 +495,45 @@
       "id": "heads-legs-6-03",
       "branchId": "modeling-heads-legs",
       "methodTaskId": "6.3",
-      "publishTier": "hidden",
-      "qaStatus": "blocked",
-      "issues": [
-        "missing_answer_key"
-      ],
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
       "childVisible": false
     },
     {
       "id": "heads-legs-6-04",
       "branchId": "modeling-heads-legs",
       "methodTaskId": "6.4",
-      "publishTier": "hidden",
-      "qaStatus": "blocked",
-      "issues": [
-        "missing_answer_key"
-      ],
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
       "childVisible": false
     },
     {
       "id": "heads-legs-3-01",
       "branchId": "modeling-heads-legs",
       "methodTaskId": "3.1",
-      "publishTier": "hidden",
-      "qaStatus": "blocked",
-      "issues": [
-        "missing_answer_key"
-      ],
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
       "childVisible": false
     },
     {
       "id": "heads-legs-6-05",
       "branchId": "modeling-heads-legs",
       "methodTaskId": "6.5",
-      "publishTier": "hidden",
-      "qaStatus": "blocked",
-      "issues": [
-        "missing_answer_key"
-      ],
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
       "childVisible": false
     },
     {
       "id": "heads-legs-7-06",
       "branchId": "modeling-heads-legs",
       "methodTaskId": "7.6",
-      "publishTier": "hidden",
-      "qaStatus": "blocked",
-      "issues": [
-        "missing_answer_key"
-      ],
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
       "childVisible": false
     },
     {
@@ -601,44 +558,36 @@
       "id": "heads-legs-7-03",
       "branchId": "modeling-heads-legs",
       "methodTaskId": "7.3",
-      "publishTier": "hidden",
-      "qaStatus": "blocked",
-      "issues": [
-        "missing_answer_key"
-      ],
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
       "childVisible": false
     },
     {
       "id": "heads-legs-7-04",
       "branchId": "modeling-heads-legs",
       "methodTaskId": "7.4",
-      "publishTier": "hidden",
-      "qaStatus": "blocked",
-      "issues": [
-        "missing_answer_key"
-      ],
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
       "childVisible": false
     },
     {
       "id": "heads-legs-7-05",
       "branchId": "modeling-heads-legs",
       "methodTaskId": "7.5",
-      "publishTier": "hidden",
-      "qaStatus": "blocked",
-      "issues": [
-        "missing_answer_key"
-      ],
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
       "childVisible": false
     },
     {
       "id": "heads-legs-7-07",
       "branchId": "modeling-heads-legs",
       "methodTaskId": "7.7",
-      "publishTier": "hidden",
-      "qaStatus": "blocked",
-      "issues": [
-        "missing_answer_key"
-      ],
+      "publishTier": "methodistOnly",
+      "qaStatus": "ready",
+      "issues": [],
       "childVisible": false
     },
     {
