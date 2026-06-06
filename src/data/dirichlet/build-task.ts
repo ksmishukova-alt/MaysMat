@@ -3,7 +3,7 @@ import type { Task } from "@/data/tasks";
 
 import { getThemeBranchConfig } from "@/data/methodology-bank/theme-branches";
 import { patchAnswerReference, resolveTaskPublishing } from "@/data/task-publishing/resolve";
-import { CONDITION_PATCHES } from "@/data/task-publishing/config";
+import { CONDITION_PATCHES, SHORT_TITLE_PATCHES, TITLE_PATCHES } from "@/data/task-publishing/config";
 import { UNLUCKY_MODELS } from "@/data/dirichlet/unlucky/models";
 import { UNLUCKY_SCREEN_SEQUENCE } from "@/data/dirichlet/unlucky/screen-sequence";
 import { REMAINDERS_SCREEN_SEQUENCE } from "@/data/dirichlet/remainders/screen-sequence";
@@ -36,12 +36,14 @@ export function catalogEntryToMeta(entry: DirichletCatalogEntry): DirichletTaskM
     rawAnswers.solutionReference ?? "",
   );
   const condition = CONDITION_PATCHES[entry.methodTaskId] ?? entry.condition;
+  const title = TITLE_PATCHES[entry.methodTaskId] ?? entry.title;
   const isUnlucky = entry.flowId === "F3_UNLUCKY";
   const isRemainders = entry.flowId === "F4_REMAINDERS";
   const unluckyModel = UNLUCKY_MODELS[entry.methodTaskId];
 
   const meta: DirichletTaskMeta = {
     ...entry,
+    title,
     condition,
     acceptedAnswers: { ...rawAnswers, solutionReference },
     solutionLines: DIRICHLET_SOLUTION_LINES[entry.methodTaskId] ?? [],
@@ -85,6 +87,7 @@ export function buildDirichletTask(meta: DirichletTaskMeta): Task {
     branchId: meta.branchId,
     number: meta.number,
     title: meta.title,
+    shortTitle: SHORT_TITLE_PATCHES[meta.methodTaskId],
     condition: meta.condition,
     stage: meta.stage,
     maxStars: 3,

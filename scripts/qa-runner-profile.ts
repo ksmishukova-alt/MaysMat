@@ -7,6 +7,7 @@ import { UNLUCKY_SCREEN_SEQUENCE } from "../src/data/dirichlet/unlucky/screen-se
 import { buildRemaindersSteps } from "../src/data/dirichlet/remainders/build-remainders-steps";
 import { REMAINDERS_SCREEN_SEQUENCE } from "../src/data/dirichlet/remainders/screen-sequence";
 import { REMAINDERS_PILOT_METHOD_IDS } from "../src/data/dirichlet/remainders/models";
+import { validateBlankChipConfiguration } from "../src/lib/word-solution-mode-a";
 import { DIRICHLET_TASKS } from "../src/data/dirichlet/build-task";
 import { isChildVisible } from "../src/data/task-publishing/resolve";
 import { resolveRunnerKind } from "../src/lib/resolve-runner-kind";
@@ -272,6 +273,15 @@ for (const methodId of REMAINDERS_PILOT_METHOD_IDS) {
   if (methodId === "M4.18" && !m.compactHouses) {
     fail(`${pilot.id}: M4.18 должна использовать compactHouses`);
   }
+  if (m.writeSolutionLines?.length) {
+    const chipCheck = validateBlankChipConfiguration(m.writeSolutionLines, "reusable");
+    if (!chipCheck.ok) {
+      fail(`${pilot.id}: writeSolutionLines — ${chipCheck.message}`);
+    }
+  }
+  if (pilot.title.includes("…")) {
+    fail(`${pilot.id}: обрезанный title «${pilot.title}»`);
+  }
 }
 ok(`pilot F4 (M4.11, M4.18): ${REMAINDERS_PILOT_METHOD_IDS.length} задач с полной моделью`);
 
@@ -292,6 +302,42 @@ ok(`pilot F4 (M4.11, M4.18): ${REMAINDERS_PILOT_METHOD_IDS.length} задач с
     } else {
       ok("dirichlet-t3-11: 12 чисел > 11 домиков (mod 11)");
     }
+    if (demo.title !== "12 чисел и остатки по модулю 11") {
+      fail(`dirichlet-t3-11: title = «${demo.title}»`);
+    }
+    if (!demo.condition.includes("12 различных двузначных")) {
+      fail("dirichlet-t3-11: condition неполное");
+    }
+  }
+}
+
+// Smoke: dirichlet-t3-18 pipeline + заголовки
+{
+  const demo = DIRICHLET_TASKS["dirichlet-t3-18"];
+  if (!demo) {
+    fail("dirichlet-t3-18 не найдена");
+  } else {
+    if (resolveRunnerKind(demo) !== "dirichlet-remainders") {
+      fail("dirichlet-t3-18: неверный runnerKind");
+    }
+    const steps = buildRemaindersSteps(demo.dirichletMeta!);
+    ok(`dirichlet-t3-18 pipeline: ${steps.length} шагов, finish=${steps.some((s) => s.kind === "finish")}`);
+    if (demo.title !== "2001 число и остатки по модулю 2000") {
+      fail(`dirichlet-t3-18: title = «${demo.title}»`);
+    }
+    if (demo.shortTitle !== "2001 число и 2000 остатков") {
+      fail(`dirichlet-t3-18: shortTitle = «${demo.shortTitle ?? "нет"}»`);
+    }
+    if (demo.title.includes("…")) {
+      fail("dirichlet-t3-18: обрезанный title");
+    }
+    if (!demo.condition.includes("2001 целых чисел")) {
+      fail("dirichlet-t3-18: condition неполное");
+    }
+    const m = demo.dirichletMeta!.remaindersModel!;
+    const chipCheck = validateBlankChipConfiguration(m.writeSolutionLines ?? [], "reusable");
+    if (!chipCheck.ok) fail(`dirichlet-t3-18: ${chipCheck.message}`);
+    else ok("dirichlet-t3-18: write_solution reusable cards OK");
   }
 }
 

@@ -1,14 +1,20 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type MouseEvent } from "react";
 import type { SolutionLine } from "@/data/heads-legs/types";
-import { buildBlankChipPool, shuffleIds } from "@/lib/word-solution-mode-a";
+import {
+  buildBlankChipPool,
+  shuffleIds,
+  type FillBlankCardMode,
+} from "@/lib/word-solution-mode-a";
 
 interface WordSolutionFillBlanksProps {
   stepId?: string;
   lines: SolutionLine[];
   blanks: Record<string, string>;
   onBlanksChange: (next: Record<string, string>) => void;
+  /** singleUse — карточка исчезает после вставки; reusable — можно использовать повторно */
+  cardMode?: FillBlankCardMode;
 }
 
 export function WordSolutionFillBlanks({
@@ -16,6 +22,7 @@ export function WordSolutionFillBlanks({
   lines,
   blanks,
   onBlanksChange,
+  cardMode = "singleUse",
 }: WordSolutionFillBlanksProps) {
   const allBlanks = useMemo(() => lines.flatMap((l) => l.blanks), [lines]);
   const [chips, setChips] = useState<string[]>(() => buildBlankChipPool(lines));
@@ -31,7 +38,22 @@ export function WordSolutionFillBlanks({
     setActiveBlankId(null);
   };
 
-  const usedValues = new Set(Object.values(blanks).map((v) => v.trim()).filter(Boolean));
+  const clearBlank = (blankId: string, e?: MouseEvent) => {
+    e?.stopPropagation();
+    const next = { ...blanks };
+    delete next[blankId];
+    onBlanksChange(next);
+    setActiveBlankId(blankId);
+  };
+
+  /** Для singleUse: сколько раз значение уже занято в пропусках */
+  const usageCount = (chip: string) =>
+    Object.values(blanks).filter((v) => v.trim() === chip).length;
+
+  const isChipAvailable = (chip: string) => {
+    if (cardMode === "reusable") return true;
+    return usageCount(chip) < 1;
+  };
 
   const renderLine = (line: SolutionLine, li: number) => {
     let bi = 0;
@@ -52,23 +74,39 @@ export function WordSolutionFillBlanks({
           const isActive = activeBlankId === blank.id;
           const wide = blank.type === "expression" || blank.type === "conclusion";
           return (
-            <button
-              key={blank.id}
-              type="button"
-              onClick={() => setActiveBlankId(blank.id)}
-              className={`mx-0.5 inline-flex min-h-[2.25rem] items-center rounded-lg border-2 px-2 align-middle transition ${
-                isActive
-                  ? "border-brand-purple bg-lavender-100 ring-2 ring-brand-purple/30"
-                  : filled
-                    ? "border-brand-purple/40 bg-lavender-50"
-                    : "border-dashed border-lavender-300 bg-white hover:border-brand-purple/50"
-              } ${wide ? "min-w-[10rem]" : "min-w-[4rem]"}`}
-              aria-label={`Пропуск ${li + 1}`}
-            >
-              {filled || (
-                <span className="text-sm text-gray-400">{blank.placeholder ?? "…"}</span>
-              )}
-            </button>
+            <span key={blank.id} className="mx-0.5 inline-flex align-middle">
+              <button
+                type="button"
+                onClick={() => setActiveBlankId(isActive ? null : blank.id)}
+                className={`inline-flex min-h-[2.25rem] items-center rounded-lg border-2 px-2 transition ${
+                  isActive
+                    ? "border-brand-purple bg-lavender-100 ring-2 ring-brand-purple/30"
+                    : filled
+                      ? "border-brand-purple/40 bg-lavender-50"
+                      : "border-dashed border-lavender-300 bg-white hover:border-brand-purple/50"
+                } ${wide ? "min-w-[10rem]" : "min-w-[4rem]"}`}
+                aria-label={`Пропуск ${li + 1}`}
+              >
+                {filled ? (
+                  <span className="flex items-center gap-1 font-medium text-gray-900">
+                    {filled}
+                  </span>
+                ) : (
+                  <span className="text-sm text-gray-400">{blank.placeholder ?? "…"}</span>
+                )}
+              </button>
+              {filled ? (
+                <button
+                  type="button"
+                  onClick={(e) => clearBlank(blank.id, e)}
+                  className="ml-0.5 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-gray-400 hover:bg-red-50 hover:text-red-600"
+                  aria-label="Очистить пропуск"
+                  title="Убрать"
+                >
+                  ×
+                </button>
+              ) : null}
+            </span>
           );
         })}
       </div>
@@ -80,7 +118,8 @@ export function WordSolutionFillBlanks({
   return (
     <div className="space-y-5">
       <p className="text-sm text-gray-600">
-        Заполни пропуски: нажми на <strong>___</strong> в тексте, затем на карточку с числом или словом.
+        Заполни пропуски: нажми на <strong>___</strong> в тексте, затем на карточку. Чтобы убрать
+        значение — нажми <strong>×</strong>.
       </p>
 
       {chips.length > 0 ? (
@@ -95,18 +134,18 @@ export function WordSolutionFillBlanks({
           </p>
           <div className="flex flex-wrap gap-2">
             {chips.map((chip) => {
-              const used = usedValues.has(chip);
+              const available = isChipAvailable(chip);
               return (
                 <button
                   key={chip}
                   type="button"
-                  disabled={used && blanks[activeBlankId ?? ""]?.trim() !== chip}
+                  disabled={!available && blanks[activeBlankId ?? ""]?.trim() !== chip}
                   onClick={() => {
                     const target = activeBlankId ?? nextEmpty?.id;
                     if (target) placeChip(target, chip);
                   }}
                   className={`rounded-xl border-2 px-4 py-2.5 text-sm font-semibold transition ${
-                    used
+                    !available && cardMode === "singleUse"
                       ? "border-gray-100 bg-gray-50 text-gray-300"
                       : activeBlankId || nextEmpty
                         ? "border-lavender-200 bg-lavender-50 hover:border-brand-purple hover:bg-lavender-100"

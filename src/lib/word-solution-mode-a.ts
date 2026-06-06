@@ -26,6 +26,55 @@ export function validateModeABlanks(
   return { ok: true };
 }
 
+/** Режим карточек: одноразовые или многоразовые (одно значение — несколько пропусков) */
+export type FillBlankCardMode = "singleUse" | "reusable";
+
+/** Проверка согласованности банка карточек и пропусков */
+export function validateBlankChipConfiguration(
+  solutionLines: SolutionLine[],
+  cardMode: FillBlankCardMode,
+): { ok: boolean; message?: string } {
+  const blanks = solutionLines.flatMap((l) => l.blanks);
+  const pool = buildBlankChipPool(solutionLines);
+
+  if (blanks.length === 0) return { ok: true };
+
+  const usageByLabel = new Map<string, number>();
+  for (const blank of blanks) {
+    const accepts = Array.isArray(blank.accept)
+      ? blank.accept
+      : blank.accept != null
+        ? [blank.accept]
+        : [];
+    const label = String(accepts[0] ?? "").trim();
+    if (!label) {
+      return { ok: false, message: "пропуск без допустимого значения (accept)" };
+    }
+    usageByLabel.set(label, (usageByLabel.get(label) ?? 0) + 1);
+  }
+
+  for (const [label, count] of usageByLabel) {
+    if (!pool.includes(label)) {
+      return { ok: false, message: `нет карточки «${label}» для пропуска` };
+    }
+    if (cardMode === "singleUse" && count > 1) {
+      return {
+        ok: false,
+        message: `«${label}» нужно ${count} раз — включите reusable или добавьте дубли карточек`,
+      };
+    }
+  }
+
+  if (cardMode === "singleUse" && pool.length < blanks.length) {
+    return {
+      ok: false,
+      message: `singleUse: карточек (${pool.length}) меньше пропусков (${blanks.length})`,
+    };
+  }
+
+  return { ok: true };
+}
+
 /** Уникальные значения для банка карточек вставок */
 export function buildBlankChipPool(solutionLines: SolutionLine[]): string[] {
   const seen = new Set<string>();

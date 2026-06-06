@@ -103,6 +103,8 @@ export interface Task {
   branchId: string;
   number: number;
   title: string;
+  /** Краткий заголовок для карточки в списке (если title длинный) */
+  shortTitle?: string;
   condition: string;
   stage: number;
   maxStars: number;

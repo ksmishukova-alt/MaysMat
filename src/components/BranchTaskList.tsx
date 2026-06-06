@@ -96,7 +96,7 @@ export function BranchTaskList({
                     <span className="rounded-full bg-emerald-500 px-2 py-0.5 text-xs text-white">
                       ✓ решено
                     </span>
-                    Задача {labelNum}. {task.title}
+                    Задача {labelNum}. {task.shortTitle ?? task.title}
                     {tierBadge}
                     {isCopy ? (
                       <span className="text-xs font-normal text-brand-purple">копия</span>
@@ -126,7 +126,7 @@ export function BranchTaskList({
               >
                 <div>
                   <div className="font-medium">
-                    Задача {labelNum}. {task.title}
+                    Задача {labelNum}. {task.shortTitle ?? task.title}
                     {tierBadge}
                   </div>
                   <div className="mt-1 text-sm text-sky-800">{PAPER_STATUS_LABEL.pending}</div>
@@ -150,7 +150,7 @@ export function BranchTaskList({
               >
                 <div>
                   <div className="font-medium">
-                    Задача {labelNum}. {task.title}
+                    Задача {labelNum}. {task.shortTitle ?? task.title}
                     {tierBadge}
                   </div>
                   <div className="mt-1 text-sm text-amber-800">{PAPER_STATUS_LABEL.redo}</div>
@@ -170,7 +170,7 @@ export function BranchTaskList({
             >
               <div>
                 <div className="font-medium">
-                  Задача {labelNum}. {task.title}
+                  Задача {labelNum}. {task.shortTitle ?? task.title}
                   {tierBadge}
                   {isCopy ? (
                     <span className="ml-2 text-xs font-normal text-brand-purple">копия</span>

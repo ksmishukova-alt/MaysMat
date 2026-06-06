@@ -15,6 +15,7 @@ import { isChildVisible } from "../src/data/task-publishing/resolve";
 import { resolveRunnerKind } from "../src/lib/resolve-runner-kind";
 import { buildUnluckySteps } from "../src/data/dirichlet/unlucky/build-unlucky-steps";
 import { buildRemaindersSteps } from "../src/data/dirichlet/remainders/build-remainders-steps";
+import { validateBlankChipConfiguration } from "../src/lib/word-solution-mode-a";
 import type { Task } from "../src/data/tasks";
 
 const allTasks = { ...HEADS_LEGS_TASKS, ...DIRICHLET_TASKS };
@@ -131,9 +132,42 @@ if (!branchViaAlias || branchViaAlias.id !== "proof-constructions") {
     const m = pilot.dirichletMeta!.remaindersModel!;
     if (m.modulus !== 11 || m.objectsCount !== 12) {
       fail(`dirichlet-t3-11: модель ${m.modulus}/${m.objectsCount}`);
-    } else {
-      ok("dirichlet-t3-11: RemaindersRunner pipeline (12 > 11, mod 11)");
     }
+    const chipCheck = validateBlankChipConfiguration(m.writeSolutionLines ?? [], "reusable");
+    if (!chipCheck.ok) fail(`dirichlet-t3-11 write_solution: ${chipCheck.message}`);
+    if (pilot.title.includes("…")) fail("dirichlet-t3-11: обрезанный title");
+    if (!pilot.condition.includes("12 различных двузначных")) {
+      fail("dirichlet-t3-11: condition неполное на этапе read");
+    }
+    ok("dirichlet-t3-11: RemaindersRunner pipeline (12 > 11, reusable blanks)");
+  }
+}
+
+// 3c. remainders pilot — dirichlet-t3-18
+{
+  const pilot = allTasks["dirichlet-t3-18"];
+  if (!pilot) {
+    fail("dirichlet-t3-18 не найдена");
+  } else {
+    if (resolveRunnerKind(pilot) !== "dirichlet-remainders") {
+      fail("dirichlet-t3-18: runnerKind !== dirichlet-remainders");
+    }
+    const steps = buildRemaindersSteps(pilot.dirichletMeta!);
+    if (!steps.some((s) => s.kind === "write_solution") || !steps.some((s) => s.kind === "finish")) {
+      fail("dirichlet-t3-18: нет write_solution или finish");
+    }
+    const m = pilot.dirichletMeta!.remaindersModel!;
+    if (!m.compactHouses) fail("dirichlet-t3-18: нужен compactHouses");
+    const chipCheck = validateBlankChipConfiguration(m.writeSolutionLines ?? [], "reusable");
+    if (!chipCheck.ok) fail(`dirichlet-t3-18 write_solution: ${chipCheck.message}`);
+    if (pilot.title.includes("…")) fail("dirichlet-t3-18: обрезанный title");
+    if (pilot.title !== "2001 число и остатки по модулю 2000") {
+      fail(`dirichlet-t3-18: title «${pilot.title}»`);
+    }
+    if (!pilot.condition.includes("2001 целых чисел")) {
+      fail("dirichlet-t3-18: condition неполное");
+    }
+    ok("dirichlet-t3-18: RemaindersRunner pipeline (2001 > 2000, compact houses)");
   }
 }
 

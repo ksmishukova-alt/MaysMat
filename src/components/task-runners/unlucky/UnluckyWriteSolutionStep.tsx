@@ -60,6 +60,7 @@ export function UnluckyWriteSolutionStep({ stepId, model, onComplete }: UnluckyW
         lines={lines}
         blanks={blanks}
         onBlanksChange={setBlanks}
+        cardMode="reusable"
       />
       {error ? <p className="mb-3 mt-4 text-sm text-red-600">{error}</p> : null}
       <button
