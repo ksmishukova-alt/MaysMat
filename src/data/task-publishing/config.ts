@@ -14,6 +14,7 @@ export const DIRICHLET_CHILD_ROUTE: Record<string, number> = {
   "M2.6": 7,
   "M2.2": 8,
   "M3.2": 9,
+  "M4.11": 10,
 };
 
 /** P0 — блокеры: visual без ассета */
@@ -74,6 +75,8 @@ export const MANUAL_PUBLISHING: Record<string, ManualPublishingOverride> = {
   "dirichlet-t1-13": { publishTier: "childRoute", qaStatus: "ready", routeOrder: 106 },
   "dirichlet-t1-15": { publishTier: "childRoute", qaStatus: "ready", routeOrder: 107 },
   "dirichlet-t2-02": { publishTier: "childRoute", qaStatus: "ready", routeOrder: 108 },
+  "dirichlet-t3-11": { publishTier: "childRoute", qaStatus: "ready", routeOrder: 110 },
+  "dirichlet-t3-18": { publishTier: "methodistOnly", qaStatus: "ready" },
   "dirichlet-t1-10": { publishTier: "childRoute", qaStatus: "ready", routeOrder: 109, clearIssues: ["contains_N_equals_N"] },
   "dirichlet-t4-14": { publishTier: "methodistOnly", qaStatus: "ready", clearIssues: ["incomplete_condition"] },
   "dirichlet-t4-31": { publishTier: "methodistOnly", qaStatus: "ready", clearIssues: ["contains_external_reference", "missing_answer_key"] },

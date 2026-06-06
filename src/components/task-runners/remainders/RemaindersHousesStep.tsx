@@ -28,7 +28,7 @@ export function RemaindersHousesStep({ stepId, model, onComplete }: RemaindersHo
   const compact = model.compactHouses ?? m >= 20;
 
   if (confirmed) {
-    return <StepSuccess message={`Домиков-остатков: ${m} — от 0 до ${m - 1}.`} />;
+    return <StepSuccess message={`Домиков для остатков: ${m} — от 0 до ${m - 1}.`} />;
   }
 
   return (

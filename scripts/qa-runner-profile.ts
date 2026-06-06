@@ -229,6 +229,7 @@ for (const task of f4Tasks) {
         "read_condition",
         "find_modulus",
         "build_houses",
+        "houses_count_quiz",
         "identify_objects",
         "find_collision",
         "explain_divisibility",
@@ -282,6 +283,18 @@ for (const methodId of REMAINDERS_PILOT_METHOD_IDS) {
   if (pilot.title.includes("…")) {
     fail(`${pilot.id}: обрезанный title «${pilot.title}»`);
   }
+  const ri = m.ruleInstance;
+  if (!ri || ri.ruleId !== "remainders-houses") {
+    fail(`${pilot.id}: нет ruleInstance remainders-houses`);
+  } else if (ri.lastRemainder !== ri.modulus - 1 || ri.housesCount !== ri.modulus) {
+    fail(`${pilot.id}: ruleInstance некорректен`);
+  }
+  if (methodId === "M4.11" && !ri?.showRuleScreen) {
+    fail(`${pilot.id}: M4.11 должна показывать экран правила`);
+  }
+  if (methodId === "M4.18" && ri?.showRuleScreen) {
+    fail(`${pilot.id}: M4.18 не должна требовать экран правила`);
+  }
 }
 ok(`pilot F4 (M4.11, M4.18): ${REMAINDERS_PILOT_METHOD_IDS.length} задач с полной моделью`);
 
@@ -308,6 +321,15 @@ ok(`pilot F4 (M4.11, M4.18): ${REMAINDERS_PILOT_METHOD_IDS.length} задач с
     if (!demo.condition.includes("12 различных двузначных")) {
       fail("dirichlet-t3-11: condition неполное");
     }
+    if (!steps.some((s) => s.kind === "method_rule")) {
+      fail("dirichlet-t3-11: нет method_rule");
+    }
+    if (!steps.some((s) => s.kind === "houses_count_quiz")) {
+      fail("dirichlet-t3-11: нет houses_count_quiz");
+    }
+    if (demo.publishing && !isChildVisible(demo.publishing)) {
+      fail("dirichlet-t3-11: должна быть в childRoute");
+    }
   }
 }
 
@@ -333,6 +355,12 @@ ok(`pilot F4 (M4.11, M4.18): ${REMAINDERS_PILOT_METHOD_IDS.length} задач с
     }
     if (!demo.condition.includes("2001 целых чисел")) {
       fail("dirichlet-t3-18: condition неполное");
+    }
+    if (steps.some((s) => s.kind === "method_rule")) {
+      fail("dirichlet-t3-18: не должно быть method_rule");
+    }
+    if (demo.publishing && isChildVisible(demo.publishing)) {
+      fail("dirichlet-t3-18: не должна быть в childRoute");
     }
     const m = demo.dirichletMeta!.remaindersModel!;
     const chipCheck = validateBlankChipConfiguration(m.writeSolutionLines ?? [], "reusable");

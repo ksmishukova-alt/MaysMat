@@ -1,5 +1,6 @@
 import type { RemaindersModel } from "./types";
 import { REMAINDERS_COMPACT_THRESHOLD } from "./types";
+import { buildRemaindersRuleInstance } from "@/data/method-rules";
 
 /** Полные модели pilot-задач F4 */
 export const REMAINDERS_MODELS: Record<string, RemaindersModel> = {
@@ -12,6 +13,18 @@ export const REMAINDERS_MODELS: Record<string, RemaindersModel> = {
     targetRelation: "разность делится на 11",
     conclusionTemplate:
       "Найдутся два числа с одинаковым остатком при делении на 11, поэтому их разность делится на 11.",
+    ruleInstance: buildRemaindersRuleInstance(
+      {
+        modulus: 11,
+        objectsCount: 12,
+        objectsLabel: "двузначных чисел",
+        housesCount: 11,
+        housesLabel: "остатков",
+        targetRelation: "",
+        conclusionTemplate: "",
+      },
+      { showRuleScreen: true },
+    ),
     writeSolutionLines: [
       {
         template: "Будем смотреть на остатки двузначных чисел при делении на [ ].",
@@ -26,7 +39,7 @@ export const REMAINDERS_MODELS: Record<string, RemaindersModel> = {
         ],
       },
       {
-        template: "Чисел дано [ ], а домиков-остатков только [ ].",
+        template: "Чисел дано [ ], а домиков для остатков только [ ].",
         blanks: [
           { id: "m411-w5", type: "number", accept: 12 },
           { id: "m411-w6", type: "number", accept: 11 },
@@ -61,6 +74,19 @@ export const REMAINDERS_MODELS: Record<string, RemaindersModel> = {
     conclusionTemplate:
       "Найдутся два числа с одинаковым остатком при делении на 2000, поэтому их разность делится на 2000.",
     compactHouses: true,
+    ruleInstance: buildRemaindersRuleInstance(
+      {
+        modulus: 2000,
+        objectsCount: 2001,
+        objectsLabel: "целых чисел",
+        housesCount: 2000,
+        housesLabel: "остатков",
+        targetRelation: "",
+        conclusionTemplate: "",
+        compactHouses: true,
+      },
+      { showRuleScreen: false },
+    ),
     writeSolutionLines: [
       {
         template: "Будем смотреть на остатки целых чисел при делении на [ ].",
@@ -75,7 +101,7 @@ export const REMAINDERS_MODELS: Record<string, RemaindersModel> = {
         ],
       },
       {
-        template: "Чисел дано [ ], а домиков-остатков только [ ].",
+        template: "Чисел дано [ ], а домиков для остатков только [ ].",
         blanks: [
           { id: "m418-w5", type: "number", accept: 2001 },
           { id: "m418-w6", type: "number", accept: 2000 },

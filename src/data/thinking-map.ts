@@ -106,7 +106,7 @@ export const THINKING_TYPES: ThinkingType[] = [
     color: "#EF4444",
     branches: [
       { id: "arith-divisibility", thinkingType: "arithmetic", title: "Делимость", slug: "divisibility", status: "locked", progress: 0, stars: 0, maxStars: 150, taskCount: 0 },
-      { id: "arith-remainders", thinkingType: "arithmetic", title: "Остатки", slug: "remainders", status: "available", progress: 0, stars: 0, maxStars: 69, taskCount: 23, firstTaskId: "dirichlet-t3-01" },
+      { id: "arith-remainders", thinkingType: "arithmetic", title: "Остатки", slug: "remainders", status: "available", progress: 0, stars: 0, maxStars: 69, taskCount: 23, firstTaskId: "dirichlet-t3-11" },
       { id: "arith-gcd", thinkingType: "arithmetic", title: "НОД/НОК", slug: "gcd", status: "locked", progress: 0, stars: 0, maxStars: 150, taskCount: 0 },
       { id: "arith-rebus", thinkingType: "arithmetic", title: "Числовые ребусы", slug: "rebus", status: "locked", progress: 0, stars: 0, maxStars: 150, taskCount: 0 },
     ],

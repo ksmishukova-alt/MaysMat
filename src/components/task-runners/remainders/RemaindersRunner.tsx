@@ -9,6 +9,8 @@ import {
   remaindersIntroTemplate,
 } from "@/data/dirichlet/remainders/build-remainders-steps";
 import type { RemaindersModel, RemaindersStep } from "@/data/dirichlet/remainders/types";
+import { getMethodRule } from "@/data/method-rules";
+import { MethodRuleModal, MethodRuleScreen } from "@/components/method/MethodRuleScreen";
 import { AutoExplanationStep } from "@/components/task-steps/AutoExplanationStep";
 import { ReadConditionStep } from "@/components/task-steps/ReadConditionStep";
 import { TaskScreenShell } from "@/components/task-steps/TaskScreenShell";
@@ -19,6 +21,7 @@ import { RemainderObjectsStep } from "./RemainderObjectsStep";
 import { RemainderCollisionStep } from "./RemainderCollisionStep";
 import { RemainderDivisibilityExplainStep } from "./RemainderDivisibilityExplainStep";
 import { RemaindersWriteSolutionStep } from "./RemaindersWriteSolutionStep";
+import { RemainderHousesCountQuizStep } from "./RemainderHousesCountQuizStep";
 import { completeTask, getTaskCompletion } from "@/lib/progress";
 import { useProgress } from "@/lib/use-progress";
 import {
@@ -38,6 +41,8 @@ export function RemaindersRunner({ task, totalTasksInBranch = 1 }: RemaindersRun
   const router = useRouter();
   const meta = task.dirichletMeta;
   const model = meta?.remaindersModel;
+  const ruleInstance = model?.ruleInstance;
+  const methodRule = ruleInstance ? getMethodRule(ruleInstance.ruleId) : undefined;
 
   const steps = useMemo(() => {
     if (!meta?.remaindersModel) return [];
@@ -57,6 +62,7 @@ export function RemaindersRunner({ task, totalTasksInBranch = 1 }: RemaindersRun
   const [stepIndex, setStepIndex] = useState(() =>
     Math.min(priorSession?.stepIndex ?? 0, Math.max(0, steps.length - 1)),
   );
+  const [ruleModalOpen, setRuleModalOpen] = useState(false);
 
   const userProgress = useProgress();
   const priorCompletion = getTaskCompletion(task.id, userProgress);
@@ -108,6 +114,9 @@ export function RemaindersRunner({ task, totalTasksInBranch = 1 }: RemaindersRun
 
   if (!step) return null;
 
+  const showHelpRule = methodRule && ruleInstance;
+  const hideHeaderCondition = step.kind === "read_condition" || step.kind === "method_rule";
+
   return (
     <div className="mx-auto max-w-2xl">
       {priorCompletion ? (
@@ -127,13 +136,25 @@ export function RemaindersRunner({ task, totalTasksInBranch = 1 }: RemaindersRun
           Остатки · Задача {task.number}
         </div>
         <h2 className="text-xl font-bold">{task.title}</h2>
-        <p className="mt-1 text-sm text-gray-500">Числа живут в домиках-остатках</p>
-        {step.kind !== "read_condition" ? (
+        <p className="mt-1 text-sm text-gray-500">Числа живут в домиках остатков</p>
+        {!hideHeaderCondition ? (
           <p className="mt-4 whitespace-pre-line text-base leading-relaxed text-gray-700">
             {highlightConditionText(task.condition, "dirichlet")}
           </p>
         ) : null}
       </div>
+
+      {showHelpRule ? (
+        <div className="mb-4">
+          <button
+            type="button"
+            onClick={() => setRuleModalOpen(true)}
+            className="rounded-xl border border-lavender-200 bg-lavender-50 px-4 py-2 text-sm font-medium text-brand-purple hover:bg-lavender-100"
+          >
+            {methodRule.helpButtonLabel}
+          </button>
+        </div>
+      ) : null}
 
       <div className="mb-4">
         <ProgressBar
@@ -148,18 +169,31 @@ export function RemaindersRunner({ task, totalTasksInBranch = 1 }: RemaindersRun
           phaseIndex={step.screenPhaseIndex}
           phaseCount={step.screenPhaseCount}
           showPhaseHeader
-          stepTitle={step.kind !== "read_condition" ? step.title : undefined}
-          showStepTitle={step.kind !== "read_condition"}
+          stepTitle={
+            step.kind !== "read_condition" && step.kind !== "method_rule" ? step.title : undefined
+          }
+          showStepTitle={step.kind !== "read_condition" && step.kind !== "method_rule"}
         >
           <RemaindersStepBody
             step={step}
             task={task}
             model={model}
+            methodRule={methodRule}
+            ruleInstance={ruleInstance}
             onAdvance={advance}
             onFinish={finish}
           />
         </TaskScreenShell>
       </div>
+
+      {showHelpRule && ruleInstance ? (
+        <MethodRuleModal
+          open={ruleModalOpen}
+          rule={methodRule}
+          instance={ruleInstance}
+          onClose={() => setRuleModalOpen(false)}
+        />
+      ) : null}
     </div>
   );
 }
@@ -168,12 +202,16 @@ function RemaindersStepBody({
   step,
   task,
   model,
+  methodRule,
+  ruleInstance,
   onAdvance,
   onFinish,
 }: {
   step: RemaindersStep;
   task: Task;
   model: RemaindersModel;
+  methodRule?: ReturnType<typeof getMethodRule>;
+  ruleInstance?: RemaindersModel["ruleInstance"];
   onAdvance: () => void;
   onFinish: () => void;
 }) {
@@ -183,6 +221,18 @@ function RemaindersStepBody({
         <AutoExplanationStep
           template={remaindersIntroTemplate()}
           role="intro"
+          onComplete={onAdvance}
+        />
+      );
+    case "method_rule":
+      if (!methodRule || !ruleInstance) {
+        return <p className="text-sm text-red-600">Нет данных правила для задачи.</p>;
+      }
+      return (
+        <MethodRuleScreen
+          rule={methodRule}
+          instance={ruleInstance}
+          variant="step"
           onComplete={onAdvance}
         />
       );
@@ -201,6 +251,10 @@ function RemaindersStepBody({
       return <RemainderModulusStep stepId={step.id} model={model} onComplete={onAdvance} />;
     case "build_houses":
       return <RemaindersHousesStep stepId={step.id} model={model} onComplete={onAdvance} />;
+    case "houses_count_quiz":
+      return (
+        <RemainderHousesCountQuizStep stepId={step.id} model={model} onComplete={onAdvance} />
+      );
     case "identify_objects":
       return <RemainderObjectsStep stepId={step.id} model={model} onComplete={onAdvance} />;
     case "find_collision":

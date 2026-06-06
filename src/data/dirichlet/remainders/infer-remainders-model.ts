@@ -1,6 +1,7 @@
 import type { DirichletTaskMeta } from "@/data/dirichlet/types";
 import { inferDirichletModel } from "@/data/dirichlet/guided/infer-model";
 import { REMAINDERS_MODELS, withCompactDefaults } from "./models";
+import { buildRemaindersRuleInstance } from "@/data/method-rules";
 import type { RemaindersModel } from "./types";
 
 /** Извлечь модуль из условия («делится на N», «делении на N») */
@@ -59,6 +60,18 @@ export function inferRemaindersModel(meta: DirichletTaskMeta): RemaindersModel |
     housesLabel: "остатков",
     targetRelation,
     conclusionTemplate: inferred.conclusionText || `найдутся два числа, ${targetRelation}`,
+    ruleInstance: buildRemaindersRuleInstance(
+      {
+        modulus,
+        objectsCount,
+        objectsLabel,
+        housesCount,
+        housesLabel: "остатков",
+        targetRelation,
+        conclusionTemplate: "",
+      },
+      { showRuleScreen: false },
+    ),
   });
 }
 

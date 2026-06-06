@@ -1,11 +1,14 @@
 /** Экранный сценарий «Остатки как домики» */
 import type { SolutionLine } from "@/data/heads-legs/types";
+import type { RemaindersRuleInstance } from "@/data/method-rules/types";
 
 export type RemaindersStepKind =
   | "intro_video"
+  | "method_rule"
   | "read_condition"
   | "find_modulus"
   | "build_houses"
+  | "houses_count_quiz"
   | "identify_objects"
   | "find_collision"
   | "explain_divisibility"
@@ -13,7 +16,7 @@ export type RemaindersStepKind =
   | "finish";
 
 export interface RemaindersModel {
-  /** Модуль деления (число домиков-остатков) */
+  /** Модуль деления (число домиков остатков) */
   modulus: number;
   objectsCount: number;
   objectsLabel: string;
@@ -26,6 +29,8 @@ export interface RemaindersModel {
   writeSolutionLines?: SolutionLine[];
   /** Сжатая визуализация при большом модуле */
   compactHouses?: boolean;
+  /** Методическое правило с числами задачи */
+  ruleInstance?: RemaindersRuleInstance;
 }
 
 export interface RemaindersStep {
