@@ -9,4 +9,5 @@ export type TaskRunnerKind =
   | "dirichlet-graph"
   | "dirichlet-coloring"
   | "paper-construction"
-  | "paper-generic";
+  | "paper-generic"
+  | "unsupported";

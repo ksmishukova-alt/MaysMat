@@ -14,6 +14,7 @@ import { GuaranteeGoalStep } from "./GuaranteeGoalStep";
 import { WorstCaseBuildStep } from "./WorstCaseBuildStep";
 import { GuaranteeThresholdStep } from "./GuaranteeThresholdStep";
 import { UnluckyExplainStep } from "./UnluckyExplainStep";
+import { UnluckyWriteSolutionStep } from "./UnluckyWriteSolutionStep";
 import { completeTask, getTaskCompletion } from "@/lib/progress";
 import { useProgress } from "@/lib/use-progress";
 import {
@@ -23,15 +24,13 @@ import {
   saveTaskSession,
 } from "@/lib/task-session";
 import { highlightConditionText } from "@/lib/highlight-condition";
-import { STEP_SUCCESS_MS } from "@/components/task-steps/step-advance";
-import { StepSuccess } from "@/components/task-steps/StepSuccess";
 
 interface UnluckyRunnerProps {
   task: Task;
   totalTasksInBranch?: number;
 }
 
-export function UnluckyRunner({ task, totalTasksInBranch = 5 }: UnluckyRunnerProps) {
+export function UnluckyRunner({ task, totalTasksInBranch = 1 }: UnluckyRunnerProps) {
   const router = useRouter();
   const meta = task.dirichletMeta;
   const model = meta?.unluckyModel;
@@ -55,9 +54,6 @@ export function UnluckyRunner({ task, totalTasksInBranch = 5 }: UnluckyRunnerPro
     Math.min(priorSession?.stepIndex ?? 0, Math.max(0, steps.length - 1)),
   );
   const [maxWithoutSuccess, setMaxWithoutSuccess] = useState(model?.maxWithoutSuccess ?? 0);
-  const [writeDone, setWriteDone] = useState(false);
-  const [answerInput, setAnswerInput] = useState("");
-  const [writeError, setWriteError] = useState("");
 
   const userProgress = useProgress();
   const priorCompletion = getTaskCompletion(task.id, userProgress);
@@ -99,9 +95,6 @@ export function UnluckyRunner({ task, totalTasksInBranch = 5 }: UnluckyRunnerPro
       return;
     }
     setStepIndex((i) => i + 1);
-    setWriteDone(false);
-    setAnswerInput("");
-    setWriteError("");
   }, [stepIndex, steps.length, finish]);
 
   if (!model || !meta) {
@@ -127,13 +120,11 @@ export function UnluckyRunner({ task, totalTasksInBranch = 5 }: UnluckyRunnerPro
       ) : null}
 
       <div className="mb-6 rounded-card bg-white p-6 shadow-card">
-        <div className="mb-2 flex flex-wrap items-center gap-2 text-xs font-medium text-brand-purple">
-          <span>Метод неудачника · Задача {task.number}</span>
-          <span className="rounded-full bg-violet-100 px-2 py-0.5 text-violet-800">
-            спец. runner
-          </span>
+        <div className="mb-2 text-xs font-medium text-brand-purple">
+          Метод неудачника · Задача {task.number}
         </div>
         <h2 className="text-xl font-bold">{task.title}</h2>
+        <p className="mt-1 text-sm text-gray-500">Учимся искать самый неудачный расклад</p>
         {step.kind !== "read_condition" ? (
           <p className="mt-4 whitespace-pre-line text-base leading-relaxed text-gray-700">
             {highlightConditionText(task.condition, "dirichlet")}
@@ -162,16 +153,7 @@ export function UnluckyRunner({ task, totalTasksInBranch = 5 }: UnluckyRunnerPro
             task={task}
             model={model}
             maxWithoutSuccess={maxWithoutSuccess}
-            writeDone={writeDone}
-            answerInput={answerInput}
-            writeError={writeError}
             onMaxWithoutSuccess={setMaxWithoutSuccess}
-            onWriteDone={() => setWriteDone(true)}
-            onAnswerInput={(v) => {
-              setAnswerInput(v);
-              setWriteError("");
-            }}
-            onWriteError={setWriteError}
             onAdvance={advance}
             onFinish={finish}
           />
@@ -186,13 +168,7 @@ function UnluckyStepBody({
   task,
   model,
   maxWithoutSuccess,
-  writeDone,
-  answerInput,
-  writeError,
   onMaxWithoutSuccess,
-  onWriteDone,
-  onAnswerInput,
-  onWriteError,
   onAdvance,
   onFinish,
 }: {
@@ -200,22 +176,10 @@ function UnluckyStepBody({
   task: Task;
   model: UnluckyModel;
   maxWithoutSuccess: number;
-  writeDone: boolean;
-  answerInput: string;
-  writeError: string;
   onMaxWithoutSuccess: (n: number) => void;
-  onWriteDone: () => void;
-  onAnswerInput: (v: string) => void;
-  onWriteError: (msg: string) => void;
   onAdvance: () => void;
   onFinish: () => void;
 }) {
-  useEffect(() => {
-    if (!writeDone) return;
-    const timer = window.setTimeout(onAdvance, STEP_SUCCESS_MS);
-    return () => window.clearTimeout(timer);
-  }, [writeDone, onAdvance]);
-
   switch (step.kind) {
     case "intro_video":
       return (
@@ -268,51 +232,8 @@ function UnluckyStepBody({
         />
       );
     case "write_solution":
-      if (writeDone) {
-        return <StepSuccess message="Ответ записан!" />;
-      }
       return (
-        <div>
-          <p className="mb-4 text-sm text-gray-600">
-            {model.variant === "deduction"
-              ? "Запиши ответ: какие монеты вытащил Петя?"
-              : `Запиши числовой ответ: сколько ${model.itemLabelGenitive ?? "предметов"} нужно?`}
-          </p>
-          <input
-            type="text"
-            value={answerInput}
-            onChange={(e) => onAnswerInput(e.target.value)}
-            className="mb-4 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
-            placeholder={
-              model.variant === "deduction"
-                ? "3 монеты по 1 руб., 2 монеты по 2 руб."
-                : String(model.answer)
-            }
-          />
-          {writeError ? <p className="mb-3 text-sm text-red-600">{writeError}</p> : null}
-          <button
-            type="button"
-            onClick={() => {
-              if (model.variant === "deduction") {
-                if (answerInput.trim().length < 8) {
-                  onWriteError("Напиши состав монет полными словами.");
-                  return;
-                }
-                onWriteDone();
-                return;
-              }
-              const n = parseInt(answerInput, 10);
-              if (n !== model.answer) {
-                onWriteError(`Проверь ответ: нужно ${model.answer}.`);
-                return;
-              }
-              onWriteDone();
-            }}
-            className="rounded-xl bg-brand-purple px-5 py-2.5 text-sm font-medium text-white"
-          >
-            Записать решение
-          </button>
-        </div>
+        <UnluckyWriteSolutionStep stepId={step.id} model={model} onComplete={onAdvance} />
       );
     case "finish":
       return (

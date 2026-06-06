@@ -17,7 +17,7 @@ export function resolveRunnerKind(task: Task): TaskRunnerKind {
     return "dirichlet-unlucky";
   }
 
-  if (task.branchId === "modeling-heads-legs") {
+  if (task.branchId === "modeling-heads-legs" || task.headsLegsMeta) {
     return "heads-legs-guided";
   }
 
@@ -25,5 +25,10 @@ export function resolveRunnerKind(task: Task): TaskRunnerKind {
     return "dirichlet-guided";
   }
 
-  return "dirichlet-guided";
+  /** Задачи с inline-шагами без отдельного runner (напр. fairy-caves) */
+  if (task.steps.length > 0) {
+    return "dirichlet-guided";
+  }
+
+  return "unsupported";
 }

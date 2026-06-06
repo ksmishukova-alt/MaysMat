@@ -66,6 +66,15 @@ export function TaskPlayer(props: TaskPlayerProps) {
     case "heads-legs-guided":
     case "dirichlet-guided":
       return <DigitalTaskPlayer {...props} />;
+    case "unsupported":
+      return (
+        <TaskUnavailableScreen
+          taskTitle={props.task.title}
+          branchId={props.task.branchId}
+          publishing={props.task.publishing}
+          reason="unsupported_runner"
+        />
+      );
     default:
       return (
         <TaskUnavailableScreen

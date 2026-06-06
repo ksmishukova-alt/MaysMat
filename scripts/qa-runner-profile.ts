@@ -3,9 +3,12 @@
  * npm run qa:runner-profile
  */
 import { buildUnluckySteps } from "../src/data/dirichlet/unlucky/build-unlucky-steps";
+import { UNLUCKY_SCREEN_SEQUENCE } from "../src/data/dirichlet/unlucky/screen-sequence";
 import { DIRICHLET_TASKS } from "../src/data/dirichlet/build-task";
 import { isChildVisible } from "../src/data/task-publishing/resolve";
 import { resolveRunnerKind } from "../src/lib/resolve-runner-kind";
+import { resolveProgressTotalForBranch } from "../src/lib/branch-task-filter";
+import { TASKS } from "../src/data/tasks";
 
 let errors = 0;
 
@@ -74,12 +77,22 @@ for (const task of f3Tasks) {
     if (steps.length < 6) {
       fail(`${id}: buildUnluckySteps вернул ${steps.length} шагов`);
     }
+    const intro = steps.find((s) => s.kind === "intro_video");
+    if (!intro || intro.title !== "Объяснение метода") {
+      fail(`${id}: intro-экран должен называться «Объяснение метода», сейчас: ${intro?.title ?? "нет"}`);
+    }
     const hasWorst = steps.some((s) => s.kind === "worst_case");
     const hasRabbits = steps.some((s) => s.title.toLowerCase().includes("зайц"));
     if (!hasWorst) fail(`${id}: нет шага worst_case`);
     if (hasRabbits) fail(`${id}: screenSequence содержит «зайц» — generic flow`);
   } catch (e) {
     fail(`${id}: buildUnluckySteps — ${e instanceof Error ? e.message : e}`);
+  }
+
+  if (model.variant !== "deduction") {
+    if (!model.writeSolutionLines?.length) {
+      fail(`${id}: threshold-задача без writeSolutionLines`);
+    }
   }
 
   if (task.publishing && isChildVisible(task.publishing) && task.publishing.qaStatus !== "ready") {
@@ -117,6 +130,47 @@ for (const task of f3Tasks) {
     }
   }
   ok(`childRoute F3 с unlucky runner: ${child.length} задач(и)`);
+}
+
+// Дефолтная screenSequence: intro без «Видеоввод»
+{
+  const introSpec = UNLUCKY_SCREEN_SEQUENCE.find((s) => s.stepKind === "intro_video");
+  if (!introSpec || introSpec.title !== "Объяснение метода") {
+    fail(`UNLUCKY_SCREEN_SEQUENCE: intro title = ${introSpec?.title ?? "нет"}`);
+  } else {
+    ok("UNLUCKY_SCREEN_SEQUENCE: intro = «Объяснение метода»");
+  }
+}
+
+// Прогресс ветки unlucky — только childRoute
+{
+  const allTasks = Object.values(TASKS);
+  const childTotal = resolveProgressTotalForBranch("proof-unlucky", allTasks, "child");
+  const childVisible = f3Tasks.filter((t) => t.publishing && isChildVisible(t.publishing)).length;
+  if (childTotal !== childVisible) {
+    fail(`proof-unlucky progress total=${childTotal}, childVisible=${childVisible}`);
+  } else {
+    ok(`proof-unlucky progress total = ${childTotal} (детский маршрут)`);
+  }
+}
+
+// Непомеченная задача не должна попадать в dirichlet-guided
+{
+  const stub = {
+    id: "qa-stub-unknown",
+    branchId: "unknown-branch",
+    number: 1,
+    title: "stub",
+    condition: "",
+    stage: 1,
+    maxStars: 3,
+    steps: [],
+  } satisfies import("../src/data/tasks").Task;
+  if (resolveRunnerKind(stub) !== "unsupported") {
+    fail(`unknown task: resolveRunnerKind=${resolveRunnerKind(stub)}, ожидалось unsupported`);
+  } else {
+    ok("resolveRunnerKind: неизвестная задача → unsupported");
+  }
 }
 
 console.log(`\n=== Итого: ${errors} ошибок ===`);

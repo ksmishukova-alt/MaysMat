@@ -1,3 +1,6 @@
+/** Экранный сценарий «Метод неудачника» */
+import type { SolutionLine } from "@/data/heads-legs/types";
+
 export type UnluckyStepKind =
   | "intro_video"
   | "read_condition"
@@ -31,6 +34,8 @@ export interface UnluckyModel {
   explanation: string[];
   /** Краткое описание худшего расклада для подсказки */
   worstCaseHint?: string;
+  /** Пропуски для экрана «Запиши решение словами» */
+  writeSolutionLines?: SolutionLine[];
 }
 
 export interface UnluckyStep {

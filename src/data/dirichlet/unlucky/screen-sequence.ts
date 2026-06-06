@@ -4,7 +4,7 @@ import type { ScreenSpec } from "@/data/screen-spec";
 export const UNLUCKY_SCREEN_SEQUENCE: ScreenSpec[] = [
   {
     screen: 1,
-    title: "Видеоввод: Метод неудачника",
+    title: "Объяснение метода",
     childAction: "Объяснить: сначала строим самый неприятный вариант без нужного результата.",
     stepKind: "intro_video",
   },

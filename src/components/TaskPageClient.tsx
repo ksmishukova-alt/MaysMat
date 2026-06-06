@@ -6,8 +6,9 @@ import { AppShell } from "@/components/AppShell";
 import { TaskPlayer } from "@/components/TaskPlayer";
 import { TaskUnavailableScreen } from "@/components/TaskUnavailableScreen";
 import { getBranchById } from "@/data/thinking-map";
-import type { Task } from "@/data/tasks";
+import { TASKS, type Task } from "@/data/tasks";
 import { canAccessTask, parseTaskAccessMode } from "@/lib/task-access-mode";
+import { resolveProgressTotalForBranch } from "@/lib/branch-task-filter";
 import { useResolvedTask } from "@/lib/use-task-store";
 
 interface TaskPageClientProps {
@@ -27,6 +28,8 @@ export function TaskPageClient({ taskId, fallbackTask }: TaskPageClientProps) {
 
   const branch = getBranchById(task.branchId);
   const branchHref = branch ? `/branch/${branch.slug}` : "/tasks";
+  const allTasks = Object.values(TASKS);
+  const progressTotal = resolveProgressTotalForBranch(task.branchId, allTasks, accessMode);
 
   if (!canAccessTask(task, accessMode)) {
     return (
@@ -45,7 +48,7 @@ export function TaskPageClient({ taskId, fallbackTask }: TaskPageClientProps) {
       <Link href={branchHref} className="mb-4 inline-block text-sm text-brand-purple hover:underline">
         ← {branch?.title ?? "К теме"}
       </Link>
-      <TaskPlayer task={task} totalTasksInBranch={branch?.taskCount} />
+      <TaskPlayer task={task} totalTasksInBranch={progressTotal} />
     </AppShell>
   );
 }

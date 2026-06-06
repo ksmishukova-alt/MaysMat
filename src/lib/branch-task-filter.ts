@@ -1,4 +1,5 @@
 import type { Task } from "@/data/tasks";
+import type { TaskAccessMode } from "@/lib/task-access-mode";
 import { isArchiveVisible, isChildVisible } from "@/data/task-publishing/resolve";
 
 /** Задачи ветки для списка на /branch/[slug] (детский режим + опционально архив) */
@@ -29,4 +30,22 @@ export function countChildVisibleTasks(tasks: Task[]): number {
 
 export function countArchiveTasks(tasks: Task[]): number {
   return tasks.filter((t) => t.publishing?.publishTier === "archive").length;
+}
+
+/** Сколько задач учитывать в прогрессе ветки (детский маршрут vs режим методиста) */
+export function resolveProgressTotalForBranch(
+  branchId: string,
+  allTasks: Task[],
+  accessMode: TaskAccessMode,
+): number {
+  const branchTasks = allTasks.filter((t) => t.branchId === branchId);
+  if (accessMode === "methodist") {
+    return Math.max(1, branchTasks.length);
+  }
+  if (accessMode === "archivePreview") {
+    const archiveCount = countArchiveTasks(branchTasks);
+    return Math.max(1, archiveCount);
+  }
+  const childCount = countChildVisibleTasks(branchTasks);
+  return Math.max(1, childCount);
 }
