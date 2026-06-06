@@ -14,6 +14,7 @@ import { canAccessTask, parseTaskAccessMode } from "../src/lib/task-access-mode"
 import { isChildVisible } from "../src/data/task-publishing/resolve";
 import { resolveRunnerKind } from "../src/lib/resolve-runner-kind";
 import { buildUnluckySteps } from "../src/data/dirichlet/unlucky/build-unlucky-steps";
+import { buildRemaindersSteps } from "../src/data/dirichlet/remainders/build-remainders-steps";
 import type { Task } from "../src/data/tasks";
 
 const allTasks = { ...HEADS_LEGS_TASKS, ...DIRICHLET_TASKS };
@@ -92,6 +93,47 @@ if (!branchViaAlias || branchViaAlias.id !== "proof-constructions") {
   }
   if (listed.length >= 1) {
     ok(`unlucky runner pipeline для childRoute (${listed.map((t) => t.id).join(", ")})`);
+  }
+}
+
+// 3b. remainders pilot — dirichlet-t3-11 (methodist mode)
+{
+  const pilot = allTasks["dirichlet-t3-11"];
+  if (!pilot) {
+    fail("dirichlet-t3-11 не найдена");
+  } else {
+    if (resolveRunnerKind(pilot) !== "dirichlet-remainders") {
+      fail("dirichlet-t3-11: runnerKind !== dirichlet-remainders");
+    }
+    if (pilot.steps.length > 0) {
+      fail("dirichlet-t3-11: не должно быть generic steps");
+    }
+    if (!canAccessTask(pilot, "methodist")) {
+      fail("dirichlet-t3-11: недоступна в mode=methodist");
+    }
+    const steps = buildRemaindersSteps(pilot.dirichletMeta!);
+    const required = [
+      "intro_video",
+      "read_condition",
+      "find_modulus",
+      "build_houses",
+      "identify_objects",
+      "find_collision",
+      "explain_divisibility",
+      "write_solution",
+      "finish",
+    ] as const;
+    for (const kind of required) {
+      if (!steps.some((s) => s.kind === kind)) {
+        fail(`dirichlet-t3-11: нет шага ${kind}`);
+      }
+    }
+    const m = pilot.dirichletMeta!.remaindersModel!;
+    if (m.modulus !== 11 || m.objectsCount !== 12) {
+      fail(`dirichlet-t3-11: модель ${m.modulus}/${m.objectsCount}`);
+    } else {
+      ok("dirichlet-t3-11: RemaindersRunner pipeline (12 > 11, mod 11)");
+    }
   }
 }
 

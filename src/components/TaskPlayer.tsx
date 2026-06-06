@@ -22,6 +22,7 @@ import {
 } from "@/lib/task-session";
 import { PaperTaskScreen } from "@/components/PaperTaskScreen";
 import { UnluckyRunner } from "@/components/task-runners/unlucky/UnluckyRunner";
+import { RemaindersRunner } from "@/components/task-runners/remainders/RemaindersRunner";
 import { TaskUnavailableScreen } from "@/components/TaskUnavailableScreen";
 import { resolveRunnerKind } from "@/lib/resolve-runner-kind";
 import { migrateHeadsLegsBranch } from "@/lib/heads-legs-migration";
@@ -60,6 +61,8 @@ export function TaskPlayer(props: TaskPlayerProps) {
   switch (runnerKind) {
     case "dirichlet-unlucky":
       return <UnluckyRunner task={props.task} totalTasksInBranch={props.totalTasksInBranch} />;
+    case "dirichlet-remainders":
+      return <RemaindersRunner task={props.task} totalTasksInBranch={props.totalTasksInBranch} />;
     case "paper-generic":
     case "paper-construction":
       return <PaperTaskScreen task={props.task} />;

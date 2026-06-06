@@ -1,9 +1,12 @@
 /**
- * QA: runnerKind и unluckyModel для F3.
+ * QA: runnerKind для F3 (unlucky) и F4 (remainders).
  * npm run qa:runner-profile
  */
 import { buildUnluckySteps } from "../src/data/dirichlet/unlucky/build-unlucky-steps";
 import { UNLUCKY_SCREEN_SEQUENCE } from "../src/data/dirichlet/unlucky/screen-sequence";
+import { buildRemaindersSteps } from "../src/data/dirichlet/remainders/build-remainders-steps";
+import { REMAINDERS_SCREEN_SEQUENCE } from "../src/data/dirichlet/remainders/screen-sequence";
+import { REMAINDERS_PILOT_METHOD_IDS } from "../src/data/dirichlet/remainders/models";
 import { DIRICHLET_TASKS } from "../src/data/dirichlet/build-task";
 import { isChildVisible } from "../src/data/task-publishing/resolve";
 import { resolveRunnerKind } from "../src/lib/resolve-runner-kind";
@@ -170,6 +173,135 @@ for (const task of f3Tasks) {
     fail(`unknown task: resolveRunnerKind=${resolveRunnerKind(stub)}, ожидалось unsupported`);
   } else {
     ok("resolveRunnerKind: неизвестная задача → unsupported");
+  }
+}
+
+console.log("\n--- F4 remainders ---\n");
+
+const f4Tasks = Object.values(DIRICHLET_TASKS).filter(
+  (t) => t.dirichletMeta?.flowId === "F4_REMAINDERS",
+);
+
+if (f4Tasks.length !== 23) {
+  fail(`ожидалось 23 F4-задач, найдено ${f4Tasks.length}`);
+} else {
+  ok(`F4 задач в каталоге: ${f4Tasks.length}`);
+}
+
+for (const task of f4Tasks) {
+  const id = task.id;
+  const kind = resolveRunnerKind(task);
+
+  if (kind !== "dirichlet-remainders") {
+    fail(`${id}: runnerKind=${kind}, ожидалось dirichlet-remainders`);
+  }
+
+  if (task.steps.length > 0) {
+    fail(`${id}: не должно быть generic steps (${task.steps.length})`);
+  }
+
+  const hasRabbits = task.dirichletMeta?.screenSequence?.some((s) =>
+    s.title.toLowerCase().includes("зайц"),
+  );
+  if (hasRabbits) {
+    fail(`${id}: screenSequence содержит «зайц» — generic flow`);
+  }
+
+  const model = task.dirichletMeta?.remaindersModel;
+  if (task.publishing && isChildVisible(task.publishing) && !model) {
+    fail(`${id}: childRoute без remaindersModel`);
+  }
+
+  if (model) {
+    if (model.objectsCount <= model.housesCount) {
+      fail(`${id}: objectsCount (${model.objectsCount}) <= housesCount (${model.housesCount})`);
+    }
+    if (model.modulus !== model.housesCount) {
+      fail(`${id}: modulus (${model.modulus}) !== housesCount (${model.housesCount})`);
+    }
+    try {
+      const steps = buildRemaindersSteps(task.dirichletMeta!);
+      if (steps.length < 7) {
+        fail(`${id}: buildRemaindersSteps вернул ${steps.length} шагов`);
+      }
+      const required = [
+        "read_condition",
+        "find_modulus",
+        "build_houses",
+        "identify_objects",
+        "find_collision",
+        "explain_divisibility",
+        "write_solution",
+        "finish",
+      ] as const;
+      for (const k of required) {
+        if (!steps.some((s) => s.kind === k)) {
+          fail(`${id}: нет шага ${k}`);
+        }
+      }
+      if (model.compactHouses && model.modulus < 20) {
+        fail(`${id}: compactHouses при маленьком модуле ${model.modulus}`);
+      }
+    } catch (e) {
+      fail(`${id}: buildRemaindersSteps — ${e instanceof Error ? e.message : e}`);
+    }
+  }
+}
+
+// Pilot-задачи F4
+for (const methodId of REMAINDERS_PILOT_METHOD_IDS) {
+  const pilot = f4Tasks.find((t) => t.dirichletMeta?.methodTaskId === methodId);
+  if (!pilot) {
+    fail(`pilot ${methodId} не найден в каталоге`);
+    continue;
+  }
+  const m = pilot.dirichletMeta?.remaindersModel;
+  if (!m) {
+    fail(`${pilot.id}: pilot без remaindersModel`);
+    continue;
+  }
+  for (const field of ["modulus", "objectsCount", "housesCount"] as const) {
+    if (m[field] == null) fail(`${pilot.id}: remaindersModel.${field} не заполнен`);
+  }
+  if (m.objectsCount <= m.housesCount) {
+    fail(`${pilot.id}: pilot objectsCount <= housesCount`);
+  }
+  if (!m.writeSolutionLines?.length) {
+    fail(`${pilot.id}: pilot без writeSolutionLines`);
+  }
+  if (methodId === "M4.18" && !m.compactHouses) {
+    fail(`${pilot.id}: M4.18 должна использовать compactHouses`);
+  }
+}
+ok(`pilot F4 (M4.11, M4.18): ${REMAINDERS_PILOT_METHOD_IDS.length} задач с полной моделью`);
+
+// Smoke: dirichlet-t3-11 pipeline
+{
+  const demo = DIRICHLET_TASKS["dirichlet-t3-11"];
+  if (!demo) {
+    fail("dirichlet-t3-11 не найдена");
+  } else {
+    if (resolveRunnerKind(demo) !== "dirichlet-remainders") {
+      fail("dirichlet-t3-11: неверный runnerKind");
+    }
+    const steps = buildRemaindersSteps(demo.dirichletMeta!);
+    ok(`dirichlet-t3-11 pipeline: ${steps.map((s) => s.kind).join(" → ")}`);
+    const m = demo.dirichletMeta!.remaindersModel!;
+    if (m.modulus !== 11 || m.objectsCount !== 12 || m.housesCount !== 11) {
+      fail(`dirichlet-t3-11: неверная модель (${m.modulus}, ${m.objectsCount}, ${m.housesCount})`);
+    } else {
+      ok("dirichlet-t3-11: 12 чисел > 11 домиков (mod 11)");
+    }
+  }
+}
+
+// REMAINDERS_SCREEN_SEQUENCE intro
+{
+  const introSpec = REMAINDERS_SCREEN_SEQUENCE.find((s) => s.stepKind === "intro_video");
+  if (!introSpec || introSpec.title !== "Остатки как домики") {
+    fail(`REMAINDERS_SCREEN_SEQUENCE: intro title = ${introSpec?.title ?? "нет"}`);
+  } else {
+    ok("REMAINDERS_SCREEN_SEQUENCE: intro = «Остатки как домики»");
   }
 }
 

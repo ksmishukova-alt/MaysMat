@@ -6,6 +6,8 @@ import { patchAnswerReference, resolveTaskPublishing } from "@/data/task-publish
 import { CONDITION_PATCHES } from "@/data/task-publishing/config";
 import { UNLUCKY_MODELS } from "@/data/dirichlet/unlucky/models";
 import { UNLUCKY_SCREEN_SEQUENCE } from "@/data/dirichlet/unlucky/screen-sequence";
+import { REMAINDERS_SCREEN_SEQUENCE } from "@/data/dirichlet/remainders/screen-sequence";
+import { resolveRemaindersModel } from "@/data/dirichlet/remainders/infer-remainders-model";
 
 import { DIRICHLET_ANSWERS } from "./answers.generated";
 import { buildDirichletGuidedSteps } from "./build-steps";
@@ -35,6 +37,7 @@ export function catalogEntryToMeta(entry: DirichletCatalogEntry): DirichletTaskM
   );
   const condition = CONDITION_PATCHES[entry.methodTaskId] ?? entry.condition;
   const isUnlucky = entry.flowId === "F3_UNLUCKY";
+  const isRemainders = entry.flowId === "F4_REMAINDERS";
   const unluckyModel = UNLUCKY_MODELS[entry.methodTaskId];
 
   const meta: DirichletTaskMeta = {
@@ -58,12 +61,23 @@ export function catalogEntryToMeta(entry: DirichletCatalogEntry): DirichletTaskM
     meta.unluckyModel = unluckyModel;
   }
 
+  if (isRemainders) {
+    const remaindersModel = resolveRemaindersModel(meta);
+    meta.runnerKind = "dirichlet-remainders";
+    meta.screenSequence = REMAINDERS_SCREEN_SEQUENCE;
+    if (remaindersModel) {
+      meta.remaindersModel = remaindersModel;
+    }
+  }
+
   return meta;
 }
 
 export function buildDirichletTask(meta: DirichletTaskMeta): Task {
   const isUnlucky = meta.flowId === "F3_UNLUCKY";
-  const steps: DiscriminatedTaskStep[] = isUnlucky ? [] : buildDirichletGuidedSteps(meta);
+  const isRemainders = meta.flowId === "F4_REMAINDERS";
+  const steps: DiscriminatedTaskStep[] =
+    isUnlucky || isRemainders ? [] : buildDirichletGuidedSteps(meta);
   const branchCfg = getThemeBranchConfig(meta.themeId);
 
   const task: Task = {
@@ -80,7 +94,9 @@ export function buildDirichletTask(meta: DirichletTaskMeta): Task {
     enableGivenStep: false,
     steps,
     dirichletMeta: meta,
-    runnerKind: meta.runnerKind ?? (isUnlucky ? "dirichlet-unlucky" : "dirichlet-guided"),
+    runnerKind:
+      meta.runnerKind ??
+      (isUnlucky ? "dirichlet-unlucky" : isRemainders ? "dirichlet-remainders" : "dirichlet-guided"),
   };
 
   task.publishing = resolveTaskPublishing(task);

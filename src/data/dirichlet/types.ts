@@ -2,6 +2,7 @@ import type { SolutionMode } from "@/data/heads-legs/solution-modes";
 import type { TaskRunnerKind } from "@/data/runner-kind";
 import type { ScreenSpec } from "@/data/screen-spec";
 import type { UnluckyModel } from "@/data/dirichlet/unlucky/types";
+import type { RemaindersModel } from "@/data/dirichlet/remainders/types";
 
 export type { SolutionMode };
 
@@ -82,4 +83,5 @@ export interface DirichletTaskMeta extends DirichletCatalogEntry {
   runnerKind?: TaskRunnerKind;
   screenSequence?: ScreenSpec[];
   unluckyModel?: UnluckyModel;
+  remaindersModel?: RemaindersModel;
 }

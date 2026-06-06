@@ -13,7 +13,7 @@ const warnings: string[] = [];
 
 for (const task of tasks) {
   const meta = task.dirichletMeta;
-  if (meta?.flowId === "F3_UNLUCKY") {
+  if (meta?.flowId === "F3_UNLUCKY" || meta?.flowId === "F4_REMAINDERS") {
     continue;
   }
 

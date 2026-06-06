@@ -17,6 +17,10 @@ export function resolveRunnerKind(task: Task): TaskRunnerKind {
     return "dirichlet-unlucky";
   }
 
+  if (task.branchId === "arith-remainders" || flowId === "F4_REMAINDERS") {
+    return "dirichlet-remainders";
+  }
+
   if (task.branchId === "modeling-heads-legs" || task.headsLegsMeta) {
     return "heads-legs-guided";
   }
