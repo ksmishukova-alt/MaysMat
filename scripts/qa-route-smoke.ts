@@ -12,6 +12,8 @@ import {
 } from "../src/lib/branch-task-filter";
 import { canAccessTask, parseTaskAccessMode } from "../src/lib/task-access-mode";
 import { isChildVisible } from "../src/data/task-publishing/resolve";
+import { resolveRunnerKind } from "../src/lib/resolve-runner-kind";
+import { buildUnluckySteps } from "../src/data/dirichlet/unlucky/build-unlucky-steps";
 import type { Task } from "../src/data/tasks";
 
 const allTasks = { ...HEADS_LEGS_TASKS, ...DIRICHLET_TASKS };
@@ -65,6 +67,32 @@ if (!branchViaAlias || branchViaAlias.id !== "proof-constructions") {
   if (bad.length) fail(`unlucky list: ${bad.length} non-child tasks`);
   else ok(`unlucky: ${listed.length} child-route task(s)`);
   if (listed.length < 1) fail("unlucky: expected ≥1 child task (M3.2)");
+  for (const t of listed) {
+    if (resolveRunnerKind(t) !== "dirichlet-unlucky") {
+      fail(`unlucky child ${t.id}: runnerKind !== dirichlet-unlucky`);
+    }
+    if (t.steps.length > 0) {
+      fail(`unlucky child ${t.id}: не должно быть generic steps`);
+    }
+    const steps = buildUnluckySteps(t.dirichletMeta!);
+    const required = [
+      "read_condition",
+      "guarantee_goal",
+      "worst_case",
+      "guarantee_plus_one",
+      "explain_why_less_fails",
+      "write_solution",
+      "finish",
+    ] as const;
+    for (const kind of required) {
+      if (!steps.some((s) => s.kind === kind)) {
+        fail(`unlucky ${t.id}: нет шага ${kind}`);
+      }
+    }
+  }
+  if (listed.length >= 1) {
+    ok(`unlucky runner pipeline для childRoute (${listed.map((t) => t.id).join(", ")})`);
+  }
 }
 
 // 4. /branch/constructions — архив скрыт по умолчанию

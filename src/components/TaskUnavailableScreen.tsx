@@ -7,6 +7,7 @@ interface TaskUnavailableScreenProps {
   taskTitle: string;
   branchId: string;
   publishing?: TaskPublishingMeta;
+  reason?: "unsupported_runner";
 }
 
 function unavailableMessage(publishing?: TaskPublishingMeta): string {
@@ -32,9 +33,15 @@ export function TaskUnavailableScreen({
   taskTitle,
   branchId,
   publishing,
+  reason,
 }: TaskUnavailableScreenProps) {
   const branch = getBranchById(branchId);
   const branchHref = branch ? `/branch/${branch.slug}` : "/tasks";
+
+  const message =
+    reason === "unsupported_runner"
+      ? "Для этой задачи ещё не подключён специализированный runner."
+      : unavailableMessage(publishing);
 
   return (
     <div className="mx-auto max-w-lg rounded-card bg-white p-8 text-center shadow-card">
@@ -43,7 +50,7 @@ export function TaskUnavailableScreen({
       </div>
       <h1 className="text-xl font-semibold text-gray-900">Задача недоступна</h1>
       <p className="mt-2 text-sm text-gray-600">{taskTitle}</p>
-      <p className="mt-4 text-sm text-gray-500">{unavailableMessage(publishing)}</p>
+      <p className="mt-4 text-sm text-gray-500">{message}</p>
       <Link
         href={branchHref}
         className="mt-6 inline-block rounded-lg bg-brand-purple px-5 py-2.5 text-sm font-medium text-white hover:opacity-90"

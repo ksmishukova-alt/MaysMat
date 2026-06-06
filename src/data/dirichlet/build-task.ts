@@ -4,6 +4,8 @@ import type { Task } from "@/data/tasks";
 import { getThemeBranchConfig } from "@/data/methodology-bank/theme-branches";
 import { patchAnswerReference, resolveTaskPublishing } from "@/data/task-publishing/resolve";
 import { CONDITION_PATCHES } from "@/data/task-publishing/config";
+import { UNLUCKY_MODELS } from "@/data/dirichlet/unlucky/models";
+import { UNLUCKY_SCREEN_SEQUENCE } from "@/data/dirichlet/unlucky/screen-sequence";
 
 import { DIRICHLET_ANSWERS } from "./answers.generated";
 import { buildDirichletGuidedSteps } from "./build-steps";
@@ -32,8 +34,10 @@ export function catalogEntryToMeta(entry: DirichletCatalogEntry): DirichletTaskM
     rawAnswers.solutionReference ?? "",
   );
   const condition = CONDITION_PATCHES[entry.methodTaskId] ?? entry.condition;
+  const isUnlucky = entry.flowId === "F3_UNLUCKY";
+  const unluckyModel = UNLUCKY_MODELS[entry.methodTaskId];
 
-  return {
+  const meta: DirichletTaskMeta = {
     ...entry,
     condition,
     acceptedAnswers: { ...rawAnswers, solutionReference },
@@ -44,10 +48,22 @@ export function catalogEntryToMeta(entry: DirichletCatalogEntry): DirichletTaskM
       "Сформулируй вывод.",
     ],
   };
+
+  if (isUnlucky) {
+    if (!unluckyModel) {
+      throw new Error(`unluckyModel не найден для ${entry.methodTaskId} (${entry.id})`);
+    }
+    meta.runnerKind = "dirichlet-unlucky";
+    meta.screenSequence = UNLUCKY_SCREEN_SEQUENCE;
+    meta.unluckyModel = unluckyModel;
+  }
+
+  return meta;
 }
 
 export function buildDirichletTask(meta: DirichletTaskMeta): Task {
-  const steps: DiscriminatedTaskStep[] = buildDirichletGuidedSteps(meta);
+  const isUnlucky = meta.flowId === "F3_UNLUCKY";
+  const steps: DiscriminatedTaskStep[] = isUnlucky ? [] : buildDirichletGuidedSteps(meta);
   const branchCfg = getThemeBranchConfig(meta.themeId);
 
   const task: Task = {
@@ -64,6 +80,7 @@ export function buildDirichletTask(meta: DirichletTaskMeta): Task {
     enableGivenStep: false,
     steps,
     dirichletMeta: meta,
+    runnerKind: meta.runnerKind ?? (isUnlucky ? "dirichlet-unlucky" : "dirichlet-guided"),
   };
 
   task.publishing = resolveTaskPublishing(task);

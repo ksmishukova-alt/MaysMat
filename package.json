@@ -16,7 +16,8 @@
     "qa:task-audit": "npx tsx scripts/audit-all-tasks-report.ts",
     "qa:categories": "node scripts/audit-categories.mjs",
     "qa:task-access": "npx tsx scripts/qa-task-access.ts",
-    "qa:smoke": "npx tsx scripts/qa-route-smoke.ts"
+    "qa:smoke": "npx tsx scripts/qa-route-smoke.ts",
+    "qa:runner-profile": "npx tsx scripts/qa-runner-profile.ts"
   },
   "dependencies": {
     "next": "^15.1.0",

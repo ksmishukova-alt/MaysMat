@@ -1,4 +1,7 @@
 import type { SolutionMode } from "@/data/heads-legs/solution-modes";
+import type { TaskRunnerKind } from "@/data/runner-kind";
+import type { ScreenSpec } from "@/data/screen-spec";
+import type { UnluckyModel } from "@/data/dirichlet/unlucky/types";
 
 export type { SolutionMode };
 
@@ -76,4 +79,7 @@ export interface DirichletTaskMeta extends DirichletCatalogEntry {
   acceptedAnswers: DirichletAcceptedAnswer;
   solutionLines: DirichletSolutionLine[];
   hintLevels: [string, string, string];
+  runnerKind?: TaskRunnerKind;
+  screenSequence?: ScreenSpec[];
+  unluckyModel?: UnluckyModel;
 }

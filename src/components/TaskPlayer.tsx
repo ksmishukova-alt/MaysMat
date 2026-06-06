@@ -21,6 +21,9 @@ import {
   type TaskStepAnswer,
 } from "@/lib/task-session";
 import { PaperTaskScreen } from "@/components/PaperTaskScreen";
+import { UnluckyRunner } from "@/components/task-runners/unlucky/UnluckyRunner";
+import { TaskUnavailableScreen } from "@/components/TaskUnavailableScreen";
+import { resolveRunnerKind } from "@/lib/resolve-runner-kind";
 import { migrateHeadsLegsBranch } from "@/lib/heads-legs-migration";
 import { highlightConditionText } from "@/lib/highlight-condition";
 import { resolveExplanationRole } from "@/data/task-steps";
@@ -52,14 +55,30 @@ export function TaskPlayer(props: TaskPlayerProps) {
     migrateHeadsLegsBranch();
   }, []);
 
-  if (props.task.requiresUpload) {
-    return <PaperTaskScreen task={props.task} />;
-  }
+  const runnerKind = resolveRunnerKind(props.task);
 
-  return <DigitalTaskPlayer {...props} />;
+  switch (runnerKind) {
+    case "dirichlet-unlucky":
+      return <UnluckyRunner task={props.task} totalTasksInBranch={props.totalTasksInBranch} />;
+    case "paper-generic":
+    case "paper-construction":
+      return <PaperTaskScreen task={props.task} />;
+    case "heads-legs-guided":
+    case "dirichlet-guided":
+      return <DigitalTaskPlayer {...props} />;
+    default:
+      return (
+        <TaskUnavailableScreen
+          taskTitle={props.task.title}
+          branchId={props.task.branchId}
+          publishing={props.task.publishing}
+          reason="unsupported_runner"
+        />
+      );
+  }
 }
 
-function DigitalTaskPlayer({ task, totalTasksInBranch = 51 }: TaskPlayerProps) {
+export function DigitalTaskPlayer({ task, totalTasksInBranch = 51 }: TaskPlayerProps) {
   const router = useRouter();
   const playerSteps = useMemo(
     () =>

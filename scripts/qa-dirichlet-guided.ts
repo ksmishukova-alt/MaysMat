@@ -12,9 +12,13 @@ const errors: string[] = [];
 const warnings: string[] = [];
 
 for (const task of tasks) {
+  const meta = task.dirichletMeta;
+  if (meta?.flowId === "F3_UNLUCKY") {
+    continue;
+  }
+
   const steps = task.steps;
   const types = steps.map((s) => s.type);
-  const meta = task.dirichletMeta;
   const plan = meta ? resolveWrittenPhase(meta) : null;
   const support = meta ? parseSupportLevel(meta.supportMode) : null;
 
