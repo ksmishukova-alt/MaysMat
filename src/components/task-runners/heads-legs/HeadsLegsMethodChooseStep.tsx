@@ -187,7 +187,7 @@ export function HeadsLegsMethodChooseStep({
   }
 
   return (
-    <div>
+    <div data-testid="method-step-hub">
       <p className="mb-4 text-sm font-medium text-gray-800">Какой шаг сейчас нужно сделать?</p>
       <div className="mb-6 space-y-2">
         {actions.map((action) => {

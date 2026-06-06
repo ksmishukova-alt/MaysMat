@@ -24,6 +24,12 @@ export function WordSolutionStep({ step, runnerContext = "heads-legs", onComplet
   const lines = step.solutionLines ?? [];
   const modeCWithScaffold = mode === "C" && lines.length > 0;
 
+  const readOnlyBlankTestId = (sample: string): string | undefined => {
+    if (/17\s*[x×*]\s*20\s*=\s*340/i.test(sample)) return "answer-transform-expression";
+    if (/340\s*простых/i.test(sample)) return "answer-transform-result";
+    return undefined;
+  };
+
   const submit = () => {
     const result = validateWordSolutionFull(text, mode, accepted, lines, blanks);
     if (result.ok) {
@@ -49,8 +55,13 @@ export function WordSolutionStep({ step, runnerContext = "heads-legs", onComplet
             const sample = Array.isArray(blank.accept)
               ? String(blank.accept[0] ?? "…")
               : "…";
+            const testId = readOnlyBlankTestId(sample);
             return (
-              <span key={blank.id} className="mx-1 rounded bg-lavender-100 px-1.5 py-0.5 font-medium text-brand-purple">
+              <span
+                key={blank.id}
+                data-testid={testId}
+                className="mx-1 rounded bg-lavender-100 px-1.5 py-0.5 font-medium text-brand-purple"
+              >
                 {sample}
               </span>
             );
@@ -76,7 +87,7 @@ export function WordSolutionStep({ step, runnerContext = "heads-legs", onComplet
 
   if (mode === "A" && lines.length > 0) {
     return (
-      <div className="space-y-4">
+      <div className="space-y-4" data-testid="word-solution-step">
         <WordSolutionFillBlanks
           stepId={step.id}
           lines={lines}
@@ -105,7 +116,7 @@ export function WordSolutionStep({ step, runnerContext = "heads-legs", onComplet
 
   if (modeCWithScaffold && !scaffoldDone) {
     return (
-      <div className="space-y-4">
+      <div className="space-y-4" data-testid="word-solution-step">
         <p className="text-sm font-medium text-gray-800">Шаг 1. Изучи опору</p>
         <p className="text-sm text-gray-600">
           Прочитай образец решения. Цифры в цветных блоках — подсказка, как может выглядеть запись. Запомни
@@ -125,7 +136,7 @@ export function WordSolutionStep({ step, runnerContext = "heads-legs", onComplet
 
   if (mode === "B" || mode === "E") {
     return (
-      <div className="space-y-4">
+      <div className="space-y-4" data-testid="word-solution-step">
         <p className="text-sm text-gray-600">
           {mode === "B" && "Дополни пропуски в готовом тексте решения."}
           {mode === "E" && "Запиши перебор: заполни строки проверки и итог."}
@@ -161,7 +172,7 @@ export function WordSolutionStep({ step, runnerContext = "heads-legs", onComplet
   }
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-3" data-testid="word-solution-step">
       {modeCWithScaffold ? (
         <p className="text-sm font-medium text-gray-800">Шаг 2. Напиши решение своими словами</p>
       ) : null}

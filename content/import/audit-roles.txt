@@ -1,0 +1,522 @@
+
+МышМат: комплексный аудит сайта и банка задач
+Роли: ребёнок 10 лет · senior методолог · UX/UI senior · архитектор · системный аналитик · разработчик
+1. Объём проверки и источники
+Проверялась актуальная локальная копия проекта из архива MaysMat-main (3).zip и live-страница production-домена. Production-главная открывается и показывает карту тем, включая «Головы и ноги», «Дирихле», «Метод неудачника» и другие ветки. Кодовая проверка проводилась по текущему проекту: task data, route guards, branch filters, QA scripts, TaskPlayer и PaperTaskScreen.
+Всего в текущем TASKS: 272 задачи.
+Детский видимый маршрут: 40 задач.
+Олимпиадный архив: 63 задачи.
+Blocked: 4 задачи, все связаны с missing_visual_asset / manual_review.
+needsReview: 87 задач.
+QA-скрипты проходят: qa:task-quality, qa:dirichlet, qa:categories, qa:task-access, qa:smoke.
+2. Executive summary
+Продукт сделал важный шаг: publishTier/qaStatus уже реально фильтруют детские списки задач, а прямой детский доступ к archive/hidden/methodistOnly закрыт экраном «Задача недоступна».
+Но текущая версия ещё не соответствует заявленной образовательной методике полного курса: нет видео перед большинством тем, нет бумажных задач 16-20, нет PDF-бланков, нет загрузки решения с подтверждением ParentID.
+В детский маршрут попадает 40 задач, но постепенное снятие опоры реализовано слабее, чем задумано: большинство видимых задач всё ещё имеет 8-10 экранов и повторяет одинаковый guided-flow.
+Скрытый/архивный банк нельзя считать методически готовым: 63 archive задачи имеют needsReview, а многие используют generic «зайцы/клетки» flow даже там, где нужен отдельный flow для конструкций/контрпримеров.
+Самый опасный технический риск: methodist mode включается query-параметром ?mode=methodist и без авторизации открывает все задачи. Для production это нужно закрыть feature flag или ролью.
+3. Сводка по веткам
+Ветка
+Всего
+Детский маршрут
+Архив
+Blocked
+Needs review
+Paper
+Download
+arith-remainders
+23
+0
+0
+0
+11
+0
+0
+fairy-caves
+3
+3
+0
+0
+0
+0
+0
+geo-cutting
+54
+0
+0
+4
+4
+0
+0
+inv-coloring
+2
+0
+0
+0
+0
+0
+0
+logic-matching
+34
+0
+0
+0
+5
+0
+0
+modeling-heads-legs
+51
+28
+0
+0
+0
+0
+0
+proof-constructions
+63
+0
+63
+0
+63
+0
+0
+proof-dirichlet
+16
+8
+0
+0
+0
+0
+0
+proof-extreme
+1
+0
+0
+0
+0
+0
+0
+proof-table-cells
+20
+0
+0
+0
+4
+0
+0
+proof-unlucky
+5
+1
+0
+0
+0
+0
+0
+4. QA и публикационные статусы
+Issues by type: {'contains_external_reference': 27, 'contains_N_equals_N': 4, 'missing_visual_asset': 4, 'requires_manual_review': 4, 'too_hard_for_child_route': 63}
+Хорошо: child-visible задачи не имеют блокирующих issues по текущему сканеру.
+Плохо: сканер не проверяет ключевую методическую логику — видео, постепенное снятие опоры, paper-mode на 16-20 задачах, возрастной язык и соответствие flow типу задачи.
+Прямой детский доступ на archive/hidden/methodistOnly закрывается, но methodist bypass доступен через URL-параметр.
+5. Видимый детский маршрут
+Ниже задачи, которые ребёнок реально видит в текущем маршруте. На практике это не полный банк, а первая публикационная волна.
+ID
+Ветка
+Порядок
+Уровень
+Шагов
+Типы шагов
+Название
+heads-legs-1-01
+modeling-heads-legs
+1
+1
+9
+auto_explanation, drag_select, single_select, table_input, word_solution, worksheet_table
+Звери и птицы
+heads-legs-1-02
+modeling-heads-legs
+2
+1
+7
+auto_explanation, drag_select, single_select, word_solution, worksheet_table
+Цыплята и змеи
+heads-legs-1-03
+modeling-heads-legs
+3
+1
+9
+auto_explanation, drag_select, single_select, table_input, word_solution, worksheet_table
+Гусята и крокодильчики
+heads-legs-1-04
+modeling-heads-legs
+4
+1
+9
+auto_explanation, drag_select, single_select, table_input, word_solution, worksheet_table
+Жуки и пауки
+heads-legs-1-06
+modeling-heads-legs
+5
+1
+9
+auto_explanation, drag_select, single_select, table_input, word_solution, worksheet_table
+Велосипедисты
+heads-legs-1-07
+modeling-heads-legs
+6
+1
+9
+auto_explanation, drag_select, single_select, table_input, word_solution, worksheet_table
+Велосипеды на парковке
+heads-legs-1-10
+modeling-heads-legs
+7
+1
+9
+auto_explanation, drag_select, single_select, table_input, word_solution, worksheet_table
+Гномы и пони
+heads-legs-1-05
+modeling-heads-legs
+8
+1
+9
+auto_explanation, drag_select, single_select, table_input, word_solution, worksheet_table
+Жуки и пауки: правые ноги
+heads-legs-1-08
+modeling-heads-legs
+9
+1
+9
+auto_explanation, drag_select, single_select, table_input, word_solution, worksheet_table
+Мухи и слоны
+heads-legs-1-13
+modeling-heads-legs
+10
+1
+9
+auto_explanation, drag_select, single_select, table_input, word_solution, worksheet_table
+Роботы AT-ST и AT-AT
+heads-legs-2-01
+modeling-heads-legs
+11
+2
+9
+auto_explanation, drag_select, single_select, table_input, word_solution, worksheet_table
+Клумбы около Лицея и Гимназии
+heads-legs-2-02
+modeling-heads-legs
+12
+2
+9
+auto_explanation, drag_select, single_select, table_input, word_solution, worksheet_table
+Коробки с карандашами
+heads-legs-2-03
+modeling-heads-legs
+13
+2
+9
+auto_explanation, drag_select, single_select, table_input, word_solution, worksheet_table
+Дроны-рабочие и дроны-пастухи
+heads-legs-2-04
+modeling-heads-legs
+14
+2
+9
+auto_explanation, drag_select, single_select, table_input, word_solution, worksheet_table
+Пирожные по 100 и 125 рублей
+heads-legs-2-05
+modeling-heads-legs
+15
+2
+9
+auto_explanation, drag_select, single_select, table_input, word_solution, worksheet_table
+Коробки простых и цветных карандашей
+heads-legs-2-06
+modeling-heads-legs
+16
+2
+9
+auto_explanation, drag_select, single_select, table_input, word_solution, worksheet_table
+Львята и тигрята
+heads-legs-2-07
+modeling-heads-legs
+17
+2
+9
+auto_explanation, drag_select, single_select, table_input, word_solution, worksheet_table
+Собаки и кошки
+heads-legs-1-09
+modeling-heads-legs
+18
+1
+10
+auto_explanation, drag_select, single_select, table_input, word_solution, worksheet_table
+Дроиды и генерал Гривус
+heads-legs-1-11
+modeling-heads-legs
+19
+1
+9
+auto_explanation, drag_select, single_select, table_input, word_solution, worksheet_table
+Жирафы и страусы
+heads-legs-1-14
+modeling-heads-legs
+20
+1
+10
+auto_explanation, drag_select, single_select, table_input, word_solution, worksheet_table
+Табуретки и стулья
+heads-legs-3-02
+modeling-heads-legs
+21
+3
+7
+auto_explanation, drag_select, word_solution, worksheet_table
+Пирожки мальчиков и девочек
+heads-legs-3-03
+modeling-heads-legs
+22
+3
+9
+auto_explanation, drag_select, single_select, table_input, word_solution, worksheet_table
+Конфеты в классе
+heads-legs-3-04
+modeling-heads-legs
+23
+3
+9
+auto_explanation, drag_select, single_select, table_input, word_solution, worksheet_table
+Снежинки
+heads-legs-3-05
+modeling-heads-legs
+24
+3
+13
+auto_explanation, drag_select, single_select, table_input, word_solution, worksheet_table
+Совята и котята
+heads-legs-3-06
+modeling-heads-legs
+25
+3
+9
+auto_explanation, drag_select, single_select, table_input, word_solution, worksheet_table
+Ученики съели конфеты
+heads-legs-3-07
+modeling-heads-legs
+26
+3
+9
+auto_explanation, drag_select, single_select, word_solution, worksheet_table
+Яблоки на варенье
+heads-legs-4-01
+modeling-heads-legs
+27
+4
+9
+auto_explanation, drag_select, single_select, table_input, word_solution, worksheet_table
+Петя на турнире
+heads-legs-4-02
+modeling-heads-legs
+28
+4
+9
+auto_explanation, drag_select, single_select, table_input, word_solution, worksheet_table
+Оценки 2 и 3
+dirichlet-t1-01
+proof-dirichlet
+101
+1
+8
+auto_explanation, drag_select, proof_lines, single_select, worksheet_table
+В поход пошли 20 туристов
+dirichlet-t1-02
+proof-dirichlet
+102
+1
+8
+auto_explanation, drag_select, proof_lines, single_select, worksheet_table
+Обязательно ли среди двадцати пяти "медных" монет (т.е
+dirichlet-t1-06
+proof-dirichlet
+103
+2
+8
+auto_explanation, drag_select, single_select, word_solution, worksheet_table
+В лесу растет миллион елок
+dirichlet-t1-09
+proof-dirichlet
+104
+2
+9
+auto_explanation, drag_select, single_select, word_solution, worksheet_table
+В классе учатся 38 человек
+dirichlet-t1-12
+proof-dirichlet
+105
+2
+9
+auto_explanation, drag_select, single_select, word_solution, worksheet_table
+Докажите, что найдутся двадцать москвичей, имеющих одинаковое число в…
+dirichlet-t1-13
+proof-dirichlet
+106
+2
+8
+auto_explanation, drag_select, single_select, word_solution, worksheet_table
+В классе 33 человека
+dirichlet-t1-15
+proof-dirichlet
+107
+3
+11
+auto_explanation, drag_select, order_questions, single_select, word_solution, worksheet_table
+В магазин привезли 25 ящиков с тремя разными сортами яблок (в каждом …
+dirichlet-t2-02
+proof-unlucky
+108
+3
+10
+auto_explanation, drag_select, number_input, order_questions, single_select, word_solution, worksheet_table
+В мешке лежат шарики двух разных цветов: черного и белого
+dirichlet-t1-10
+proof-dirichlet
+109
+2
+9
+auto_explanation, drag_select, single_select, word_solution, worksheet_table
+В школе 800 учеников
+fairy-caves-01
+fairy-caves
+
+
+7
+auto_explanation, drag_select, number_input, table_input
+Первая пещера
+fairy-caves-02
+fairy-caves
+
+
+7
+auto_explanation, drag_select, number_input, table_input
+Вторая пещера
+fairy-caves-03
+fairy-caves
+
+
+5
+auto_explanation, number_input, table_input
+Третья пещера
+6. Проверка в роли ребёнка 10 лет
+Что хорошо: задача открывается с чтения условия, есть видимые шаги, есть подсказки, карточки и проверяемые поля, финальный эталон.
+Где ребёнок застрянет: в задачах на доказательство язык слишком быстро становится взрослым: N/M, «клетки», «переполнение», «обобщённый принцип» без постоянной детской переформулировки.
+На task 1.1 Dirichlet логика понятна, но фраза «Клетки — группы по признаку из условия» в proof lines слишком обобщённая; ребёнку лучше видеть «возрасты 20, 21, ..., 35».
+На heads-legs ребёнок долго решает почти одинаковые 9-экранные задачи. Это тренирует повторение, но быстрее утомляет, чем методическая задумка с постепенным сокращением окон.
+Ветка «Конструкции» по умолчанию пустая и показывает архивный toggle. Для ребёнка это лучше скрыть из карты тем или показать как «скоро/для старших», иначе непонятно, почему тема есть, а задач нет.
+Нет очевидного механизма «реши на бумаге»: ребёнку не предлагают скачать бланк, распечатать, загрузить решение и ждать ParentID/родительскую проверку.
+7. Проверка в роли senior методолога
+Методическая траектория стала лучше: T1 начинается с простых OK-задач, T2 вынесен в «Метод неудачника», archive отделён.
+Но структура «1 задача объясняет всё → 2-3 сокращают → 4-5 спрашивают следующее действие → 12-15 вписывают выражения → 16-20 решают на бумаге» пока не реализована как data-driven профиль.
+В child-route нет ни одной задачи paper-mode, поэтому последняя стадия самостоятельности отсутствует.
+Видимых задач по Дирихле всего 8 + 1 в unlucky; это скорее demo-траектория, а не полноценная тема.
+Скрытые/архивные задачи нельзя проверять как готовую методологию: у них правильно выставлен статус archive/needsReview, но многие уже имеют сгенерированные шаги. Методисту нужно явно видеть, что это черновой flow.
+Рекомендуется ввести themePathVersion: demo / course / archive. Сейчас ветки выглядят как полноценные темы, даже если внутри 0-8 готовых задач.
+8. Проверка скрытых и архивных задач
+Скрытых/не детских задач: 232. Это нормально как банк, но нельзя смешивать их с детским курсом.
+63 задачи proof-constructions находятся в archive + needsReview. Это правильно с точки зрения публикации, но их экранные сценарии часто generic и не соответствуют типу «конструкции/контрпример».
+4 задачи blocked из-за visual assets: M5.27, M5.46, M5.47, M5.48. Их нельзя выпускать без SVG/схем.
+27 задач содержат external reference («см. задачу…»), 4 задачи содержат N=N/M=M. Они должны оставаться methodistOnly/archive до раскрытия решений.
+ID
+Ветка
+Название
+Issues
+Visual
+dirichlet-t4-26
+geo-cutting
+Квадратный лист бумаги разрезали на шесть кусков в форме выпуклых мно…
+missing_visual_asset, requires_manual_review
+missing
+dirichlet-t4-45
+geo-cutting
+Можно ли из 18 плиток размером 1×2 выложить квадрат так, чтобы при эт…
+contains_external_reference, requires_manual_review, missing_visual_asset
+missing
+dirichlet-t4-46
+geo-cutting
+Есть 40 одинаковых шнуров
+missing_visual_asset, requires_manual_review
+missing
+dirichlet-t4-47
+geo-cutting
+Напомним, что игра в "морской бой" начинается с того, что на доске ра…
+requires_manual_review, missing_visual_asset
+missing
+9. UX/UI senior audit
+Сильные стороны: визуально дружелюбная оболочка, понятные карточки, мягкая палитра, есть навигация по теме, статус недоступной задачи.
+Проблема 1: недостаточно видно метод. Нужно добавить постоянную ленту метода: «кто участвует → куда раскладываем → считаем → сравниваем → вывод → запись».
+Проблема 2: названия задач обрезаются в child list и h2. Нужен childTitle + fullTitle/condition отдельно.
+Проблема 3: в ветках с 0 детских задач лучше показывать не пустой список, а экран «Тема готовится» или скрывать такие ветки с детской карты.
+Проблема 4: видео — заглушка и только у двух веток. Для UX это обещание, которое не выполняется в большинстве тем.
+Проблема 5: paper upload screen существует, но не встроен в маршруты; кнопки «Скачать бланк» нет.
+10. Архитектурный аудит
+Хорошо: есть единая Task model, step discriminated union, publishTier/qaStatus, branch filters, TaskUnavailableScreen, route smoke tests.
+Риск: data хранится в TypeScript и manual overrides. Для методиста без разработчика это трудно поддерживать. Нужен нормализованный JSON/CMS layer или admin editor.
+Критично: ?mode=methodist даёт доступ ко всем задачам без auth. В production это должно быть закрыто.
+Риск: QA основан на regex-сканировании текста. Это полезно, но не гарантирует методическую корректность flow.
+Риск: visual asset pipeline отсутствует. Нет схемы: task.requiresVisual -> assetId -> alt -> render -> fallback.
+Риск: бумажный режим не имеет генератора PDF-бланка и идентификатора родительской проверки.
+11. Системно-аналитический аудит
+Нужно формально описать state machine: draft -> qaReview -> ready -> childRoute/training -> archived/hidden.
+Нужно разделить роли: child, parent, methodist, admin. Сейчас methodist mode - query parameter.
+Нужно описать event model: video_seen, task_started, hint_used, step_failed, paper_blank_downloaded, paper_solution_uploaded, parent_review_requested, parent_approved/redo.
+Нужно связать ParentID с загрузкой решения и статусом проверки. Сейчас user-profile имеет parentId=demo-parent, но PaperTaskScreen не показывает/не подтверждает это ребёнку.
+Нужно добавить acceptance criteria для каждого publishTier: что видно в списке, что видно по прямой ссылке, что доступно с archive toggle, что доступно только в admin.
+12. Developer audit
+npm run qa:task-quality, qa:dirichlet, qa:categories, qa:task-access, qa:smoke - PASS.
+npm run lint - PASS; npx tsc --noEmit - PASS.
+npm run build в sandbox компилируется, но не завершился в лимит 10 минут на стадии lint/type-check. Нужно проверить CI/Vercel logs.
+Нет e2e browser tests на клики по реальному UI. Текущие smoke-тесты проверяют data/routing, но не проходят путь ребёнка по кнопкам.
+Рекомендация: добавить Playwright smoke: branch list, task start, first correct answer, unavailable screen, archive toggle, paper upload view.
+13. Приоритетный backlog
+P0 · P0-01 · methodist mode доступен query-параметром без авторизации
+Доказательство: canAccessTask(mode="methodist") возвращает true для любой задачи; parseTaskAccessMode читает mode из URL. При отключенной авторизации любой пользователь, знающий URL, может открыть ?mode=methodist.
+Что сделать: В production отключить methodist mode через feature flag или требовать реальную роль/секрет. Для ребёнка прямые ссылки на hidden/blocked/archive уже закрыты, но methodist bypass надо убрать из публичного контура.
+P0 · P0-02 · нет реализации бумажных задач 16-20: бланк PDF + загрузка + parentId
+Доказательство: В TASKS: requiresUpload=true найдено 0 задач; hasDownload=true найдено 0 задач. PaperTaskScreen умеет загрузку фото, но нет PDF-бланка, нет привязки к ParentID в отправке.
+Что сделать: Добавить тип этапа paper_solution для задач 16-20 внутри подтем: downloadBlankUrl, uploadRequired/optional, parentReviewId, status pending/approved/redo. Генерировать PDF-бланк с условием и местом под решение.
+P0 · P0-03 · нет видеообъяснений перед большинством тем/подтем
+Доказательство: BRANCH_VIDEOS содержит только modeling-heads-legs и fairy-caves. У dirichlet/unlucky/constructions/remainders/cutting/tables/relations/coloring/extreme нет intro video, хотя методика требует видео перед каждой темой/подтемой.
+Что сделать: Сделать обязательный videoMeta для каждой публикуемой темы и подкатегории: intro, methodDemo, beforeSubtopic. До готовности видео показывать scripted explanation screen, но не молча пропускать этап.
+P0 · P0-04 · архивные/скрытые задачи не методически готовы, но доступны в preview/methodist
+Доказательство: 63 archive задачи имеют qaStatus=needsReview и too_hard_for_child_route; многие используют generic flow с «зайцы/клетки» даже для конструкций/контрпримеров. Для ребёнка скрыто, но методистский preview может создавать ложное впечатление готовности.
+Что сделать: В archive preview явно ставить watermark «черновик/методистский банк». Не использовать детский task-runner для F10_ADVANCED, пока не разработаны отдельные flows для конструкций, графов, крайних задач.
+P1 · P1-01 · снятие опоры почти не реализовано внутри видимого маршрута
+Доказательство: В детском маршруте 40 задач; 26 из них имеют 9 шагов, у heads-legs 23 из 28 задач имеют 9 шагов. На 16-20 задачах нет перехода к бумажному полному решению.
+Что сделать: Ввести progressionProfile по каждой подтеме: 1 задача - объяснение; 2-3 - тренировка с меньшим числом окон; 4-5 - выбор следующего действия; 12-15 - вписать выражения; 16-20 - бумажное решение.
+P1 · P1-02 · видимый маршрут Дирихле слишком короткий для заявленной методики
+Доказательство: Ветка dirichlet показывает 8 childRoute задач, unlucky - 1. Остальные темы (remainders/cutting/tables/relations/coloring/extreme) имеют 0 childRoute задач.
+Что сделать: Для каждой полноценной темы готовить отдельный детский маршрут минимум 12-20 задач или маркировать как «банк методиста, не курс».
+P1 · P1-03 · названия задач обрезаются, встречаются технические/взрослые формулировки
+Доказательство: Например, title dirichlet-t1-02 в UI: «Обязательно ли среди двадцати пяти "медных" монет (т.е»; у многих задач используются «N», «M», «клетки» без детского переименования после первых шагов.
+Что сделать: Добавить childTitle отдельно от source title. В интерфейсе использовать детские названия, а полное условие держать в condition.
+P1 · P1-04 · publishTier/qaStatus есть, но нет админского управления и журнала решений
+Доказательство: Статусы задаются кодом и manual override. Нет UI для методиста, кто/когда перевел задачу в childRoute/hidden/needsReview, почему оставлены issues.
+Что сделать: Сделать admin QA panel: статус, issues, комментарий методиста, дата проверки, diff, история публикации.
+P1 · P1-05 · QA-скрипты ловят синтаксические проблемы, но не методическую корректность flow
+Доказательство: qa:task-quality проходит, но не проверяет постепенное снятие опоры, соответствие solutionMode реальному типу задачи, наличие видео/бумажного режима по номеру задачи.
+Что сделать: Добавить qa:pedagogy-profile: проверка expectedStepCountRange, requiredStepTypes, supportDecay, videoRequired, paperRequiredFromN, childLanguage.
+P1 · P1-06 · нет явной карты «что я сейчас изучаю и зачем этот шаг»
+Доказательство: Первый task показывает много шагов, но глобально ребёнку не видно, почему после «зайцы» идут «клетки», где он находится в методе, сколько таких задач осталось.
+Что сделать: Добавить MethodRibbon: 1) кто участвует, 2) куда раскладываем, 3) считаем N/M, 4) сравниваем, 5) вывод, 6) записываем. На поздних задачах часть пунктов скрывается.
+P2 · P2-01 · next build не завершился в sandbox за 10 минут, хотя compile/tsc/lint проходят
+Доказательство: npm run build компилируется, затем зависает на этапе lint/type-check в sandbox; отдельно npx tsc --noEmit и npm run lint проходят.
+Что сделать: Проверить build в CI/Vercel logs; возможно, добавить отдельные commands или увеличить timeout. Не блокирует продукт, но стоит стабилизировать.
+14. Рекомендуемый следующий план работ
+P0: закрыть ?mode=methodist в production или защитить ролью/секретом.
+P0: добавить обязательные видео/экран объяснения хотя бы для visible branches: heads-legs, dirichlet, unlucky.
+P0: спроектировать и внедрить paper-mode v1: Скачать бланк PDF, Загрузить решение, ParentID, статус проверки.
+P1: описать progressionProfile и применить к heads-legs + dirichlet: stepCount и stepTypes должны уменьшаться по мере роста номера задачи.
+P1: сделать admin QA panel для publishTier/qaStatus/issues/visualStatus.
+P1: сделать visual asset pipeline и закрыть 4 blocked P0 geometry tasks.
+P2: добавить Playwright e2e на детский маршрут и archive toggle.
+15. Вердикт
+Текущий сайт можно использовать как внутренний прототип и как демо первой волны задач. Для детского тестирования в ограниченном режиме можно давать только видимые childRoute задачи, но при условии закрытия methodist mode и явного предупреждения, что видео/бумажный режим ещё не реализованы. Для полноценной образовательной платформы нужно сначала довести контур методической самостоятельности: видео -> guided explanation -> сокращение шагов -> выбор следующего действия -> вписывание выражений -> бумажное решение с проверкой родителя.

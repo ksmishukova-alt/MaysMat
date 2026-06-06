@@ -275,7 +275,7 @@ export function DigitalTaskPlayer({ task, totalTasksInBranch = 51 }: TaskPlayerP
   if (!step) return null;
 
   return (
-    <div className="mx-auto max-w-2xl">
+    <div className="mx-auto max-w-2xl" data-testid="digital-task-player">
       {priorCompletion ? (
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-emerald-200 bg-emerald-50/60 px-4 py-3 text-sm">
           <span className="font-medium text-emerald-800">✓ Эта задача уже решена</span>

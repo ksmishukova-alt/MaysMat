@@ -31,7 +31,7 @@ export function HeadsLegsMethodRuleScreen({
   };
 
   return (
-    <div>
+    <div data-testid="method-rule-screen">
       <p className="mb-2 text-xs font-medium uppercase tracking-wide text-brand-purple">
         {rule.title}
       </p>

@@ -29,7 +29,7 @@ function ResultContent() {
   }, [taskId, starsFromUrl]);
 
   return (
-    <div className="mx-auto max-w-lg text-center">
+    <div className="mx-auto max-w-lg text-center" data-testid="finish-screen">
       <p className="mb-4 text-sm text-gray-500">Задача закрыта · в альбоме отмечена ✓</p>
 
       <TaskCompletionStampById stampId={stampId} stars={stars} animate />

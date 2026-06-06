@@ -36,15 +36,17 @@ export function HeadsLegsQuestionCheckStep({
   }
 
   return (
-    <div>
+    <div data-testid={answerTransform ? "answer-transform-step" : "question-check-step"}>
       <p className="mb-4 text-sm font-medium text-gray-800">Проверь, что именно спрашивают в задаче</p>
       <div className="mb-6 rounded-xl border-2 border-sky-200 bg-sky-50 px-4 py-4 text-sm leading-relaxed text-sky-950">
         <p className="font-medium">Нужно найти:</p>
         <p className="mt-2">{questionAsks}.</p>
         {answerTransform?.type === "multiply_found_objects" ? (
-          <p className="mt-3 text-sky-900">
+          <p className="mt-3 text-sky-900" data-testid="answer-transform-hint">
             После подсчёта {answerTransform.foundObjectLabel ?? "объектов"} умножь на{" "}
-            {answerTransform.multiplier}, чтобы получить {answerTransform.resultLabel}.
+            <span data-testid="answer-transform-multiplier">{answerTransform.multiplier}</span>, чтобы
+            получить{" "}
+            <span data-testid="answer-transform-result-label">{answerTransform.resultLabel}</span>.
           </p>
         ) : null}
       </div>

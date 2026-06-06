@@ -155,7 +155,7 @@ function HeadsLegsProgressionPlayer({
       : undefined;
 
   return (
-    <div className="mx-auto max-w-2xl">
+    <div className="mx-auto max-w-2xl" data-testid="task-runner-shell">
       {priorCompletion ? (
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-emerald-200 bg-emerald-50/60 px-4 py-3 text-sm">
           <span className="font-medium text-emerald-800">✓ Эта задача уже решена</span>
@@ -184,6 +184,7 @@ function HeadsLegsProgressionPlayer({
       <div className="mb-4">
         <button
           type="button"
+          data-testid="remember-rule-button"
           onClick={() => setRuleModalOpen(true)}
           className="rounded-xl border border-lavender-200 bg-lavender-50 px-4 py-2 text-sm font-medium text-brand-purple hover:bg-lavender-100"
         >
