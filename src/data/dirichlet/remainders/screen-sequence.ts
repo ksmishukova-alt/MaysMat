@@ -4,8 +4,8 @@ import type { ScreenSpec } from "@/data/screen-spec";
 export const REMAINDERS_SCREEN_SEQUENCE: ScreenSpec[] = [
   {
     screen: 1,
-    title: "Остатки как домики",
-    childAction: "Объяснить: остаток — это домик; если чисел больше домиков — будет столкновение.",
+    title: "Куда поселятся числа?",
+    childAction: "Объяснить: для каждого остатка — домик; число попадает в домик своего остатка.",
     stepKind: "intro_video",
   },
   {
@@ -28,7 +28,7 @@ export const REMAINDERS_SCREEN_SEQUENCE: ScreenSpec[] = [
   },
   {
     screen: 5,
-    title: "Построй домики остатков",
+    title: "Построй домики для остатков",
     childAction: "Показать домики 0 … m−1.",
     stepKind: "build_houses",
   },
@@ -52,18 +52,24 @@ export const REMAINDERS_SCREEN_SEQUENCE: ScreenSpec[] = [
   },
   {
     screen: 9,
-    title: "Почему это решает задачу?",
-    childAction: "Одинаковые остатки ⇒ разность делится на модуль.",
-    stepKind: "explain_divisibility",
+    title: "Пример с одинаковым остатком",
+    childAction: "23 и 34 → остаток 1 → разность делится на 11.",
+    stepKind: "divisibility_example",
   },
   {
     screen: 10,
+    title: "Почему это решает задачу?",
+    childAction: "Расставить рассуждение: домик → остаток → делимость разности.",
+    stepKind: "explain_divisibility",
+  },
+  {
+    screen: 11,
     title: "Запиши решение словами",
     childAction: "Собрать полный текст решения с пропусками.",
     stepKind: "write_solution",
   },
   {
-    screen: 11,
+    screen: 12,
     title: "Проверка и завершение",
     childAction: "Сверить с эталоном и завершить задачу.",
     stepKind: "finish",

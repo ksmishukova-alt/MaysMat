@@ -39,6 +39,11 @@ export const REMAINDERS_MODELS: Record<string, RemaindersModel> = {
         ],
       },
       {
+        template:
+          "Остатка [ ] быть не может, потому что остаток всегда меньше числа, на которое делим.",
+        blanks: [{ id: "m411-w2b", type: "number", accept: 11 }],
+      },
+      {
         template: "Чисел дано [ ], а домиков для остатков только [ ].",
         blanks: [
           { id: "m411-w5", type: "number", accept: 12 },

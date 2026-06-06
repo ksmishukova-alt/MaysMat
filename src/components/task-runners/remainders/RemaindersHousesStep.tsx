@@ -39,7 +39,7 @@ export function RemaindersHousesStep({ stepId, model, onComplete }: RemaindersHo
 
       {compact ? (
         <div className="mb-6 rounded-xl border-2 border-sky-200 bg-sky-50 p-4">
-          <p className="text-sm font-medium text-sky-900">Домики остатков:</p>
+          <p className="text-sm font-medium text-sky-900">Домики для остатков:</p>
           <p className="mt-2 font-mono text-lg text-sky-800">
             0, 1, 2, …, {m - 1}
           </p>
@@ -47,7 +47,7 @@ export function RemaindersHousesStep({ stepId, model, onComplete }: RemaindersHo
         </div>
       ) : (
         <div className="mb-6">
-          <p className="mb-3 text-sm font-medium text-gray-700">Домики остатков (0 … {m - 1}):</p>
+          <p className="mb-3 text-sm font-medium text-gray-700">Домики для остатков (0 … {m - 1}):</p>
           <div className="flex flex-wrap gap-2">
             {Array.from({ length: m }, (_, i) => (
               <div

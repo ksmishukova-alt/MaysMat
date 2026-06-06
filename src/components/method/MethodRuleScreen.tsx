@@ -3,6 +3,7 @@
 import type { MethodRule, RemaindersRuleInstance } from "@/data/method-rules/types";
 import {
   buildRemaindersRuleExample,
+  buildWhyRemaindersRangeBlock,
   localizeRuleLines,
 } from "@/data/method-rules";
 
@@ -23,6 +24,7 @@ export function MethodRuleScreen({
   onClose,
 }: MethodRuleScreenProps) {
   const example = buildRemaindersRuleExample(instance);
+  const whyRange = buildWhyRemaindersRangeBlock(instance);
   const localized = localizeRuleLines(rule, instance.modulus);
 
   const handlePrimary = () => {
@@ -42,6 +44,18 @@ export function MethodRuleScreen({
 
       <div className="mb-6 rounded-xl border-2 border-amber-200 bg-amber-50 px-4 py-3 text-base font-medium leading-relaxed text-amber-950">
         {rule.anchorPhrase}
+      </div>
+
+      <div className="mb-6 rounded-xl border-2 border-emerald-200 bg-emerald-50 px-4 py-4 text-sm leading-relaxed text-emerald-950">
+        {whyRange.map((line, i) =>
+          line === "" ? (
+            <div key={`why-${i}`} className="h-2" />
+          ) : (
+            <p key={`why-${i}`} className={line.startsWith("Почему") ? "font-semibold" : undefined}>
+              {line}
+            </p>
+          ),
+        )}
       </div>
 
       <div className="mb-6 space-y-3">

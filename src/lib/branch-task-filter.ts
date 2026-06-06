@@ -28,6 +28,17 @@ export function countChildVisibleTasks(tasks: Task[]): number {
   return tasks.filter((t) => t.publishing && isChildVisible(t.publishing)).length;
 }
 
+/** Порядковый номер задачи в детском маршруте ветки (1, 2, 3…), не внутренний номер банка */
+export function resolveChildRouteDisplayNumber(task: Task, branchTasks: Task[]): number {
+  const listed = filterBranchTasksForList(branchTasks, {
+    methodologyBank: true,
+    showArchive: false,
+  });
+  const index = listed.findIndex((t) => t.id === task.id);
+  if (index >= 0) return index + 1;
+  return task.number;
+}
+
 export function countArchiveTasks(tasks: Task[]): number {
   return tasks.filter((t) => t.publishing?.publishTier === "archive").length;
 }

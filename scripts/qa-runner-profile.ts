@@ -232,6 +232,7 @@ for (const task of f4Tasks) {
         "houses_count_quiz",
         "identify_objects",
         "find_collision",
+        "divisibility_example",
         "explain_divisibility",
         "write_solution",
         "finish",
@@ -372,10 +373,10 @@ ok(`pilot F4 (M4.11, M4.18): ${REMAINDERS_PILOT_METHOD_IDS.length} задач с
 // REMAINDERS_SCREEN_SEQUENCE intro
 {
   const introSpec = REMAINDERS_SCREEN_SEQUENCE.find((s) => s.stepKind === "intro_video");
-  if (!introSpec || introSpec.title !== "Остатки как домики") {
+  if (!introSpec || introSpec.title !== "Куда поселятся числа?") {
     fail(`REMAINDERS_SCREEN_SEQUENCE: intro title = ${introSpec?.title ?? "нет"}`);
   } else {
-    ok("REMAINDERS_SCREEN_SEQUENCE: intro = «Остатки как домики»");
+    ok("REMAINDERS_SCREEN_SEQUENCE: intro = «Куда поселятся числа?»");
   }
 }
 

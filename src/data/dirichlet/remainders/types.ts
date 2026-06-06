@@ -11,6 +11,7 @@ export type RemaindersStepKind =
   | "houses_count_quiz"
   | "identify_objects"
   | "find_collision"
+  | "divisibility_example"
   | "explain_divisibility"
   | "write_solution"
   | "finish";

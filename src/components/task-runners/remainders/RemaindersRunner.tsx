@@ -31,6 +31,9 @@ import {
   saveTaskSession,
 } from "@/lib/task-session";
 import { highlightConditionText } from "@/lib/highlight-condition";
+import { resolveChildRouteDisplayNumber } from "@/lib/branch-task-filter";
+import { useResolvedTasksForBranch } from "@/lib/use-task-store";
+import { RemainderDivisibilityExampleStep } from "./RemainderDivisibilityExampleStep";
 
 interface RemaindersRunnerProps {
   task: Task;
@@ -64,6 +67,8 @@ export function RemaindersRunner({ task, totalTasksInBranch = 1 }: RemaindersRun
   );
   const [ruleModalOpen, setRuleModalOpen] = useState(false);
 
+  const branchTasks = useResolvedTasksForBranch(task.branchId);
+  const displayNumber = resolveChildRouteDisplayNumber(task, branchTasks);
   const userProgress = useProgress();
   const priorCompletion = getTaskCompletion(task.id, userProgress);
   const step = steps[stepIndex];
@@ -133,10 +138,10 @@ export function RemaindersRunner({ task, totalTasksInBranch = 1 }: RemaindersRun
 
       <div className="mb-6 rounded-card bg-white p-6 shadow-card">
         <div className="mb-2 text-xs font-medium text-brand-purple">
-          Остатки · Задача {task.number}
+          Остатки · Задача {displayNumber}
         </div>
         <h2 className="text-xl font-bold">{task.title}</h2>
-        <p className="mt-1 text-sm text-gray-500">Числа живут в домиках остатков</p>
+        <p className="mt-1 text-sm text-gray-500">Числа живут в домиках для остатков</p>
         {!hideHeaderCondition ? (
           <p className="mt-4 whitespace-pre-line text-base leading-relaxed text-gray-700">
             {highlightConditionText(task.condition, "dirichlet")}
@@ -219,7 +224,7 @@ function RemaindersStepBody({
     case "intro_video":
       return (
         <AutoExplanationStep
-          template={remaindersIntroTemplate()}
+          template={remaindersIntroTemplate(model.modulus)}
           role="intro"
           onComplete={onAdvance}
         />
@@ -259,6 +264,10 @@ function RemaindersStepBody({
       return <RemainderObjectsStep stepId={step.id} model={model} onComplete={onAdvance} />;
     case "find_collision":
       return <RemainderCollisionStep stepId={step.id} model={model} onComplete={onAdvance} />;
+    case "divisibility_example":
+      return (
+        <RemainderDivisibilityExampleStep modulus={model.modulus} onComplete={onAdvance} />
+      );
     case "explain_divisibility":
       return (
         <RemainderDivisibilityExplainStep stepId={step.id} model={model} onComplete={onAdvance} />

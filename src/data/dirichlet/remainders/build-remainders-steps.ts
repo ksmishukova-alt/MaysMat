@@ -1,5 +1,4 @@
 import type { DirichletTaskMeta } from "@/data/dirichlet/types";
-import { DIRICHLET_FLOW_PROFILES } from "@/data/dirichlet/flows";
 
 import { REMAINDERS_SCREEN_SEQUENCE } from "./screen-sequence";
 import type { RemaindersStep, RemaindersStepKind } from "./types";
@@ -13,9 +12,10 @@ const KIND_BY_STEP: Record<number, RemaindersStepKind> = {
   6: "houses_count_quiz",
   7: "identify_objects",
   8: "find_collision",
-  9: "explain_divisibility",
-  10: "write_solution",
-  11: "finish",
+  9: "divisibility_example",
+  10: "explain_divisibility",
+  11: "write_solution",
+  12: "finish",
 };
 
 function filterSequence(meta: DirichletTaskMeta) {
@@ -54,12 +54,11 @@ export function buildRemaindersSteps(meta: DirichletTaskMeta): RemaindersStep[] 
 }
 
 /** Текст вводного экрана F4 */
-export function remaindersIntroTemplate(): string[] {
+export function remaindersIntroTemplate(modulus: number): string[] {
   return [
-    "Остатки как домики",
-    "Когда мы делим числа на одно и то же число, у каждого числа появляется остаток.",
-    "Остаток можно представить как домик.",
-    "Если чисел больше, чем домиков для остатков, два числа обязательно попадут в один домик.",
-    ...DIRICHLET_FLOW_PROFILES.F4_REMAINDERS.intro.slice(0, 1),
+    "Куда поселятся числа?",
+    `Когда мы делим число на ${modulus}, у него получается остаток.`,
+    "Для каждого остатка сделаем отдельный домик.",
+    `Число попадёт в тот домик, какой остаток у него получится при делении на ${modulus}.`,
   ];
 }

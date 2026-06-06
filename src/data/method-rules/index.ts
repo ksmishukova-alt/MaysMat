@@ -77,6 +77,23 @@ export function buildRemaindersRuleExample(instance: RemaindersRuleInstance): st
   ];
 }
 
+/** Блок «Почему домики идут от 0 до m−1?» для экрана правила */
+export function buildWhyRemaindersRangeBlock(instance: RemaindersRuleInstance): string[] {
+  const m = instance.modulus;
+  const range = formatRemainderRange(instance.firstRemainder, instance.lastRemainder, m >= 20);
+  return [
+    `Почему домики идут от ${instance.firstRemainder} до ${instance.lastRemainder}?`,
+    "",
+    "Остаток всегда меньше числа, на которое делим.",
+    "",
+    `Если после деления осталось ${m}, можно собрать ещё одну полную группу по ${m}.`,
+    "",
+    "Тогда остаток станет 0.",
+    "",
+    `Поэтому при делении на ${m} возможны остатки только:`,
+    range + ".",
+  ];
+}
 /** Подставить m в fullRule для конкретного модуля */
 export function localizeRuleLines(rule: MethodRule, modulus: number): string[] {
   return rule.fullRule.map((line) => line.replace(/\bm\b/g, String(modulus)));

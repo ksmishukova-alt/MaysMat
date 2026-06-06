@@ -126,6 +126,7 @@ if (!branchViaAlias || branchViaAlias.id !== "proof-constructions") {
       "houses_count_quiz",
       "identify_objects",
       "find_collision",
+      "divisibility_example",
       "explain_divisibility",
       "write_solution",
       "finish",
@@ -151,7 +152,7 @@ if (!branchViaAlias || branchViaAlias.id !== "proof-constructions") {
     if (!pilot.condition.includes("12 различных двузначных")) {
       fail("dirichlet-t3-11: condition неполное на этапе read");
     }
-    ok("dirichlet-t3-11: childRoute + rule screen + 11 домиков + reusable blanks");
+    ok("dirichlet-t3-11: childRoute + rule screen + 12 шагов + reusable blanks");
   }
 }
 
