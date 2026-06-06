@@ -15,6 +15,7 @@ import {
   countArchiveTasks,
   countChildVisibleTasks,
   filterBranchTasksForList,
+  formatChildRouteTaskCount,
 } from "@/lib/branch-task-filter";
 import { taskPlayHref } from "@/lib/task-access-mode";
 
@@ -63,7 +64,7 @@ export function BranchTaskList({
       </div>
       {methodologyBank ? (
         <p className="mb-4 text-xs text-gray-500">
-          Детский маршрут: {childCount} задач. Остальные — в банке методиста или архиве.
+          Детский маршрут: {formatChildRouteTaskCount(childCount)}. Остальные — в банке методиста или архиве.
         </p>
       ) : null}
       <div className="space-y-3">

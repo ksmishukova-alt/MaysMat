@@ -24,6 +24,9 @@ interface ReadConditionStepProps {
 
   highlightVariant?: "heads-legs" | "dirichlet";
 
+  /** Подсказка под заголовком; по умолчанию — generic для guided-задач */
+  hintText?: string;
+
   onComplete: () => void;
 
 }
@@ -41,6 +44,8 @@ export function ReadConditionStep({
   enableTts = false,
 
   highlightVariant = "heads-legs",
+
+  hintText = "Числа и ключевые слова подсвечены — перенеси их на следующих шагах. На следующих экранах условие останется сверху.",
 
   onComplete,
 
@@ -146,13 +151,7 @@ export function ReadConditionStep({
 
       <h3 className="mb-4 text-lg font-semibold">Прочитай задачу</h3>
 
-      <p className="mb-4 text-sm text-gray-500">
-
-        Числа и ключевые слова подсвечены — перенеси их на следующих шагах. На следующих экранах
-
-        условие останется сверху.
-
-      </p>
+      <p className="mb-4 text-sm text-gray-500">{hintText}</p>
 
       <div className="mb-6 rounded-xl border border-lavender-200 bg-white p-6 shadow-sm">
 

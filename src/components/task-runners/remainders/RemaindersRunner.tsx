@@ -253,6 +253,11 @@ function RemaindersStepBody({
           condition={task.condition}
           enableTts
           highlightVariant="dirichlet"
+          hintText={
+            (model.progressionProfile ?? 1) >= 3
+              ? "Прочитай условие. Дальше ты сам найдёшь: на какое число делим, сколько есть остатков и почему два числа попадут в один домик."
+              : undefined
+          }
           onComplete={onAdvance}
         />
       );

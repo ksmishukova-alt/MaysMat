@@ -60,3 +60,13 @@ export function resolveProgressTotalForBranch(
   const childCount = countChildVisibleTasks(branchTasks);
   return Math.max(1, childCount);
 }
+
+/** «1 задача», «2 задачи», «5 задач» */
+export function formatChildRouteTaskCount(n: number): string {
+  const mod10 = n % 10;
+  const mod100 = n % 100;
+  if (mod100 >= 11 && mod100 <= 14) return `${n} задач`;
+  if (mod10 === 1) return `${n} задача`;
+  if (mod10 >= 2 && mod10 <= 4) return `${n} задачи`;
+  return `${n} задач`;
+}
