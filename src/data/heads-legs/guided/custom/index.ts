@@ -5,6 +5,7 @@ import { buildSteps31 } from "./steps-3-1";
 import { buildSteps32 } from "./steps-3-2";
 import { buildSteps35Secondary } from "./steps-3-5";
 import { buildSteps37 } from "./steps-3-7";
+import { buildSteps43 } from "./steps-4-3";
 import { buildSteps51 } from "./steps-5-1";
 import { buildSteps55 } from "./steps-5-5";
 import { buildSteps61 } from "./steps-6-1";
@@ -23,6 +24,7 @@ const REPLACE: Record<string, (taskId: string) => DiscriminatedTaskStep[]> = {
   "3.1": buildSteps31,
   "3.2": buildSteps32,
   "3.7": buildSteps37,
+  "4.3": buildSteps43,
   "5.1": buildSteps51,
   "5.5": buildSteps55,
   "6.1": buildSteps61,

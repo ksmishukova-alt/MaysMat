@@ -20,13 +20,45 @@ import {
 
 function assumptionObjectPhrase(condition: string, totalObjects: number | null | undefined): string {
   if (totalObjects != null) {
+    if (/девоч/i.test(condition)) return ` все ${totalObjects} девочек`;
     if (/клумб/i.test(condition)) return ` все ${totalObjects} клумб`;
     if (/голов/i.test(condition)) return ` все ${totalObjects} животных`;
     if (/яиц|детёныш/i.test(condition)) return ` все ${totalObjects} детёнышей`;
     return ` все ${totalObjects} объектов`;
   }
+  if (/девоч/i.test(condition)) return " все девочки";
   if (/клумб/i.test(condition)) return " все клумбы";
   return " все объекты";
+}
+
+function entityMatchesAssumeKind(entityLabel: string, assumeKind: string): boolean {
+  const el = entityLabel.toLowerCase().trim();
+  const ak = assumeKind.toLowerCase().trim();
+  if (el === ak) return true;
+  const words = ak.split(/\s+/).filter((w) => w.length > 3);
+  return words.length > 0 && words.every((w) => el.includes(w));
+}
+
+function resolveAssumeEntityIndex(
+  entities: ReturnType<typeof inferTaskEntities>,
+  meta: HeadsLegsTaskMeta,
+): 0 | 1 {
+  const ri = meta.ruleInstance;
+  if (ri?.ruleId === "heads-legs-score-base") {
+    const key = ri.assumeKind.toLowerCase();
+    const byKind = entities.findIndex((e) => entityMatchesAssumeKind(e.label, key));
+    if (byKind >= 0) return byKind as 0 | 1;
+    if (/2|двой/i.test(key)) {
+      const idx = entities.findIndex((e) => /2|двой/i.test(e.label));
+      if (idx >= 0) return idx as 0 | 1;
+    }
+    if (/3|трой/i.test(key)) {
+      const idx = entities.findIndex((e) => /3|трой/i.test(e.label));
+      if (idx >= 0) return idx as 0 | 1;
+    }
+  }
+  // По умолчанию — первый вид (обычно меньший вклад / «простой» вариант)
+  return 0;
 }
 
 function buildAssumptionStep(
@@ -34,26 +66,28 @@ function buildAssumptionStep(
   entities: ReturnType<typeof inferTaskEntities>,
   condition: string,
   totalObjects: number | null | undefined,
+  meta: HeadsLegsTaskMeta,
 ): DiscriminatedTaskStep {
   const totalHint = assumptionObjectPhrase(condition, totalObjects);
+  const assumeIdx = resolveAssumeEntityIndex(entities, meta);
   return {
     id: `${taskId}-assume`,
     type: "single_select",
     title: "Выбери предположение",
-    selectPrompt: `Представим, что${totalHint} были…`,
+    selectPrompt: `Представим, что${totalHint} получили…`,
     context: "С какого вида удобнее начать пробный расчёт?",
     options: [
-      {
-        id: "type2",
-        label: entities[1]?.label ?? "вид 2",
-        emoji: resolveEntityEmoji(entities[1]?.label ?? "вид 2", { id: "type2", role: "object" }),
-        correct: true,
-      },
       {
         id: "type1",
         label: entities[0]?.label ?? "вид 1",
         emoji: resolveEntityEmoji(entities[0]?.label ?? "вид 1", { id: "type1", role: "object" }),
-        correct: true,
+        correct: assumeIdx === 0,
+      },
+      {
+        id: "type2",
+        label: entities[1]?.label ?? "вид 2",
+        emoji: resolveEntityEmoji(entities[1]?.label ?? "вид 2", { id: "type2", role: "object" }),
+        correct: assumeIdx === 1,
       },
     ],
     successMessage: "Хорошо! Считаем дальше.",
@@ -72,9 +106,11 @@ function buildTotalsWorksheet(meta: HeadsLegsTaskMeta): DiscriminatedTaskStep | 
     ? "животных (голов)"
     : /яиц|детёныш/i.test(meta.condition)
       ? "детёнышей"
-      : /клумб/i.test(meta.condition)
-        ? "клумб"
-        : "объектов";
+      : /девоч/i.test(meta.condition)
+        ? "девочек"
+        : /клумб/i.test(meta.condition)
+          ? "клумб"
+          : "объектов";
   const featureLabel = inferFeatureSumLabel(featMeta.columnLabel).toLowerCase();
 
   const rows = [];
@@ -147,7 +183,7 @@ export function buildGuidedSteps(meta: HeadsLegsTaskMeta): DiscriminatedTaskStep
   if (totalsStep) steps.push(totalsStep);
 
   if (flow.assumptionStep) {
-    steps.push(buildAssumptionStep(meta.id, entities, meta.condition, meta.totals?.totalObjects));
+    steps.push(buildAssumptionStep(meta.id, entities, meta.condition, meta.totals?.totalObjects, meta));
   }
 
   if (hasCustomMiddleSteps(meta.methodTaskId)) {

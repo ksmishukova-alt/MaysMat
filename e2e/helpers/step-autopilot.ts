@@ -178,30 +178,27 @@ async function completeDragSelect(page: Page, task: Task): Promise<boolean> {
   return true;
 }
 
-async function completeAssumeSelect(page: Page): Promise<boolean> {
-  const assumePrompt = page.getByText(/Выбери предположение|Представим, что все \d+ объектов были/);
+async function completeAssumeSelect(page: Page, task: Task): Promise<boolean> {
+  const assumePrompt = page.getByText(
+    /Выбери предположение|Представим, что все \d+ (объектов|девочек)/,
+  );
   if (!(await assumePrompt.first().isVisible().catch(() => false))) return false;
 
-  const candidates = [
-    /Неверные ответы/i,
-    /с двойкой/i,
-    /По 2 открытки/i,
-    /без ничьих|не вничью/i,
-    /неправильными/i,
-  ];
-  for (const pattern of candidates) {
-    const btn = page.getByRole("button", { name: pattern }).first();
-    if (await btn.isVisible().catch(() => false)) {
-      await btn.click();
-      await clickIfVisible(page, "Проверить");
-      return true;
-    }
+  for (const step of task.steps) {
+    if (step.type !== "single_select" || step.title !== "Выбери предположение") continue;
+    const correct = step.options.find((o) => o.correct);
+    if (!correct) continue;
+    const btn = page.getByRole("button", { name: correct.label }).first();
+    if (!(await btn.isVisible().catch(() => false))) continue;
+    await btn.click();
+    await clickIfVisible(page, "Проверить");
+    return true;
   }
   return false;
 }
 
 async function completeSingleSelect(page: Page, task: Task): Promise<boolean> {
-  if (await completeAssumeSelect(page)) return true;
+  if (await completeAssumeSelect(page, task)) return true;
 
   const cards = page.locator("button:has(span.text-5xl)");
   if ((await cards.count()) === 0) return false;

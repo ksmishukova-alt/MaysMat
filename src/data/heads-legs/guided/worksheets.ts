@@ -18,6 +18,7 @@ function blankAnswer(blank: SolutionBlank): number | undefined {
 function shouldSkipLine(line: SolutionLine, profile: FlowProfile): boolean {
   const t = line.template;
   if (/^Представим,\s*что\s+все/i.test(t)) return true;
+  if (/^Представим,\s*что\s+кажда/i.test(t)) return true;
   if (profile === "diagnostic") {
     if (/не сказано|по смыслу участвовали|можно получить разные|единственный ответ/i.test(t)) {
       return true;

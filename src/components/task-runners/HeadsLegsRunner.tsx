@@ -132,6 +132,25 @@ function HeadsLegsProgressionPlayer({
     setStepIndex((i) => i + 1);
   }, [stepIndex, playerSteps.length, finish]);
 
+  const goBack = useCallback(() => {
+    setStepIndex((i) => Math.max(0, i - 1));
+  }, []);
+
+  const conditionStepIndex = useMemo(
+    () => playerSteps.findIndex((s) => s.type === "read_condition"),
+    [playerSteps],
+  );
+
+  const goToCondition = useCallback(() => {
+    if (conditionStepIndex >= 0) setStepIndex(conditionStepIndex);
+  }, [conditionStepIndex]);
+
+  const restartTask = useCallback(() => {
+    clearTaskSession(task.id);
+    startedAt.current = Date.now();
+    setStepIndex(0);
+  }, [task.id]);
+
   if (!methodRule) {
     return (
       <p className="text-sm text-red-600">Нет данных правила для задачи {task.id}</p>
@@ -206,6 +225,34 @@ function HeadsLegsProgressionPlayer({
           label={`Шаг ${stepIndex + 1} из ${playerSteps.length}`}
         />
       </div>
+
+      {!priorCompletion && stepIndex > 0 ? (
+        <div className="mb-4 flex flex-wrap gap-2" data-testid="task-step-nav">
+          <button
+            type="button"
+            onClick={goBack}
+            className="rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:border-lavender-200"
+          >
+            ← Назад
+          </button>
+          {conditionStepIndex >= 0 && stepIndex !== conditionStepIndex ? (
+            <button
+              type="button"
+              onClick={goToCondition}
+              className="rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:border-lavender-200"
+            >
+              К условию
+            </button>
+          ) : null}
+          <button
+            type="button"
+            onClick={restartTask}
+            className="rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:border-lavender-200"
+          >
+            Начать заново
+          </button>
+        </div>
+      ) : null}
 
       <div className="rounded-card bg-white p-6 shadow-card">
         <TaskScreenShell

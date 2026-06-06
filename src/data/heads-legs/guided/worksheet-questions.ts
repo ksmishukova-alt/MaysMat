@@ -49,12 +49,23 @@ function inferAssumedEntity(lines: SolutionLine[], entities: HeadsLegsEntity[]):
   for (const line of lines) {
     if (!/^Представим/i.test(line.template)) continue;
     for (const b of line.blanks) {
-      if (b.type !== "object") continue;
-      const raw = Array.isArray(b.accept) ? String(b.accept[0] ?? "") : String(b.accept ?? "");
-      return matchEntity(normalizeObjectLabel(raw), entities) ?? entities[1] ?? entities[0] ?? null;
+      if (b.type === "object") {
+        const raw = Array.isArray(b.accept) ? String(b.accept[0] ?? "") : String(b.accept ?? "");
+        return matchEntity(normalizeObjectLabel(raw), entities) ?? entities[0] ?? null;
+      }
+      if (b.type === "number" && /по\s*\[/i.test(line.template)) {
+        const per = blankNum(b);
+        if (per != null) {
+          const byFeat = entities.find((e) => {
+            const digits = e.label.match(/\d+/);
+            return digits && Number(digits[0]) === per;
+          });
+          if (byFeat) return byFeat;
+        }
+      }
     }
   }
-  return entities[1] ?? entities[0] ?? null;
+  return entities[0] ?? null;
 }
 
 function parseTotalFeature(condition: string): number | null {
@@ -65,6 +76,7 @@ function parseTotalFeature(condition: string): number | null {
     condition.match(/(\d+)\s+цвет(?:ов|ка|ков)/i) ??
     condition.match(/(\d+)\s+кол(?:ё|е)с/i) ??
     condition.match(/(\d+)\s+ящик/i) ??
+    condition.match(/(\d+)\s+открыт/i) ??
     condition.match(/(\d+)\s+задач/i);
   return m ? Number(m[1]) : null;
 }
@@ -72,6 +84,8 @@ function parseTotalFeature(condition: string): number | null {
 function parseTotalObjectsFromCondition(condition: string): number | null {
   if (/одиннадцат(?:и|ь)\s+клумб/i.test(condition)) return 11;
   const m =
+    condition.match(/(\d+)\s+девоч/i) ??
+    condition.match(/(\d+)\s+открыт/i) ??
     condition.match(/(\d+)\s+голов/i) ??
     condition.match(/(\d+)\s+животн/i) ??
     condition.match(/(\d+)\s+яиц/i) ??
@@ -123,13 +137,15 @@ export function buildWorksheetContext(
     ? "животных"
     : /яиц|детёныш/i.test(meta.condition)
       ? "детёнышей"
-      : /клумб/i.test(meta.condition)
-        ? "клумб"
-        : /ученик|человек|класс/i.test(meta.condition)
-          ? "учеников"
-          : /охотник|совён|котён/i.test(meta.condition)
-            ? "охотников"
-            : "объектов";
+      : /девоч/i.test(meta.condition)
+        ? "девочек"
+        : /клумб/i.test(meta.condition)
+          ? "клумб"
+          : /ученик|человек|класс/i.test(meta.condition)
+            ? "учеников"
+            : /охотник|совён|котён/i.test(meta.condition)
+              ? "охотников"
+              : "объектов";
 
   return {
     entities,
