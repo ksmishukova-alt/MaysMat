@@ -16,6 +16,7 @@ import type {
   WaveP1SecondPathStatus,
 } from "../src/data/heads-legs/wave-p1/single-path-assume-audit.types";
 import { WAVE_P1_RULE } from "../src/data/heads-legs/wave-p1/single-path-assume-audit.types";
+import { WAVE_P1_EXPLICIT_TRAINING_METHOD_IDS } from "../src/data/heads-legs/wave-p1/explicit-training-paths";
 
 const SPECIAL_DEFER: Record<string, { secondPath: WaveP1SecondPathStatus; approach: WaveP1AssumeApproach; decision: string; notes: string }> = {
   "1.2": {
@@ -132,16 +133,21 @@ for (const entry of HEADS_LEGS_CATALOG) {
 
   let decision = special?.decision ?? "pending — выбрать dual_path или explicit_training_path";
   if (approach === "already_ok") decision = "no change";
-  if (state === "single_path_assume" && secondPath === "yes") {
+  if (WAVE_P1_EXPLICIT_TRAINING_METHOD_IDS.has(entry.methodTaskId)) {
+    approach = "explicit_training_path";
+    decision = "approved: explicit_training_path (Wave P1)";
+  } else if (state === "single_path_assume" && secondPath === "yes") {
     decision = `pending — ${approach === "dual_path" ? "dual_path" : "explicit_training_path"} (profile ${profile})`;
   }
 
   const notes =
     special?.notes ??
-    (assume?.notes ||
-      (secondPath === "yes"
-        ? `assumeKind=${task?.headsLegsMeta?.ruleInstance && "assumeKind" in task.headsLegsMeta.ruleInstance ? task.headsLegsMeta.ruleInstance.assumeKind : "?"}; второй путь не принимается`
-        : undefined));
+    (WAVE_P1_EXPLICIT_TRAINING_METHOD_IDS.has(entry.methodTaskId)
+      ? "explicitTrainingPath в buildAssumptionStep"
+      : assume?.notes ||
+        (secondPath === "yes"
+          ? `assumeKind=${task?.headsLegsMeta?.ruleInstance && "assumeKind" in task.headsLegsMeta.ruleInstance ? task.headsLegsMeta.ruleInstance.assumeKind : "?"}; второй путь не принимается`
+          : undefined));
 
   rows.push({
     taskId: entry.id,

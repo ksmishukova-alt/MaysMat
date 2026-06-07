@@ -65,6 +65,10 @@ import {
   CANONICAL_PUBLISH_BY_METHOD,
   PUBLICATION_CANDIDATE_CHILD_ROUTE_ALLOWLIST,
 } from "../src/data/heads-legs/full-methodology-audit-publish";
+import {
+  WAVE_P1_EXPLICIT_TRAINING_METHOD_IDS,
+} from "../src/data/heads-legs/wave-p1/explicit-training-paths";
+import { HEADS_LEGS_SCREEN_METHODOLOGY_AUDIT } from "../src/data/heads-legs/full-screen-methodology-audit";
 
 const FORBIDDEN_UI_TERMS = [
   "runnerKind",
@@ -1058,6 +1062,50 @@ if (PATTERN5_FROZEN) {
   } else {
     ok("pattern 5 frozen: нет утечек в childRoute");
   }
+}
+
+console.log("\n--- Wave P1 explicit training path ---\n");
+
+for (const methodId of WAVE_P1_EXPLICIT_TRAINING_METHOD_IDS) {
+  const task = Object.values(HEADS_LEGS_TASKS).find((t) => t.headsLegsMeta?.methodTaskId === methodId);
+  if (!task) {
+    fail(`Wave P1 ${methodId}: задача не найдена`);
+    continue;
+  }
+
+  const assumeStep = task.steps.find(
+    (s) => s.type === "single_select" && s.id.includes("-assume"),
+  );
+  if (!assumeStep || assumeStep.type !== "single_select") {
+    fail(`${task.id}: нет assume single_select`);
+    continue;
+  }
+
+  if (!assumeStep.explicitTrainingPath) {
+    fail(`${task.id}: assume без explicitTrainingPath`);
+  }
+  if (!assumeStep.alternativeWrongFeedback?.includes("Так тоже можно решить")) {
+    fail(`${task.id}: нет мягкого alternativeWrongFeedback`);
+  }
+  const copy = `${assumeStep.context ?? ""} ${assumeStep.selectPrompt ?? ""}`;
+  if (/удобнее/i.test(copy)) {
+    fail(`${task.id}: субъективное «удобнее» в assume`);
+  }
+  if (!/потренируем/i.test(copy)) {
+    fail(`${task.id}: нет обучающей формулировки «потренируем»`);
+  }
+
+  const screenAudit = HEADS_LEGS_SCREEN_METHODOLOGY_AUDIT.find((a) => a.methodTaskId === methodId);
+  const assumeScreen = screenAudit?.screens.find(
+    (s) => s.screenKind === "single_select" && s.alternativeValidPath === true,
+  );
+  if (assumeScreen && !assumeStep.explicitTrainingPath) {
+    fail(`${task.id}: alternativeValidPath без explicitTrainingPath`);
+  }
+}
+
+if ([...WAVE_P1_EXPLICIT_TRAINING_METHOD_IDS].length === 7) {
+  ok("Wave P1: 7 задач с explicitTrainingPath на assume");
 }
 
 ok(

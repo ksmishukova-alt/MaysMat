@@ -23,6 +23,10 @@ import {
   TRANSFER_WORD_SOLUTION_HINT,
   TRANSFER_WORD_SOLUTION_TITLE,
 } from "../transfer-pattern/models";
+import {
+  buildExplicitTrainingAssumeCopy,
+  hasExplicitTrainingPath,
+} from "../wave-p1/explicit-training-paths";
 
 function assumptionObjectPhrase(condition: string, totalObjects: number | null | undefined): string {
   if (totalObjects != null) {
@@ -79,9 +83,9 @@ function buildAssumptionStep(
 ): DiscriminatedTaskStep {
   const totalHint = assumptionObjectPhrase(condition, totalObjects);
   const assumeIdx = resolveAssumeEntityIndex(entities, meta);
-  return {
+  const base = {
     id: `${taskId}-assume`,
-    type: "single_select",
+    type: "single_select" as const,
     title: "Выбери предположение",
     selectPrompt: `Представим, что${totalHint} — …`,
     context:
@@ -102,6 +106,19 @@ function buildAssumptionStep(
     ],
     successMessage: "Хорошо! Считаем дальше.",
   };
+
+  if (hasExplicitTrainingPath(meta.methodTaskId)) {
+    const copy = buildExplicitTrainingAssumeCopy(meta, entities, totalHint, assumeIdx);
+    return {
+      ...base,
+      context: copy.context,
+      selectPrompt: copy.selectPrompt,
+      alternativeWrongFeedback: copy.alternativeWrongFeedback,
+      explicitTrainingPath: true,
+    };
+  }
+
+  return base;
 }
 
 /** FactExtractor: общие числа из условия (docx экран 4 для 1.1 / 1.3) */

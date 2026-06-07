@@ -13,6 +13,7 @@ interface SingleSelectStepProps {
   options: DragOption[];
   prompt?: string;
   successMessage?: string;
+  alternativeWrongFeedback?: string;
   runnerContext?: RunnerContext;
   onComplete: () => void;
 }
@@ -23,6 +24,7 @@ export function SingleSelectStep({
   options,
   prompt = "Выбери один вариант",
   successMessage,
+  alternativeWrongFeedback,
   runnerContext = "heads-legs",
   onComplete,
 }: SingleSelectStepProps) {
@@ -50,9 +52,10 @@ export function SingleSelectStep({
       setError("");
     } else {
       setError(
-        runnerContext === "dirichlet"
-          ? "Подумай: какой вариант следует из сравнения N и M?"
-          : "Подумай: у кого в задаче есть ноги?",
+        alternativeWrongFeedback ??
+          (runnerContext === "dirichlet"
+            ? "Подумай: какой вариант следует из сравнения N и M?"
+            : "Подумай: у кого в задаче есть ноги?"),
       );
     }
   };
@@ -62,7 +65,7 @@ export function SingleSelectStep({
   }
 
   return (
-    <div>
+    <div data-testid={alternativeWrongFeedback ? "explicit-training-assume-step" : undefined}>
       {context ? (
         <p className="mb-4 rounded-xl bg-lavender-50 p-4 text-sm text-gray-600">{context}</p>
       ) : null}
@@ -90,7 +93,14 @@ export function SingleSelectStep({
           );
         })}
       </div>
-      {error ? <p className="mb-3 text-sm text-red-500">{error}</p> : null}
+      {error ? (
+        <p
+          className={`mb-3 text-sm ${alternativeWrongFeedback ? "text-amber-700" : "text-red-500"}`}
+          data-testid={alternativeWrongFeedback ? "explicit-training-wrong-feedback" : undefined}
+        >
+          {error}
+        </p>
+      ) : null}
       <button
         type="button"
         onClick={check}

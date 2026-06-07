@@ -9,6 +9,7 @@ import {
   type TaskScreenMethodologyAudit,
 } from "../src/data/heads-legs/full-screen-methodology-audit";
 import { DUAL_ASSUME_PATH_CONFIG } from "../src/data/heads-legs/derive-pattern/dual-assume-paths";
+import { hasExplicitTrainingPath } from "../src/data/heads-legs/wave-p1/explicit-training-paths";
 import { DERIVE_PRELUDE_TYPES } from "../src/data/heads-legs/full-methodology-audit";
 
 let errors = 0;
@@ -47,7 +48,9 @@ for (const audit of HEADS_LEGS_SCREEN_METHODOLOGY_AUDIT) {
   if (audit.alternativeValidStrategies.length > 0) {
     const dual = DUAL_ASSUME_PATH_CONFIG[audit.methodTaskId];
     const hasDualStep = audit.screens.some((s) => s.screenKind === "hl_dual_path_assume");
-    const hasExplicitTraining = audit.requiredFixes.some((f) => /explicitTrainingPath/i.test(f));
+    const hasExplicitTraining =
+      hasExplicitTrainingPath(audit.methodTaskId) ||
+      audit.requiredFixes.some((f) => /explicitTrainingPath/i.test(f));
     if (dual && !hasDualStep && !hasExplicitTraining) {
       fail(
         `${audit.taskId}: alternativeValidStrategies без dual-path runner или explicitTrainingPath`,

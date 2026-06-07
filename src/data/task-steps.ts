@@ -40,6 +40,9 @@ export interface SingleSelectStep extends TaskStepBase {
   selectPrompt?: string;
   context?: string;
   successMessage?: string;
+  /** Wave P1: мягкий feedback, если выбран другой математически допустимый путь */
+  alternativeWrongFeedback?: string;
+  explicitTrainingPath?: boolean;
 }
 
 export interface OrderQuestionsStep extends TaskStepBase {

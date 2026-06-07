@@ -19,8 +19,8 @@ export const WAVE_P1_ASSUME_AUDIT: WaveP1AssumeAuditRow[] = [
     "currentState": "single_path_assume",
     "recommendedApproach": "explicit_training_path",
     "risk": "medium",
-    "decision": "pending — explicit_training_path (profile 1)",
-    "notes": "assumeKind=птицы; второй путь не принимается"
+    "decision": "approved: explicit_training_path (Wave P1)",
+    "notes": "explicitTrainingPath в buildAssumptionStep"
   },
   {
     "taskId": "heads-legs-1-02",
@@ -47,8 +47,8 @@ export const WAVE_P1_ASSUME_AUDIT: WaveP1AssumeAuditRow[] = [
     "currentState": "single_path_assume",
     "recommendedApproach": "explicit_training_path",
     "risk": "medium",
-    "decision": "pending — explicit_training_path (profile 2)",
-    "notes": "assumeKind=гусята; второй путь не принимается"
+    "decision": "approved: explicit_training_path (Wave P1)",
+    "notes": "explicitTrainingPath в buildAssumptionStep"
   },
   {
     "taskId": "heads-legs-1-04",
@@ -159,8 +159,8 @@ export const WAVE_P1_ASSUME_AUDIT: WaveP1AssumeAuditRow[] = [
     "currentState": "single_path_assume",
     "recommendedApproach": "explicit_training_path",
     "risk": "medium",
-    "decision": "pending — explicit_training_path (profile 1)",
-    "notes": "assumeKind=клумбы около Гимназии; второй путь не принимается"
+    "decision": "approved: explicit_training_path (Wave P1)",
+    "notes": "explicitTrainingPath в buildAssumptionStep"
   },
   {
     "taskId": "heads-legs-2-02",
@@ -173,8 +173,8 @@ export const WAVE_P1_ASSUME_AUDIT: WaveP1AssumeAuditRow[] = [
     "currentState": "single_path_assume",
     "recommendedApproach": "explicit_training_path",
     "risk": "medium",
-    "decision": "pending — explicit_training_path (profile 2)",
-    "notes": "assumeKind=маленькие коробки; второй путь не принимается"
+    "decision": "approved: explicit_training_path (Wave P1)",
+    "notes": "explicitTrainingPath в buildAssumptionStep"
   },
   {
     "taskId": "heads-legs-2-03",
@@ -187,8 +187,8 @@ export const WAVE_P1_ASSUME_AUDIT: WaveP1AssumeAuditRow[] = [
     "currentState": "single_path_assume",
     "recommendedApproach": "explicit_training_path",
     "risk": "medium",
-    "decision": "pending — explicit_training_path (profile 2)",
-    "notes": "assumeKind=дроны-пастухи; второй путь не принимается"
+    "decision": "approved: explicit_training_path (Wave P1)",
+    "notes": "explicitTrainingPath в buildAssumptionStep"
   },
   {
     "taskId": "heads-legs-2-04",
@@ -312,8 +312,8 @@ export const WAVE_P1_ASSUME_AUDIT: WaveP1AssumeAuditRow[] = [
     "currentState": "single_path_assume",
     "recommendedApproach": "explicit_training_path",
     "risk": "medium",
-    "decision": "pending — explicit_training_path (profile 1)",
-    "notes": "assumeKind=мальчики; второй путь не принимается"
+    "decision": "approved: explicit_training_path (Wave P1)",
+    "notes": "explicitTrainingPath в buildAssumptionStep"
   },
   {
     "taskId": "heads-legs-3-04",
@@ -326,8 +326,8 @@ export const WAVE_P1_ASSUME_AUDIT: WaveP1AssumeAuditRow[] = [
     "currentState": "single_path_assume",
     "recommendedApproach": "explicit_training_path",
     "risk": "medium",
-    "decision": "pending — explicit_training_path (profile 2)",
-    "notes": "assumeKind=мальчики; второй путь не принимается"
+    "decision": "approved: explicit_training_path (Wave P1)",
+    "notes": "explicitTrainingPath в buildAssumptionStep"
   },
   {
     "taskId": "heads-legs-3-05",

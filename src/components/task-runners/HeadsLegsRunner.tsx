@@ -463,6 +463,9 @@ function HeadsLegsStepBody({
           options={step.options!}
           prompt={step.selectPrompt}
           successMessage={step.successMessage}
+          alternativeWrongFeedback={
+            "alternativeWrongFeedback" in step ? step.alternativeWrongFeedback : undefined
+          }
           runnerContext="heads-legs"
           onComplete={onAdvance}
         />
