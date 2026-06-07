@@ -79,19 +79,23 @@ export function HeadsLegsDerivePreludeStep({
   const featureLabel = instance.featureName;
 
   if (phase === "totals") {
-    const skipObjects = deriveConfirmed || instance.preludeDeriveAnswer != null;
+    const deriveTarget = instance.preludeDeriveTarget ?? "objects";
+    const objectsKnown = deriveConfirmed && deriveTarget === "objects";
+    const featureKnown = deriveConfirmed && deriveTarget === "feature";
 
     const checkTotals = () => {
-      const feature = Number(featureInput.trim());
-      if (Number.isNaN(feature) || feature !== instance.totalFeature) {
-        setTotalsError(`Проверь, сколько всего ${featureLabel} по условию.`);
-        return;
-      }
-
-      if (!skipObjects) {
+      if (!objectsKnown) {
         const objects = Number(objectsInput.trim());
         if (objects !== instance.totalObjects) {
-          setTotalsError("Проверь числа в условии задачи.");
+          setTotalsError(`Сколько всего ${objectsLabel} по условию?`);
+          return;
+        }
+      }
+
+      if (!featureKnown) {
+        const feature = Number(featureInput.trim());
+        if (Number.isNaN(feature) || feature !== instance.totalFeature) {
+          setTotalsError(`Проверь, сколько всего ${featureLabel} по условию.`);
           return;
         }
       }
@@ -104,7 +108,11 @@ export function HeadsLegsDerivePreludeStep({
       <div data-testid="derive-prelude-step">
         <p className="mb-4 text-sm font-medium text-gray-800">Запиши главные числа из условия</p>
         <div className="space-y-4">
-          {!skipObjects ? (
+          {objectsKnown ? (
+            <p className="text-sm text-gray-600">
+              Всего {objectsLabel}: <strong>{instance.preludeDeriveAnswer ?? instance.totalObjects}</strong>
+            </p>
+          ) : (
             <label className="block text-sm text-gray-700">
               Сколько всего {objectsLabel}?
               <input
@@ -115,21 +123,23 @@ export function HeadsLegsDerivePreludeStep({
                 data-testid="derive-totals-objects"
               />
             </label>
-          ) : (
-            <p className="text-sm text-gray-600">
-              Всего {objectsLabel}: <strong>{instance.preludeDeriveAnswer ?? instance.totalObjects}</strong>
-            </p>
           )}
-          <label className="block text-sm text-gray-700">
-            Сколько всего {featureLabel}?
-            <input
-              type="number"
-              value={featureInput}
-              onChange={(e) => setFeatureInput(e.target.value)}
-              className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
-              data-testid="derive-totals-feature"
-            />
-          </label>
+          {featureKnown ? (
+            <p className="text-sm text-gray-600">
+              Всего {featureLabel}: <strong>{instance.preludeDeriveAnswer ?? instance.totalFeature}</strong>
+            </p>
+          ) : (
+            <label className="block text-sm text-gray-700">
+              Сколько всего {featureLabel}?
+              <input
+                type="number"
+                value={featureInput}
+                onChange={(e) => setFeatureInput(e.target.value)}
+                className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
+                data-testid="derive-totals-feature"
+              />
+            </label>
+          )}
         </div>
         {totalsError ? <p className="mt-3 text-sm text-red-600">{totalsError}</p> : null}
         <button
@@ -145,6 +155,7 @@ export function HeadsLegsDerivePreludeStep({
 
   if (phase === "featureNorms" && instance.preludeFeatureNorms) {
     const norms = instance.preludeFeatureNorms;
+    const rowHeader = norms.rowLabel ?? "Участник";
     const checkNorms = () => {
       const ok = norms.rows.every((row) => Number(featureValues[row.id]) === row.answer);
       if (!ok) {
@@ -161,7 +172,7 @@ export function HeadsLegsDerivePreludeStep({
         <table className="mb-6 w-full max-w-md overflow-hidden rounded-xl bg-white shadow-card">
           <thead>
             <tr className="bg-lavender-50 text-left text-sm text-gray-500">
-              <th className="px-4 py-3">Вид меча</th>
+              <th className="px-4 py-3">{rowHeader}</th>
               <th className="px-4 py-3">{norms.columnLabel}</th>
             </tr>
           </thead>
@@ -202,7 +213,9 @@ export function HeadsLegsDerivePreludeStep({
     const checkDerive = () => {
       const n = Number(deriveInput.trim());
       if (n !== instance.preludeDeriveAnswer) {
-        setDeriveError("Посчитай: одна рукоять — один меч.");
+        setDeriveError(
+          instance.preludeDeriveWrongHint ?? "Проверь вычисление по условию.",
+        );
         return;
       }
       setDeriveError(null);

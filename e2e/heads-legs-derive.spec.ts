@@ -115,3 +115,87 @@ test.describe("Heads-Legs derive 5.6 (methodist smoke)", () => {
     await expect(page.getByText(/знакомым методом замены/i)).toBeVisible();
   });
 });
+
+test.describe("Heads-Legs derive 5.2 (methodist smoke)", () => {
+  test("5.02 — unit conversion prelude без «кто участвует»", async ({ page }) => {
+    test.setTimeout(120_000);
+    await openTaskFresh(page, "heads-legs-5-02", "methodist");
+
+    await expect(page.getByTestId("task-runner-shell")).toBeVisible();
+    await expect(page.getByText("Кто участвует в задаче?")).not.toBeVisible();
+
+    await page.getByRole("button", { name: "Прочитал, дальше" }).click();
+    await page.waitForTimeout(1_100);
+
+    await expect(page.getByTestId("derive-prelude-step")).toBeVisible();
+    await page
+      .getByRole("button", { name: /перевести пары ног в общее число ног/i })
+      .click();
+    await page.getByRole("button", { name: "Проверить" }).click();
+    await page.waitForTimeout(400);
+
+    await page.getByTestId("derive-count-input").fill("108");
+    await page.getByRole("button", { name: "Проверить" }).click();
+    await page.waitForTimeout(400);
+
+    await expect(page.getByText(/сколько ног у каждого вида/i)).toBeVisible();
+    await page.getByTestId("derive-feature-f1").fill("4");
+    await page.getByTestId("derive-feature-f2").fill("2");
+    await page.getByRole("button", { name: "Проверить" }).click();
+    await page.waitForTimeout(400);
+
+    await page.getByTestId("derive-totals-objects").fill("44");
+    await page.getByRole("button", { name: "Проверить" }).click();
+    await page.waitForTimeout(1_100);
+
+    await expect(page.getByText(/знакомым методом замены/i)).toBeVisible();
+  });
+
+  test("5.02 — dual-path assume: оба пути и итог 34 Джавы", async ({ page }) => {
+    test.setTimeout(180_000);
+    await openTaskFresh(page, "heads-legs-5-02", "methodist");
+
+    await page.getByRole("button", { name: "Прочитал, дальше" }).click();
+    await page.waitForTimeout(1_100);
+
+    await page
+      .getByRole("button", { name: /перевести пары ног в общее число ног/i })
+      .click();
+    await page.getByRole("button", { name: "Проверить" }).click();
+    await page.waitForTimeout(400);
+    await page.getByTestId("derive-count-input").fill("108");
+    await page.getByRole("button", { name: "Проверить" }).click();
+    await page.waitForTimeout(400);
+    await page.getByTestId("derive-feature-f1").fill("4");
+    await page.getByTestId("derive-feature-f2").fill("2");
+    await page.getByRole("button", { name: "Проверить" }).click();
+    await page.waitForTimeout(400);
+    await page.getByTestId("derive-totals-objects").fill("44");
+    await page.getByRole("button", { name: "Проверить" }).click();
+    await page.waitForTimeout(1_100);
+
+    await page.getByRole("button", { name: /Понятно, дальше/i }).click();
+    await page.waitForTimeout(1_100);
+
+    await expect(page.getByTestId("dual-path-assume-step")).toBeVisible();
+    await expect(page.getByText(/оба пути верны/i)).toBeVisible();
+    await expect(page.getByText(/удобнее/i)).not.toBeVisible();
+
+    await page.getByTestId("assume-path-1").click();
+    await page.getByRole("button", { name: "Проверить" }).click();
+    await page.waitForTimeout(1_100);
+
+    await page.getByRole("button", { name: "Понятно, записываю ответ" }).click();
+    await page.waitForTimeout(1_100);
+
+    await expect(page.getByTestId("word-solution-step")).toBeVisible();
+    await playTaskToFinish(page, "heads-legs-5-02", 200);
+    await expectFinishScreen(page, "heads-legs-5-02");
+  });
+
+  test("5.02 — без methodist недоступна в child route", async ({ page }) => {
+    await openTaskFresh(page, "heads-legs-5-02");
+    await expect(page.getByText("Задача недоступна")).toBeVisible();
+    await expect(page.getByTestId("task-runner-shell")).not.toBeVisible();
+  });
+});

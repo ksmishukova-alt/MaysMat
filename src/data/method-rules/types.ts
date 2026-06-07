@@ -103,6 +103,7 @@ export interface HeadsLegsScoreRuleInstance {
 export interface HeadsLegsDeriveFeatureNorms {
   columnLabel: string;
   stepHint: string;
+  rowLabel?: string;
   rows: Array<{ id: string; label: string; emoji: string; answer: number }>;
 }
 
@@ -121,9 +122,14 @@ export interface HeadsLegsDeriveRuleInstance {
   questionAsks: string;
   preludeQuestion: string;
   preludeChoices: Array<{ id: string; label: string; correct: boolean }>;
-  /** Вывод числа из условия (напр. 17 мечей из рукоятей) */
+  /** Вывод числа из условия (напр. 17 мечей или 108 ног) */
   preludeDerivePrompt?: string;
   preludeDeriveAnswer?: number;
+  /** objects — выводим totalObjects (5.6); feature — суммарный признак (5.2) */
+  preludeDeriveTarget?: "objects" | "feature";
+  preludeDeriveWrongHint?: string;
+  /** Заголовок первого столбца таблицы норм */
+  preludeFeatureNormsRowLabel?: string;
   /** Таблица «сколько требуется» на объект — один раз в prelude */
   preludeFeatureNorms?: HeadsLegsDeriveFeatureNorms;
   assumeKindPhrase?: string;

@@ -83,8 +83,9 @@ function buildAssumptionStep(
     id: `${taskId}-assume`,
     type: "single_select",
     title: "Выбери предположение",
-    selectPrompt: `Представим, что${totalHint} получили…`,
-    context: "С какого вида удобнее начать пробный расчёт?",
+    selectPrompt: `Представим, что${totalHint} — …`,
+    context:
+      "С каким видом начнём пробную картину? Сначала посчитаем, как будто все объекты этого вида.",
     options: [
       {
         id: "type1",

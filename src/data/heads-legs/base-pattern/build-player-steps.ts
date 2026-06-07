@@ -28,6 +28,11 @@ import {
   shouldInjectProductionQuestionCheck,
 } from "../production-pattern/progression";
 import { shouldInjectScoreQuestionCheck } from "../score-pattern/progression";
+import {
+  DUAL_ASSUME_PATH_CONFIG,
+  hasDualAssumePath,
+} from "../derive-pattern/dual-assume-paths";
+import type { DualAssumePathConfig } from "../derive-pattern/dual-assume-paths";
 
 export type HeadsLegsExtendedPlayerStep =
   | PlayerStep
@@ -111,6 +116,16 @@ export type HeadsLegsExtendedPlayerStep =
     }
   | {
       id: string;
+      type: "hl_dual_path_assume";
+      title: string;
+      dualAssumeConfig: DualAssumePathConfig;
+      screenPhaseId?: string;
+      screenPhaseTitle?: string;
+      screenPhaseIndex?: number;
+      screenPhaseCount?: number;
+    }
+  | {
+      id: string;
       type: "hl_match_total";
       title: string;
       scoreRuleInstance: HeadsLegsScoreRuleInstance;
@@ -138,7 +153,9 @@ function applyPhaseMeta(steps: HeadsLegsExtendedPlayerStep[]): HeadsLegsExtended
               ? "Очки за матч"
               : step.type === "hl_derive_prelude"
                 ? "Подготовка"
-                : step.type === "read_condition"
+                : step.type === "hl_dual_path_assume"
+                  ? "Предположение"
+                  : step.type === "read_condition"
                 ? "Понимаем задачу"
                 : step.type === "hl_choose_method"
                   ? "Выбираем шаг"
@@ -295,9 +312,17 @@ export function buildHeadsLegsPlayerSteps(task: Task): HeadsLegsExtendedPlayerSt
       return applyPhaseMeta([readStep, ...filterStepsForPilot(rawContent, profile, pilot.flowMode)]);
     }
 
-    const assume = rawContent.find(
-      (s) => s.type === "single_select" && s.id.includes("-assume"),
-    );
+    const assume: HeadsLegsExtendedPlayerStep | undefined = hasDualAssumePath(meta.methodTaskId)
+      ? {
+          id: `${task.id}-dual-assume`,
+          type: "hl_dual_path_assume",
+          title: "Выбери предположение",
+          dualAssumeConfig: DUAL_ASSUME_PATH_CONFIG[meta.methodTaskId],
+          screenPhaseId: "assume",
+        }
+      : (rawContent.find(
+          (s) => s.type === "single_select" && s.id.includes("-assume"),
+        ) as HeadsLegsExtendedPlayerStep | undefined);
     const word = rawContent.find((s) => s.type === "word_solution");
     const preview = rawContent.find(
       (s) => s.type === "auto_explanation" && s.id.includes("-preview"),

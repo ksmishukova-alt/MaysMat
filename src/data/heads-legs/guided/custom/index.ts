@@ -72,6 +72,7 @@ export function skipsDefaultParticipant(methodTaskId: string): boolean {
   return (
     methodTaskId === "4.3" ||
     methodTaskId === "5.3" ||
+    methodTaskId === "5.2" ||
     methodTaskId === "5.6" ||
     methodTaskId === "6.1" ||
     methodTaskId === "6.2" ||

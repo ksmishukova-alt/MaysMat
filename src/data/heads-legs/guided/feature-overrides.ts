@@ -152,6 +152,15 @@ export const FEATURE_TABLE_OVERRIDES: Record<
       { id: "f2", label: "Осьминог", emoji: "🐙", answer: 8 },
     ],
   },
+  "5.2": {
+    columnLabel: "Ног",
+    stepTitle: "Сколько ног у каждого?",
+    stepHint: "Укажи, сколько ног у каждого вида по условию.",
+    rows: [
+      { id: "f1", label: "Банты", emoji: "🐫", answer: 4 },
+      { id: "f2", label: "Джавы", emoji: "👤", answer: 2 },
+    ],
+  },
   "5.6": {
     columnLabel: "Кристаллов",
     stepTitle: "Сколько кристаллов нужно на меч?",

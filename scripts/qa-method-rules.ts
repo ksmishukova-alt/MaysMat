@@ -782,7 +782,13 @@ function auditDerivePilot(methodId: string) {
   if (!steps.some((s) => s.type === "hl_intro" && s.id.includes("-derive-transition"))) {
     fail(`${task.id}: derive без transition`);
   }
-  if (!steps.some((s) => s.type === "single_select" && s.id.includes("-assume"))) {
+  if (
+    !steps.some(
+      (s) =>
+        s.type === "hl_dual_path_assume" ||
+        (s.type === "single_select" && s.id.includes("-assume")),
+    )
+  ) {
     fail(`${task.id}: derive без assume`);
   }
   if (!steps.some((s) => s.type === "hl_question_check")) {
@@ -808,28 +814,44 @@ ok(
 );
 
 const task56 = HEADS_LEGS_TASKS["heads-legs-5-06"];
-if (DERIVE_PATTERN_PILOT["5.6"]) {
-  if (!task56) {
-    fail("heads-legs-5-06 не найдена");
+const task52 = HEADS_LEGS_TASKS["heads-legs-5-02"];
+
+function auditDerivePilotTask(
+  methodId: string,
+  task: (typeof HEADS_LEGS_TASKS)[string] | undefined,
+) {
+  if (!DERIVE_PATTERN_PILOT[methodId]) return;
+  if (!task) {
+    fail(`heads-legs-${methodId.replace(".", "-")}: задача не найдена`);
+    return;
+  }
+  if (isChildVisible(task.publishing!)) {
+    fail(`${methodId}: derive pilot не должен быть в childRoute`);
   } else {
-    if (isChildVisible(task56.publishing!)) {
-      fail("heads-legs-5-06: derive pilot не должен быть в childRoute");
+    ok(`${methodId}: derive pilot methodist-only (не childRoute)`);
+  }
+  const steps = buildHeadsLegsPlayerSteps(task);
+  if (steps.some((s) => s.type === "drag_select" && s.id.includes("-objects"))) {
+    fail(`${methodId}: derive не должен начинаться с «кто участвует»`);
+  } else {
+    ok(`${methodId}: без drag_select участников`);
+  }
+  if (!steps.some((s) => s.type === "hl_derive_prelude")) {
+    fail(`${methodId}: derive pilot без hl_derive_prelude`);
+  } else {
+    ok(`${methodId}: hl_derive_prelude подключён`);
+  }
+  if (methodId === "5.2" || methodId === "5.6") {
+    if (!steps.some((s) => s.type === "hl_dual_path_assume")) {
+      fail(`${methodId}: derive pilot без hl_dual_path_assume (два корректных пути)`);
     } else {
-      ok("heads-legs-5-06: derive pilot methodist-only (не childRoute)");
-    }
-    const steps56 = buildHeadsLegsPlayerSteps(task56);
-    if (steps56.some((s) => s.type === "drag_select" && s.id.includes("-objects"))) {
-      fail("heads-legs-5-06: derive не должен начинаться с «кто участвует»");
-    } else {
-      ok("heads-legs-5-06: без drag_select участников");
-    }
-    if (!steps56.some((s) => s.type === "hl_derive_prelude")) {
-      fail("heads-legs-5-06: derive pilot без hl_derive_prelude");
-    } else {
-      ok("heads-legs-5-06: hl_derive_prelude подключён");
+      ok(`${methodId}: dual-path assume подключён`);
     }
   }
 }
+
+auditDerivePilotTask("5.2", task52);
+auditDerivePilotTask("5.6", task56);
 
 const audit53 = getPattern5Audit("5.3");
 if (audit53 && hasExplicitStandardReplacementData(audit53)) {

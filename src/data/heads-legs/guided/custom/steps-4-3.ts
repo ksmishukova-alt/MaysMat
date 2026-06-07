@@ -6,8 +6,9 @@ export function buildTransferAssumeStep43(taskId: string): DiscriminatedTaskStep
     id: `${taskId}-assume`,
     type: "single_select",
     title: "Выбери пробное предположение",
-    context: "С чего удобнее начать?",
-    selectPrompt: "С чего удобнее начать?",
+    context:
+      "Начнём с меньшего числа открыток на девочку — так проще увидеть, сколько «не хватает» до суммы из условия.",
+    selectPrompt: "Какое пробное предположение подходит для этого шага?",
     options: [
       {
         id: "all-2",

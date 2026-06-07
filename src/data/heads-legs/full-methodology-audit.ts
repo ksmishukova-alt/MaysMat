@@ -911,6 +911,8 @@ const DERIVE_PRELUDE_TYPES: PreludeType[] = [
   "common_resource",
 ];
 
+export { DERIVE_PRELUDE_TYPES };
+
 /** Ожидаемый flowMode pilot по канонической карте (если pilot подключён) */
 export function expectedPilotFlowMode(
   record: FullMethodologyAuditRecord,

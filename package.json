@@ -19,6 +19,9 @@
     "qa:smoke": "npx tsx scripts/qa-route-smoke.ts",
     "qa:runner-profile": "npx tsx scripts/qa-runner-profile.ts",
     "qa:method-rules": "npx tsx scripts/qa-method-rules.ts",
+    "audit:heads-legs-runner": "npx tsx scripts/audit-heads-legs-methodology-runner.ts",
+    "generate:heads-legs-screen-audit": "npx tsx scripts/generate-heads-legs-screen-audit.ts",
+    "audit:heads-legs-screens": "npx tsx scripts/audit-heads-legs-screens.ts",
     "test:e2e": "playwright test"
   },
   "dependencies": {

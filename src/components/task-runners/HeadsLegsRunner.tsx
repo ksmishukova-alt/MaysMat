@@ -17,6 +17,7 @@ import {
 import { HeadsLegsMethodChooseStep } from "@/components/task-runners/heads-legs/HeadsLegsMethodChooseStep";
 import { HeadsLegsQuestionCheckStep } from "@/components/task-runners/heads-legs/HeadsLegsQuestionCheckStep";
 import { HeadsLegsDerivePreludeStep } from "@/components/task-runners/heads-legs/HeadsLegsDerivePreludeStep";
+import { HeadsLegsDualPathAssumeStep } from "@/components/task-runners/heads-legs/HeadsLegsDualPathAssumeStep";
 import { MatchTotalStep } from "@/components/task-runners/heads-legs/MatchTotalStep";
 import { ScoreQuestionCheckStep } from "@/components/task-runners/heads-legs/ScoreQuestionCheckStep";
 import { ScoreReplacementStep } from "@/components/task-runners/heads-legs/ScoreReplacementStep";
@@ -47,6 +48,11 @@ import { resolveChildRouteDisplayNumber } from "@/lib/branch-task-filter";
 import { useResolvedTasksForBranch } from "@/lib/use-task-store";
 import { isCompactRuleScreen } from "@/data/heads-legs/base-pattern/progression";
 import { resolveHeadsLegsPilot } from "@/data/heads-legs/pilot/resolve";
+import {
+  hasDualAssumePath,
+  resolveDualAssumeSolutionLines,
+} from "@/data/heads-legs/derive-pattern/dual-assume-paths";
+import { buildSolutionPreviewLines } from "@/data/heads-legs/guided/solution-preview";
 
 interface HeadsLegsRunnerProps {
   task: Task;
@@ -88,6 +94,7 @@ function HeadsLegsProgressionPlayer({
   const [stepIndex, setStepIndex] = useState(() =>
     Math.min(priorSession?.stepIndex ?? 0, Math.max(0, playerSteps.length - 1)),
   );
+  const [assumePathIndex, setAssumePathIndex] = useState<0 | 1 | null>(null);
   const [ruleModalOpen, setRuleModalOpen] = useState(false);
 
   const branchTasks = useResolvedTasksForBranch(task.branchId);
@@ -151,6 +158,7 @@ function HeadsLegsProgressionPlayer({
   const restartTask = useCallback(() => {
     clearTaskSession(task.id);
     startedAt.current = Date.now();
+    setAssumePathIndex(null);
     setStepIndex(0);
   }, [task.id]);
 
@@ -275,7 +283,7 @@ function HeadsLegsProgressionPlayer({
           showPhaseHeader={showPhaseHeader}
           stepTitle={!isReadStep && step.type !== "hl_intro" && step.type !== "hl_method_rule" && step.type !== "hl_question_check" && step.type !== "hl_score_question_check" && step.type !== "hl_score_replacement" && step.type !== "hl_match_total" && step.type !== "hl_derive_prelude" ? step.title : undefined}
           hint={stepHintText && !isReadStep ? stepHintText : undefined}
-          showStepTitle={!isReadStep && step.type !== "hl_intro" && step.type !== "hl_method_rule" && step.type !== "hl_question_check" && step.type !== "hl_score_question_check" && step.type !== "hl_score_replacement" && step.type !== "hl_match_total" && step.type !== "hl_derive_prelude"}
+          showStepTitle={!isReadStep && step.type !== "hl_intro" && step.type !== "hl_method_rule" && step.type !== "hl_question_check" && step.type !== "hl_score_question_check" && step.type !== "hl_score_replacement" && step.type !== "hl_match_total" && step.type !== "hl_derive_prelude" && step.type !== "hl_dual_path_assume"}
         >
           <HeadsLegsStepBody
             step={step}
@@ -284,6 +292,8 @@ function HeadsLegsProgressionPlayer({
             ruleInstance={ruleInstance}
             profile={meta.progressionProfile ?? 1}
             isLastStep={stepIndex >= playerSteps.length - 1}
+            assumePathIndex={assumePathIndex}
+            onAssumePathSelect={setAssumePathIndex}
             onAdvance={advance}
           />
         </TaskScreenShell>
@@ -306,6 +316,8 @@ function HeadsLegsStepBody({
   ruleInstance,
   profile,
   isLastStep,
+  assumePathIndex,
+  onAssumePathSelect,
   onAdvance,
 }: {
   step: HeadsLegsExtendedPlayerStep;
@@ -314,9 +326,17 @@ function HeadsLegsStepBody({
   ruleInstance: NonNullable<Task["headsLegsMeta"]>["ruleInstance"];
   profile: number;
   isLastStep: boolean;
+  assumePathIndex: 0 | 1 | null;
+  onAssumePathSelect: (index: 0 | 1) => void;
   onAdvance: () => void;
 }) {
   if (!ruleInstance) return null;
+
+  const meta = task.headsLegsMeta!;
+  const pathLines =
+    hasDualAssumePath(meta.methodTaskId) && assumePathIndex != null
+      ? resolveDualAssumeSolutionLines(meta.methodTaskId, assumePathIndex)
+      : undefined;
 
   switch (step.type) {
     case "hl_intro":
@@ -378,6 +398,17 @@ function HeadsLegsStepBody({
           stepId={step.id}
           instance={step.deriveRuleInstance}
           onComplete={onAdvance}
+        />
+      );
+    case "hl_dual_path_assume":
+      return (
+        <HeadsLegsDualPathAssumeStep
+          stepId={step.id}
+          config={step.dualAssumeConfig}
+          onComplete={(pathIndex) => {
+            onAssumePathSelect(pathIndex);
+            onAdvance();
+          }}
         />
       );
     case "hl_question_check":
@@ -479,14 +510,22 @@ function HeadsLegsStepBody({
     case "auto_explanation":
       return (
         <AutoExplanationStep
-          template={step.template!}
+          template={
+            pathLines && step.id.includes("-preview")
+              ? buildSolutionPreviewLines(pathLines)
+              : step.template!
+          }
           role={resolveExplanationRole(step, isLastStep)}
           onComplete={onAdvance}
         />
       );
     case "word_solution":
       return (
-        <WordSolutionStep step={step} runnerContext="heads-legs" onComplete={onAdvance} />
+        <WordSolutionStep
+          step={pathLines ? { ...step, solutionLines: pathLines } : step}
+          runnerContext="heads-legs"
+          onComplete={onAdvance}
+        />
       );
     default:
       return null;
