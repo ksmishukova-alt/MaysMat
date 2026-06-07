@@ -19,6 +19,7 @@ import {
   shouldShowRuleScreen,
 } from "../base-pattern/progression";
 import { resolveHeadsLegsPilot } from "../pilot/resolve";
+import { TRANSFER_43_READ_HINT } from "../transfer-pattern/models";
 import { shouldInjectQuestionCheck } from "../value-pattern/progression";
 import {
   filterMultipleAnswersSteps,
@@ -236,7 +237,26 @@ export function buildHeadsLegsPlayerSteps(task: Task): HeadsLegsExtendedPlayerSt
   });
 
   const readStep = base[0];
-  let contentSteps = filterStepsForPilot(base.slice(1), profile, pilot.flowMode);
+  const rawContent = base.slice(1);
+
+  if (pilot.flowMode === "transfer") {
+    const readWithHint =
+      meta.methodTaskId === "4.3"
+        ? { ...readStep, hint: TRANSFER_43_READ_HINT }
+        : readStep;
+    const assume = rawContent.find(
+      (s) => s.type === "single_select" && s.id.includes("-assume"),
+    );
+    const word = rawContent.find((s) => s.type === "word_solution");
+    const preview = rawContent.find(
+      (s) => s.type === "auto_explanation" && s.id.includes("-preview"),
+    );
+    return applyPhaseMeta(
+      [readWithHint, assume, word, preview].filter(Boolean) as HeadsLegsExtendedPlayerStep[],
+    );
+  }
+
+  let contentSteps = filterStepsForPilot(rawContent, profile, pilot.flowMode);
 
   const prefix: HeadsLegsExtendedPlayerStep[] = [];
   const ruleTitle =

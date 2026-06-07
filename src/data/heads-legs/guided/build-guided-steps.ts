@@ -17,6 +17,7 @@ import {
   hasCustomTailSteps,
   skipsDefaultParticipant,
 } from "./custom";
+import { buildTransferAssumeStep43 } from "./custom/steps-4-3";
 
 function assumptionObjectPhrase(condition: string, totalObjects: number | null | undefined): string {
   if (totalObjects != null) {
@@ -186,7 +187,9 @@ export function buildGuidedSteps(meta: HeadsLegsTaskMeta): DiscriminatedTaskStep
     steps.push(buildAssumptionStep(meta.id, entities, meta.condition, meta.totals?.totalObjects, meta));
   }
 
-  if (hasCustomMiddleSteps(meta.methodTaskId)) {
+  if (meta.methodTaskId === "4.3") {
+    steps.push(buildTransferAssumeStep43(meta.id));
+  } else if (hasCustomMiddleSteps(meta.methodTaskId)) {
     const custom = buildCustomMiddleSteps(meta.methodTaskId, meta.id);
     if (custom) steps.push(...custom);
   } else if (flow.calcWorksheets) {
@@ -201,13 +204,16 @@ export function buildGuidedSteps(meta: HeadsLegsTaskMeta): DiscriminatedTaskStep
   steps.push({
     id: `${meta.id}-words`,
     type: "word_solution",
-    title: wordStepTitle(mode, flow.profile),
+    title:
+      meta.methodTaskId === "4.3" ? "Запиши решение с пропусками" : wordStepTitle(mode, flow.profile),
     hint:
-      flow.profile === "diagnostic"
-        ? "Объясни, какого числа не хватает и приведи примеры вариантов."
-        : flow.profile === "enumeration"
-          ? "Запиши проверку вариантов и итоговый ответ."
-          : "Собери полный текст решения. Ответ — полным предложением.",
+      meta.methodTaskId === "4.3"
+        ? "Запиши решение с пропусками. Проверь каждый шаг."
+        : flow.profile === "diagnostic"
+          ? "Объясни, какого числа не хватает и приведи примеры вариантов."
+          : flow.profile === "enumeration"
+            ? "Запиши проверку вариантов и итоговый ответ."
+            : "Собери полный текст решения. Ответ — полным предложением.",
     solutionMode: mode,
     solutionLines: lines,
     acceptedAnswers: meta.acceptedAnswers,
@@ -219,7 +225,7 @@ export function buildGuidedSteps(meta: HeadsLegsTaskMeta): DiscriminatedTaskStep
       id: `${meta.id}-preview`,
       type: "auto_explanation",
       explanationRole: "preview",
-      title: "Что мы сделали?",
+      title: meta.methodTaskId === "4.3" ? "Ответ" : "Что мы сделали?",
       hint: "Прочитай готовый текст — так пишут на контрольной.",
       template: buildSolutionPreviewLines(lines),
     });

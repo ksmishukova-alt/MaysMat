@@ -1,10 +1,13 @@
 import { BASE_PATTERN_PILOT } from "../base-pattern/models";
 import { PRODUCTION_PATTERN_PILOT } from "../production-pattern/models";
 import { SCORE_PATTERN_PILOT } from "../score-pattern/models";
+import { TRANSFER_PATTERN_PILOT } from "../transfer-pattern/models";
 import { VALUE_PATTERN_PILOT } from "../value-pattern/models";
 import type { HeadsLegsPilotMeta } from "./types";
 
 export function resolveHeadsLegsPilot(methodTaskId: string): HeadsLegsPilotMeta | undefined {
+  const transfer = TRANSFER_PATTERN_PILOT[methodTaskId];
+  if (transfer) return transfer;
   const base = BASE_PATTERN_PILOT[methodTaskId];
   if (base) return { ...base, patternKind: "base" as const };
   const production = PRODUCTION_PATTERN_PILOT[methodTaskId];
@@ -15,6 +18,7 @@ export function resolveHeadsLegsPilot(methodTaskId: string): HeadsLegsPilotMeta 
 }
 
 export const ALL_PILOT_METHOD_IDS = [
+  ...Object.keys(TRANSFER_PATTERN_PILOT),
   ...Object.keys(BASE_PATTERN_PILOT),
   ...Object.keys(VALUE_PATTERN_PILOT),
   ...Object.keys(PRODUCTION_PATTERN_PILOT),

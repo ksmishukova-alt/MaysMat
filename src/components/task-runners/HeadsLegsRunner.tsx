@@ -45,6 +45,7 @@ import { highlightConditionText } from "@/lib/highlight-condition";
 import { resolveChildRouteDisplayNumber } from "@/lib/branch-task-filter";
 import { useResolvedTasksForBranch } from "@/lib/use-task-store";
 import { isCompactRuleScreen } from "@/data/heads-legs/base-pattern/progression";
+import { resolveHeadsLegsPilot } from "@/data/heads-legs/pilot/resolve";
 
 interface HeadsLegsRunnerProps {
   task: Task;
@@ -68,6 +69,7 @@ function HeadsLegsProgressionPlayer({
   const router = useRouter();
   const meta = task.headsLegsMeta!;
   const ruleInstance = meta.ruleInstance!;
+  const pilot = resolveHeadsLegsPilot(meta.methodTaskId);
   const methodRule = getMethodRule(ruleInstance.ruleId);
 
   const playerSteps = useMemo(() => buildHeadsLegsPlayerSteps(task), [task]);
@@ -168,6 +170,14 @@ function HeadsLegsProgressionPlayer({
   const showPhaseHeader =
     step.screenPhaseTitle != null && step.screenPhaseTitle !== prevStep?.screenPhaseTitle;
   const isReadStep = step.type === "read_condition";
+  const branchSubtitle =
+    pilot?.flowMode === "transfer"
+      ? "Та же замена: по 2 или по 3"
+      : pilot?.patternKind === "score"
+        ? "Представим, что все одного типа"
+        : pilot?.patternKind === "production"
+          ? "Представим, что все сделали одинаково"
+          : "Представим, что все одного вида";
   const stepHintText =
     step.type !== "hl_intro" &&
     step.type !== "hl_method_rule" &&
@@ -200,7 +210,7 @@ function HeadsLegsProgressionPlayer({
           Головы и ноги · Задача {displayNumber}
         </div>
         <h2 className="text-xl font-bold">{task.title}</h2>
-        <p className="mt-1 text-sm text-gray-500">Представим, что все одного вида</p>
+        <p className="mt-1 text-sm text-gray-500">{branchSubtitle}</p>
         {!hideHeaderCondition ? (
           <p className="mt-4 whitespace-pre-line text-base leading-relaxed text-gray-700">
             {highlightConditionText(task.condition, "heads-legs")}
@@ -376,9 +386,11 @@ function HeadsLegsStepBody({
           condition={task.condition}
           highlightVariant="heads-legs"
           hintText={
-            profile >= 3
-              ? "Прочитай условие. Дальше выбери шаг метода или заполни решение."
-              : undefined
+            "hint" in step && step.hint
+              ? step.hint
+              : profile >= 3
+                ? "Прочитай условие. Дальше выбери шаг метода или заполни решение."
+                : undefined
           }
           onComplete={onAdvance}
         />

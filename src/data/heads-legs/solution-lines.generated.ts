@@ -3497,7 +3497,7 @@ export const HEADS_LEGS_SOLUTION_LINES: Record<string, SolutionLine[]> = {
   ],
   "4.3": [
     {
-      "template": "Представим, что каждая из [12] девочек получила по [2] открытки.",
+      "template": "Представим, что все [12] девочек получили по [2] открытки.",
       "blanks": [
         {
           "id": "4.3-b-0-0",
@@ -3518,12 +3518,13 @@ export const HEADS_LEGS_SOLUTION_LINES: Record<string, SolutionLine[]> = {
       ]
     },
     {
-      "template": "Тогда открыток было бы [12 x 2 = 24].",
+      "template": "Тогда открыток было бы: [12 × 2 = 24].",
       "blanks": [
         {
           "id": "4.3-b-1-0",
           "type": "expression",
           "accept": [
+            "12 × 2 = 24",
             "12 x 2 = 24"
           ]
         }
@@ -3543,50 +3544,40 @@ export const HEADS_LEGS_SOLUTION_LINES: Record<string, SolutionLine[]> = {
       ]
     },
     {
-      "template": "Лишняя открытка [25 - 24 = 1].",
+      "template": "Разница: [25 − 24 = 1].",
       "blanks": [
         {
           "id": "4.3-b-3-0",
           "type": "expression",
           "accept": [
+            "25 − 24 = 1",
             "25 - 24 = 1"
           ]
         }
       ]
     },
     {
-      "template": "Одна девочка с 3 открытками добавляет [3 - 2 = 1] открытку.",
+      "template": "Девочка с 3 открытками получает на [3 − 2 = 1] открытку больше.",
       "blanks": [
         {
           "id": "4.3-b-4-0",
           "type": "expression",
           "accept": [
+            "3 − 2 = 1",
             "3 - 2 = 1"
           ]
         }
       ]
     },
     {
-      "template": "По 3 открытки получила [1] девочка.",
+      "template": "Значит, по 3 открытки получила [1 ÷ 1 = 1] девочка.",
       "blanks": [
         {
           "id": "4.3-b-5-0",
-          "type": "number",
+          "type": "expression",
           "accept": [
-            "1",
-            1
-          ]
-        }
-      ]
-    },
-    {
-      "template": "Ответ: [1 девочка].",
-      "blanks": [
-        {
-          "id": "4.3-b-6-0",
-          "type": "object",
-          "accept": [
-            "1 девочка"
+            "1 ÷ 1 = 1",
+            "1 / 1 = 1"
           ]
         }
       ]

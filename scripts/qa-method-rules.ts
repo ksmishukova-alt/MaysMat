@@ -31,6 +31,10 @@ import {
   SCORE_PATTERN_PILOT,
   SCORE_PATTERN_PILOT_METHOD_IDS,
 } from "../src/data/heads-legs/score-pattern/models";
+import {
+  TRANSFER_PATTERN_PILOT,
+  TRANSFER_PATTERN_PILOT_METHOD_IDS,
+} from "../src/data/heads-legs/transfer-pattern/models";
 import { getScoreAudit, isMatchTotalPilot } from "../src/data/heads-legs/score-pattern/completeness-audit";
 import { isNonStandardProductionPilot } from "../src/data/heads-legs/production-pattern/completeness-audit";
 import { ALL_PILOT_METHOD_IDS } from "../src/data/heads-legs/pilot/resolve";
@@ -485,6 +489,60 @@ if (legacy && isHeadsLegsProgressionTask(legacy)) {
 } else {
   ok("heads-legs-1-10: старый DigitalTaskPlayer");
 }
+
+console.log("\n--- heads-legs transfer pattern ---\n");
+
+for (const methodId of TRANSFER_PATTERN_PILOT_METHOD_IDS) {
+  const task = Object.values(HEADS_LEGS_TASKS).find((t) => t.headsLegsMeta?.methodTaskId === methodId);
+  if (!task) {
+    fail(`transfer ${methodId}: задача не найдена`);
+    continue;
+  }
+  const pilot = TRANSFER_PATTERN_PILOT[methodId];
+  const meta = task.headsLegsMeta!;
+  const ri = meta.ruleInstance;
+
+  if (pilot.flowMode !== "transfer") {
+    fail(`${methodId}: flowMode !== transfer`);
+  }
+  if (ri?.ruleId !== "heads-legs-base") {
+    fail(`${task.id}: transfer без heads-legs-base rule`);
+  }
+  if (meta.progressionProfile !== pilot.progressionProfile) {
+    fail(`${task.id}: progressionProfile !== ${pilot.progressionProfile}`);
+  }
+
+  const steps = buildHeadsLegsPlayerSteps(task);
+  if (steps.some((s) => s.type === "hl_method_rule" || s.type === "hl_intro")) {
+    fail(`${task.id}: transfer не должен показывать rule/intro`);
+  }
+  if (steps.some((s) => s.type === "hl_score_replacement" || s.type === "hl_match_total")) {
+    fail(`${task.id}: transfer не должен использовать score-экраны`);
+  }
+  if (!steps.some((s) => s.type === "read_condition")) {
+    fail(`${task.id}: transfer без read_condition`);
+  }
+  if (!steps.some((s) => s.type === "single_select" && s.id.includes("-assume"))) {
+    fail(`${task.id}: transfer без assume`);
+  }
+  if (!steps.some((s) => s.type === "word_solution")) {
+    fail(`${task.id}: transfer без word_solution`);
+  }
+  if (!steps.some((s) => s.type === "auto_explanation" && s.id.includes("-preview"))) {
+    fail(`${task.id}: transfer без preview`);
+  }
+  if (steps.length !== 4) {
+    fail(`${task.id}: transfer ожидает 4 экрана, получено ${steps.length}`);
+  }
+
+  if (methodId === "4.3") {
+    ok("heads-legs-4-03: transfer 4 экрана, base rule");
+  }
+}
+
+ok(
+  `pilot transfer pattern: ${TRANSFER_PATTERN_PILOT_METHOD_IDS.length} задач (${TRANSFER_PATTERN_PILOT_METHOD_IDS.join(", ")})`,
+);
 
 console.log("\n--- heads-legs score pattern ---\n");
 

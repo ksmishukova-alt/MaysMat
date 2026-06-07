@@ -117,9 +117,10 @@ export const SCORE_COMPLETENESS_AUDIT: ScoreCompletenessRecord[] = [
     replacementStep: 1,
     assumeKind: "девочки с 2 открытками",
     expectedAnswer: 1,
-    recommendedFlow: "progression",
-    recommendedProfile: 2,
-    notes: "12×2=24; diff 1 → 1 девочка с 3 открытками. Feature override 4.3 есть.",
+    recommendedFlow: "word_solution",
+    recommendedProfile: 4,
+    notes:
+      "Transfer-сценарий: 4 экрана (условие → предположение → пропуски → ответ). Не score-runner. 12×2=24; diff 1 → 1 девочка с 3 открытками.",
   },
   {
     methodTaskId: "4.4",

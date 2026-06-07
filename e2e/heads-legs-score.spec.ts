@@ -52,37 +52,35 @@ test.describe("Heads-Legs score pattern pilot", () => {
     await expectFinishScreen(page, "heads-legs-4-02");
   });
 
-  test("4.03 — trial picture: все по 2, навигация назад", async ({ page }) => {
+  test("4.03 — transfer: 4 экрана, нейтральная рамка", async ({ page }) => {
     test.setTimeout(120_000);
     await openTaskFresh(page, "heads-legs-4-03", "methodist");
 
     await expect(page.getByTestId("task-runner-shell")).toBeVisible();
-    await page.getByRole("button", { name: "Понятно, решаю" }).click();
-    await page.waitForTimeout(1_100);
+    await expect(page.getByText("Та же замена: по 2 или по 3")).toBeVisible();
+    await expect(page.getByText(/Баллы: прибавили или вычли/i)).not.toBeVisible();
+    await expect(page.getByTestId("method-rule-screen")).not.toBeVisible();
+    await expect(page.getByText(/знакомый тип задачи/i)).toBeVisible();
+
     await page.getByRole("button", { name: "Прочитал, дальше" }).click();
     await page.waitForTimeout(1_100);
 
-    await advanceUntilVisible(page, "heads-legs-4-03", undefined, 40, "Выбери предположение");
-    await page.getByRole("button", { name: /По 2 открытки/i }).click();
+    await advanceUntilVisible(page, "heads-legs-4-03", undefined, 10, "Выбери пробное предположение");
+    await page
+      .getByRole("button", { name: /Представить, что все девочки получили по 2 открытки/i })
+      .click();
     await page.getByRole("button", { name: "Проверить" }).click();
     await page.waitForTimeout(1_100);
 
-    await expect(page.getByText("Пробная картина")).toBeVisible();
-    await expect(
-      page.getByText("Представим, что каждая девочка получила по 2 открытки."),
-    ).toBeVisible();
-    await expect(page.getByText(/12 × 2 =/)).toBeVisible();
-    await expect(page.getByText(/12 учеников/i)).not.toBeVisible();
-    await expect(
-      page.getByText("Сколько открыток было бы, если все 12 девочек получили по 2 открытки?"),
-    ).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Запиши решение с пропусками" })).toBeVisible();
+    await expect(page.getByText("Шаг 3 из 4")).toBeVisible();
 
     await expect(page.getByTestId("task-step-nav")).toBeVisible();
     await page.getByRole("button", { name: "← Назад" }).click();
     await page.waitForTimeout(500);
-    await expect(page.getByText("Выбери предположение")).toBeVisible();
+    await expect(page.getByText("Выбери пробное предположение")).toBeVisible();
 
-    await playTaskToFinish(page, "heads-legs-4-03", 120);
+    await playTaskToFinish(page, "heads-legs-4-03", 80);
     await expectFinishScreen(page, "heads-legs-4-03");
   });
 

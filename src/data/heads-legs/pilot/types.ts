@@ -11,5 +11,5 @@ export interface HeadsLegsPilotMeta {
   /** base — ноги/колёса; value — расход/цена; production — кто сколько сделал; score — баллы */
   patternKind: "base" | "value" | "production" | "score";
   /** Отдельный режим pilot (не смешивать с классической заменой) */
-  flowMode?: "standard" | "enumeration" | "multiple_answers";
+  flowMode?: "standard" | "enumeration" | "multiple_answers" | "transfer";
 }

@@ -180,12 +180,12 @@ async function completeDragSelect(page: Page, task: Task): Promise<boolean> {
 
 async function completeAssumeSelect(page: Page, task: Task): Promise<boolean> {
   const assumePrompt = page.getByText(
-    /Выбери предположение|Представим, что все \d+ (объектов|девочек)/,
+    /Выбери (пробное )?предположение|Представим, что все \d+ (объектов|девочек)/,
   );
   if (!(await assumePrompt.first().isVisible().catch(() => false))) return false;
 
   for (const step of task.steps) {
-    if (step.type !== "single_select" || step.title !== "Выбери предположение") continue;
+    if (step.type !== "single_select" || !step.id.includes("-assume")) continue;
     const correct = step.options.find((o) => o.correct);
     if (!correct) continue;
     const btn = page.getByRole("button", { name: correct.label }).first();
