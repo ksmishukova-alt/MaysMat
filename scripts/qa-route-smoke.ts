@@ -200,16 +200,17 @@ if (!branchViaAlias || branchViaAlias.id !== "proof-constructions") {
   }
 }
 
-// 3d. heads-legs — волна 4.03–4.05 в child route
+// 3d. heads-legs — child route (31 + allowlist 5.3 → UI №32)
 {
   const tasks = branchTasks("modeling-heads-legs");
   const listed = filterBranchTasksForList(tasks, { methodologyBank: false, showArchive: false });
   const waveIds = ["heads-legs-4-03", "heads-legs-4-04", "heads-legs-4-05"] as const;
+  const wave53 = "heads-legs-5-03";
 
-  if (listed.length !== 31) {
-    fail(`heads-legs: ожидалось 31 child-route задач, найдено ${listed.length}`);
+  if (listed.length !== 32) {
+    fail(`heads-legs: ожидалось 32 child-route задач, найдено ${listed.length}`);
   } else {
-    ok("heads-legs: 31 задач в child route");
+    ok("heads-legs: 32 задач в child route");
   }
 
   for (const id of waveIds) {
@@ -226,6 +227,24 @@ if (!branchViaAlias || branchViaAlias.id !== "proof-constructions") {
     }
   }
   ok(`heads-legs wave: ${waveIds.join(", ")} в child route`);
+
+  const t53 = allTasks[wave53];
+  if (!t53) {
+    fail(`${wave53}: не найдена`);
+  } else {
+    if (!canAccessTask(t53, "child")) {
+      fail(`${wave53}: должна открываться без mode=methodist`);
+    }
+    if (!listed.some((t) => t.id === wave53)) {
+      fail(`${wave53}: нет в списке /branch/heads-legs`);
+    }
+    const idx = listed.findIndex((t) => t.id === wave53);
+    if (idx !== 31) {
+      fail(`${wave53}: ожидался UI-порядок 32 (index 31), index=${idx}`);
+    } else {
+      ok(`${wave53}: UI №32 в child route`);
+    }
+  }
 }
 
 // 4. /branch/constructions — архив скрыт по умолчанию
@@ -295,6 +314,10 @@ const directCases: Array<{
   { id: "heads-legs-4-04", child: true, archivePreview: false, methodist: true },
   { id: "heads-legs-4-05", child: true, archivePreview: false, methodist: true },
   { id: "heads-legs-5-01", child: false, archivePreview: false, methodist: true },
+  { id: "heads-legs-5-03", child: true, archivePreview: false, methodist: true },
+  { id: "heads-legs-5-05", child: false, archivePreview: false, methodist: true },
+  { id: "heads-legs-5-06", child: false, archivePreview: false, methodist: true },
+  { id: "heads-legs-5-07", child: false, archivePreview: false, methodist: true },
 ];
 
 for (const c of directCases) {

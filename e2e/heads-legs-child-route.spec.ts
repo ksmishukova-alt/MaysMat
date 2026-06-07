@@ -5,10 +5,11 @@ const PUBLISHED_WAVE = [
   { routeNum: 29, taskId: "heads-legs-4-03", title: "Открытки девочкам" },
   { routeNum: 30, taskId: "heads-legs-4-04", title: "Матчи двух команд" },
   { routeNum: 31, taskId: "heads-legs-4-05", title: "Экзамен Васи" },
+  { routeNum: 32, taskId: "heads-legs-5-03", title: "Банты и Ранкоры" },
 ] as const;
 
-test.describe("Heads-Legs child route wave 4.03–4.05", () => {
-  test("/branch/heads-legs — задачи 29–31 доступны, не «скоро»", async ({ page }) => {
+test.describe("Heads-Legs child route wave 4.03–4.05 + 5.03", () => {
+  test("/branch/heads-legs — задачи 29–32 доступны, не «скоро»", async ({ page }) => {
     await page.goto("/branch/heads-legs");
     await page.waitForLoadState("networkidle");
 

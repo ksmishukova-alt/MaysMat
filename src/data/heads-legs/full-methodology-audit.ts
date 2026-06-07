@@ -120,7 +120,9 @@ const AUDIT_BY_METHOD_ID: Record<
     | "legacyPatternId"
     | "currentRuleId"
     | "currentFlowMode"
-  > & { recommendedRuleId?: string }
+    | "canonicalPublishRecommendation"
+    | "publishRecommendation"
+  > & { recommendedRuleId?: string; publishRecommendation: PublishRecommendation }
 > = {
   "1.1": {
     primaryMethod: "standard_replacement",
@@ -992,19 +994,21 @@ export function collectMethodologyAuditIssues(
   }
 
   if (childVisible) {
+    const allowlisted = PUBLICATION_CANDIDATE_CHILD_ROUTE_ALLOWLIST.has(record.taskId);
     if (record.canonicalPublishRecommendation === "blocked") {
       issues.push("blocked_in_child_route");
     }
     if (record.canonicalPublishRecommendation === "methodistOnly") {
       issues.push("methodist_only_in_child_route");
     }
-    if (record.canonicalPublishRecommendation === "publicationCandidate") {
+    if (record.canonicalPublishRecommendation === "publicationCandidate" && !allowlisted) {
       issues.push("publication_candidate_in_child_route");
     }
     if (
       PATTERN5_FROZEN &&
       record.legacyPatternId === 5 &&
-      record.canonicalPublishRecommendation !== "childRoute"
+      record.canonicalPublishRecommendation !== "childRoute" &&
+      !allowlisted
     ) {
       issues.push("pattern5_frozen_in_child_route");
     }

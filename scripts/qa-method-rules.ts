@@ -61,7 +61,10 @@ import {
   HEADS_LEGS_FULL_METHODOLOGY_AUDIT,
   PATTERN5_FROZEN,
 } from "../src/data/heads-legs/full-methodology-audit";
-import { CANONICAL_PUBLISH_BY_METHOD } from "../src/data/heads-legs/full-methodology-audit-publish";
+import {
+  CANONICAL_PUBLISH_BY_METHOD,
+  PUBLICATION_CANDIDATE_CHILD_ROUTE_ALLOWLIST,
+} from "../src/data/heads-legs/full-methodology-audit-publish";
 
 const FORBIDDEN_UI_TERMS = [
   "runnerKind",
@@ -834,20 +837,39 @@ const task53 = HEADS_LEGS_TASKS["heads-legs-5-03"];
 if (!task53) {
   fail("heads-legs-5-03 не найдена");
 } else {
-  if (task53.number <= HEADS_LEGS_CHILD_ROUTE_MAX_NUMBER && isChildVisible(task53.publishing!)) {
-    fail("heads-legs-5-03 не должна быть в childRoute при лимите 31");
+  const published53 = PUBLICATION_CANDIDATE_CHILD_ROUTE_ALLOWLIST.has("heads-legs-5-03");
+  if (published53) {
+    if (!isChildVisible(task53.publishing!)) {
+      fail("heads-legs-5-03: должна быть в childRoute после allowlist");
+    } else {
+      ok("heads-legs-5-03: childRoute через allowlist (UI №32)");
+    }
+    if (!canAccessTask(task53, "child")) {
+      fail("heads-legs-5-03: должна открываться без mode=methodist");
+    } else {
+      ok("heads-legs-5-03: child mode OK");
+    }
+    if (task53.publishing?.routeOrder !== 32) {
+      fail(`heads-legs-5-03: routeOrder должен быть 32, получено ${task53.publishing?.routeOrder}`);
+    } else {
+      ok("heads-legs-5-03: routeOrder = 32");
+    }
   } else {
-    ok(`heads-legs-5-03: не childRoute при max=${HEADS_LEGS_CHILD_ROUTE_MAX_NUMBER}`);
-  }
-  if (!canAccessTask(task53, "methodist")) {
-    fail("heads-legs-5-03 должна открываться в methodist mode");
-  } else {
-    ok("heads-legs-5-03: methodist mode OK");
-  }
-  if (canAccessTask(task53, "child")) {
-    fail("heads-legs-5-03 не должна открываться в child mode");
-  } else {
-    ok("heads-legs-5-03: child mode blocked");
+    if (task53.number <= HEADS_LEGS_CHILD_ROUTE_MAX_NUMBER && isChildVisible(task53.publishing!)) {
+      fail("heads-legs-5-03 не должна быть в childRoute без allowlist");
+    } else {
+      ok(`heads-legs-5-03: не childRoute без allowlist (max=${HEADS_LEGS_CHILD_ROUTE_MAX_NUMBER})`);
+    }
+    if (!canAccessTask(task53, "methodist")) {
+      fail("heads-legs-5-03 должна открываться в methodist mode");
+    } else {
+      ok("heads-legs-5-03: methodist mode OK");
+    }
+    if (canAccessTask(task53, "child")) {
+      fail("heads-legs-5-03 не должна открываться в child mode без allowlist");
+    } else {
+      ok("heads-legs-5-03: child mode blocked без allowlist");
+    }
   }
   if (task53.headsLegsMeta?.ruleInstance?.ruleId !== "heads-legs-base") {
     fail("heads-legs-5-03: ruleInstance должен быть heads-legs-base (transfer)");
@@ -894,11 +916,16 @@ if (!PATTERN5_BLOCKED_TASK_IDS.includes("heads-legs-5-07")) {
 
 const pattern5ChildLeaks = PATTERN5_COMPLETENESS_AUDIT.filter((r) => {
   const task = HEADS_LEGS_TASKS[r.taskId];
-  return task && isChildVisible(task.publishing!);
+  if (!task || !isChildVisible(task.publishing!)) return false;
+  return !PUBLICATION_CANDIDATE_CHILD_ROUTE_ALLOWLIST.has(r.taskId);
 });
 if (pattern5ChildLeaks.length) {
   fail(
     `pattern 5 не должен публиковаться в childRoute: ${pattern5ChildLeaks.map((r) => r.taskId).join(", ")}`,
+  );
+} else if (PUBLICATION_CANDIDATE_CHILD_ROUTE_ALLOWLIST.size > 0) {
+  ok(
+    `pattern 5 в childRoute только allowlist: ${[...PUBLICATION_CANDIDATE_CHILD_ROUTE_ALLOWLIST].join(", ")}`,
   );
 } else {
   ok("pattern 5 не опубликован в childRoute");
@@ -972,11 +999,16 @@ for (const record of HEADS_LEGS_FULL_METHODOLOGY_AUDIT) {
 if (PATTERN5_FROZEN) {
   const pattern5Child = HEADS_LEGS_FULL_METHODOLOGY_AUDIT.filter((r) => {
     if (r.legacyPatternId !== 5) return false;
+    if (PUBLICATION_CANDIDATE_CHILD_ROUTE_ALLOWLIST.has(r.taskId)) return false;
     const task = HEADS_LEGS_TASKS[r.taskId];
     return task?.publishing && isChildVisible(task.publishing);
   });
   if (pattern5Child.length) {
     fail(`pattern 5 frozen: childRoute leak ${pattern5Child.map((r) => r.taskId).join(", ")}`);
+  } else if (PUBLICATION_CANDIDATE_CHILD_ROUTE_ALLOWLIST.size > 0) {
+    ok(
+      `pattern 5 frozen: allowlist в childRoute ${[...PUBLICATION_CANDIDATE_CHILD_ROUTE_ALLOWLIST].join(", ")}`,
+    );
   } else {
     ok("pattern 5 frozen: нет утечек в childRoute");
   }

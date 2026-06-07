@@ -68,7 +68,7 @@ export const CANONICAL_PUBLISH_BY_METHOD: Record<string, PublishRecommendation> 
 export const PATTERN5_FROZEN = true;
 
 /** После smoke + e2e — явный allowlist publicationCandidate в childRoute */
-export const PUBLICATION_CANDIDATE_CHILD_ROUTE_ALLOWLIST = new Set<string>([]);
+export const PUBLICATION_CANDIDATE_CHILD_ROUTE_ALLOWLIST = new Set<string>(["heads-legs-5-03"]);
 
 export interface HeadsLegsAuditPublishGuard {
   canonicalPublishRecommendation: PublishRecommendation;

@@ -19,14 +19,18 @@ import {
 } from "@/data/heads-legs/pattern-5/completeness-audit";
 import type { QaIssue, TaskPublishingMeta, VisualStatus } from "./types";
 
-/** Явный allowlist pattern 5 / publicationCandidate в child route — пуст до smoke и e2e */
-const PATTERN5_CHILD_ROUTE_ALLOWLIST = new Set<string>([]);
-
 /** Lazy import — разрыв цикла build-task → resolve → full-methodology-audit → build-task */
-function headsLegsAuditPublishGuard(taskId: string) {
+function headsLegsAuditPublishModule() {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const mod = require("@/data/heads-legs/full-methodology-audit-publish") as typeof import("@/data/heads-legs/full-methodology-audit-publish");
-  return mod.getHeadsLegsAuditPublishGuard(taskId);
+  return require("@/data/heads-legs/full-methodology-audit-publish") as typeof import("@/data/heads-legs/full-methodology-audit-publish");
+}
+
+function headsLegsAuditPublishGuard(taskId: string) {
+  return headsLegsAuditPublishModule().getHeadsLegsAuditPublishGuard(taskId);
+}
+
+function pattern5ChildRouteAllowlist(): Set<string> {
+  return headsLegsAuditPublishModule().PUBLICATION_CANDIDATE_CHILD_ROUTE_ALLOWLIST;
 }
 
 const EXTERNAL_REF_RE = /см\.\s*задач|см\.\s*решение|задача\s*#\d|задача\s*1#/i;
@@ -150,13 +154,16 @@ function defaultTier(task: Task, issues: QaIssue[]): TaskPublishingMeta["publish
       if (audit.pattern5Frozen && audit.legacyPatternId === 5 && !audit.canAutoPublish) {
         return "methodistOnly";
       }
+      if (audit.canAutoPublish && audit.canonicalPublishRecommendation === "publicationCandidate") {
+        return "childRoute";
+      }
     }
 
     if (mid && requiresPattern5Runner(mid)) {
       if (
         PATTERN5_BLOCKED_TASK_IDS.includes(task.id) ||
         PATTERN5_METHODIST_ONLY_UNTIL_RUNNER.includes(task.id) ||
-        !PATTERN5_CHILD_ROUTE_ALLOWLIST.has(task.id)
+        !pattern5ChildRouteAllowlist().has(task.id)
       ) {
         return "methodistOnly";
       }

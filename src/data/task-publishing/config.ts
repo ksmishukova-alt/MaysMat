@@ -1,7 +1,10 @@
 import type { PublishTier, QaIssue, QaStatus, TaskPublishingMeta, VisualStatus } from "./types";
 
-/** Первая волна детского маршрута: «Головы и ноги» (31 задача, этапы 1–4 включая 4.03–4.05) */
+/** Первая волна детского маршрута: «Головы и ноги» (31 задача + allowlist publicationCandidate) */
 export const HEADS_LEGS_CHILD_ROUTE_MAX_NUMBER = 31;
+
+/** UI-порядок опубликованной 5.3 в детском маршруте (catalogNumber = 34) */
+export const HEADS_LEGS_CHILD_ROUTE_WAVE_5_3_ROUTE_ORDER = 32;
 
 /** Базовый Дирихле — OK / исправленные задачи первой волны (methodTaskId → routeOrder) */
 export const DIRICHLET_CHILD_ROUTE: Record<string, number> = {
@@ -99,4 +102,9 @@ export const MANUAL_PUBLISHING: Record<string, ManualPublishingOverride> = {
   "dirichlet-t4-45": { publishTier: "hidden", qaStatus: "blocked", requiresVisual: true, visualStatus: "missing", forceIssues: ["missing_visual_asset"] },
   "dirichlet-t4-46": { publishTier: "hidden", qaStatus: "blocked", requiresVisual: true, visualStatus: "missing", forceIssues: ["missing_visual_asset"] },
   "dirichlet-t4-47": { publishTier: "hidden", qaStatus: "blocked", requiresVisual: true, visualStatus: "missing", forceIssues: ["missing_visual_asset"] },
+  "heads-legs-5-03": {
+    publishTier: "childRoute",
+    qaStatus: "ready",
+    routeOrder: HEADS_LEGS_CHILD_ROUTE_WAVE_5_3_ROUTE_ORDER,
+  },
 };
