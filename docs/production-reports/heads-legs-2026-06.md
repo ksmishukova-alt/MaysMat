@@ -96,3 +96,12 @@ Production smoke (https://album-myshleniya.vercel.app, post-`f9b0e4f`):
 | `/tasks/heads-legs-5-06?mode=methodist` | Dual-path assume; Jedi path → «Не хватает кристаллов»; Sith path → «Лишних кристаллов» |
 
 Production smoke — **passed** (2026-06-05, post-`f9b0e4f`).
+
+## Next wave (planned, not started)
+
+**Wave P1:** single-path assume cleanup for childRoute 1.x–3.x.
+
+- Audit: `docs/heads-legs-wave-p1-single-path-assume.md`
+- Typed source: `src/data/heads-legs/wave-p1/single-path-assume-audit.ts`
+- **7 fix candidates** (2-й путь valid + single-path assume); no childRoute/allowlist changes in this wave.
+- Representative e2e targets (proposed): 1.1, 2.1, 3.3
