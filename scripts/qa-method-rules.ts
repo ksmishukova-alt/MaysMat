@@ -56,6 +56,12 @@ import { ALL_PILOT_METHOD_IDS } from "../src/data/heads-legs/pilot/resolve";
 import { buildHeadsLegsPlayerSteps, isHeadsLegsProgressionTask } from "../src/data/heads-legs/base-pattern/build-player-steps";
 import { isChildVisible } from "../src/data/task-publishing/resolve";
 import { resolveRunnerKind } from "../src/lib/resolve-runner-kind";
+import {
+  collectMethodologyAuditIssues,
+  HEADS_LEGS_FULL_METHODOLOGY_AUDIT,
+  PATTERN5_FROZEN,
+} from "../src/data/heads-legs/full-methodology-audit";
+import { CANONICAL_PUBLISH_BY_METHOD } from "../src/data/heads-legs/full-methodology-audit-publish";
 
 const FORBIDDEN_UI_TERMS = [
   "runnerKind",
@@ -897,6 +903,88 @@ if (pattern5ChildLeaks.length) {
 } else {
   ok("pattern 5 не опубликован в childRoute");
 }
+
+console.log("\n--- heads-legs full methodology audit ---\n");
+
+if (HEADS_LEGS_FULL_METHODOLOGY_AUDIT.length !== 51) {
+  fail(`full-methodology-audit: ожидалось 51 задач, найдено ${HEADS_LEGS_FULL_METHODOLOGY_AUDIT.length}`);
+} else {
+  ok("full-methodology-audit: 51 задача");
+}
+
+for (const record of HEADS_LEGS_FULL_METHODOLOGY_AUDIT) {
+  const canonical = CANONICAL_PUBLISH_BY_METHOD[record.methodTaskId];
+  if (canonical !== record.canonicalPublishRecommendation) {
+    fail(
+      `${record.methodTaskId}: CANONICAL_PUBLISH_BY_METHOD (${canonical}) !== audit (${record.canonicalPublishRecommendation})`,
+    );
+  }
+}
+ok("CANONICAL_PUBLISH_BY_METHOD синхронизирован с full-methodology-audit");
+
+let legacyReserveInChild = 0;
+
+for (const record of HEADS_LEGS_FULL_METHODOLOGY_AUDIT) {
+  const task = HEADS_LEGS_TASKS[record.taskId];
+  if (!task) {
+    fail(`${record.taskId}: нет в HEADS_LEGS_TASKS`);
+    continue;
+  }
+
+  const childVisible = Boolean(task.publishing && isChildVisible(task.publishing));
+  const issues = collectMethodologyAuditIssues(record, { childRouteVisible: childVisible });
+
+  for (const issue of issues) {
+    fail(`${record.taskId} (${record.methodTaskId}): ${issue}`);
+  }
+
+  if (
+    childVisible &&
+    record.canonicalPublishRecommendation === "reserve"
+  ) {
+    legacyReserveInChild++;
+    console.warn(
+      `⚠ ${record.taskId}: reserve в childRoute (legacy tolerated): ${record.notes}`,
+    );
+  }
+
+  if (
+    record.primaryMethod === "transfer_replacement" &&
+    record.preludeType === "none"
+  ) {
+    const pilot = resolveHeadsLegsPilot(record.methodTaskId);
+    if (pilot?.flowMode === "derive" || pilot?.ruleInstance.ruleId === "heads-legs-derive-base") {
+      fail(`${record.methodTaskId}: transfer_replacement + prelude none → не derive-base`);
+    }
+  }
+
+  if (isHeadsLegsProgressionTask(task)) {
+    const steps = buildHeadsLegsPlayerSteps(task);
+    if (
+      record.primaryMethod === "transfer_replacement" &&
+      steps.some((s) => s.type === "hl_derive_prelude")
+    ) {
+      fail(`${record.taskId}: transfer не должен иметь hl_derive_prelude`);
+    }
+  }
+}
+
+if (PATTERN5_FROZEN) {
+  const pattern5Child = HEADS_LEGS_FULL_METHODOLOGY_AUDIT.filter((r) => {
+    if (r.legacyPatternId !== 5) return false;
+    const task = HEADS_LEGS_TASKS[r.taskId];
+    return task?.publishing && isChildVisible(task.publishing);
+  });
+  if (pattern5Child.length) {
+    fail(`pattern 5 frozen: childRoute leak ${pattern5Child.map((r) => r.taskId).join(", ")}`);
+  } else {
+    ok("pattern 5 frozen: нет утечек в childRoute");
+  }
+}
+
+ok(
+  `full methodology audit: runner/publish guards OK (${legacyReserveInChild} legacy reserve в childRoute — см. warnings)`,
+);
 
 console.log(`\n=== Итого: ${errors} ошибок ===`);
 process.exit(errors > 0 ? 1 : 0);

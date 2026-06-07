@@ -19,8 +19,15 @@ import {
 } from "@/data/heads-legs/pattern-5/completeness-audit";
 import type { QaIssue, TaskPublishingMeta, VisualStatus } from "./types";
 
-/** Явный allowlist pattern 5 в child route — пуст до smoke и поднятия лимита */
+/** Явный allowlist pattern 5 / publicationCandidate в child route — пуст до smoke и e2e */
 const PATTERN5_CHILD_ROUTE_ALLOWLIST = new Set<string>([]);
+
+/** Lazy import — разрыв цикла build-task → resolve → full-methodology-audit → build-task */
+function headsLegsAuditPublishGuard(taskId: string) {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const mod = require("@/data/heads-legs/full-methodology-audit-publish") as typeof import("@/data/heads-legs/full-methodology-audit-publish");
+  return mod.getHeadsLegsAuditPublishGuard(taskId);
+}
 
 const EXTERNAL_REF_RE = /см\.\s*задач|см\.\s*решение|задача\s*#\d|задача\s*1#/i;
 const INCOMPLETE_COND_RE = /не превосходит\s*\.|не превосходит\s*$/i;
@@ -129,6 +136,22 @@ function defaultTier(task: Task, issues: QaIssue[]): TaskPublishingMeta["publish
 
   if (task.headsLegsMeta) {
     const mid = task.headsLegsMeta.methodTaskId;
+    const audit = headsLegsAuditPublishGuard(task.id);
+
+    if (audit) {
+      if (audit.canonicalPublishRecommendation === "blocked") return "methodistOnly";
+      if (audit.canonicalPublishRecommendation === "methodistOnly") return "methodistOnly";
+      if (
+        audit.canonicalPublishRecommendation === "publicationCandidate" &&
+        !audit.canAutoPublish
+      ) {
+        return "methodistOnly";
+      }
+      if (audit.pattern5Frozen && audit.legacyPatternId === 5 && !audit.canAutoPublish) {
+        return "methodistOnly";
+      }
+    }
+
     if (mid && requiresPattern5Runner(mid)) {
       if (
         PATTERN5_BLOCKED_TASK_IDS.includes(task.id) ||
