@@ -99,11 +99,34 @@ export interface HeadsLegsScoreRuleInstance {
   showRuleScreen?: boolean;
 }
 
+/** Prelude + стандартная замена (паттерн 5) */
+export interface HeadsLegsDeriveRuleInstance {
+  ruleId: "heads-legs-derive-base";
+  totalObjects: number;
+  totalFeature: number;
+  firstKind: string;
+  firstFeature: number;
+  secondKind: string;
+  secondFeature: number;
+  featureName: string;
+  assumeKind: string;
+  replacementStep: number;
+  questionAsks: string;
+  preludeQuestion: string;
+  preludeChoices: Array<{ id: string; label: string; correct: boolean }>;
+  assumeKindPhrase?: string;
+  objectsLabel?: string;
+  sceneIntro?: string;
+  featureLines?: [string, string];
+  showRuleScreen?: boolean;
+}
+
 export type HeadsLegsMethodRuleInstance =
   | HeadsLegsRuleInstance
   | HeadsLegsValueRuleInstance
   | HeadsLegsProductionRuleInstance
-  | HeadsLegsScoreRuleInstance;
+  | HeadsLegsScoreRuleInstance
+  | HeadsLegsDeriveRuleInstance;
 
 export type TaskCompletenessStatus =
   | "complete_unique_answer"

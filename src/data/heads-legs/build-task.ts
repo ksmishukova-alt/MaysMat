@@ -143,7 +143,17 @@ export function catalogEntryToMeta(entry: HeadsLegsCatalogEntry): HeadsLegsTaskM
       ? pilot.ruleInstance
       : undefined;
 
-  const totalsFromPilot = productionPilot
+  const derivePilot =
+    pilot?.patternKind === "derive" && pilot.ruleInstance.ruleId === "heads-legs-derive-base"
+      ? pilot.ruleInstance
+      : undefined;
+
+  const totalsFromPilot = derivePilot
+    ? {
+        totalObjects: derivePilot.totalObjects,
+        totalFeature: derivePilot.totalFeature,
+      }
+    : productionPilot
     ? {
         totalObjects: productionPilot.totalParticipants ?? null,
         totalFeature: productionPilot.totalResult,

@@ -16,6 +16,7 @@ import {
 } from "@/components/method/HeadsLegsMethodRuleScreen";
 import { HeadsLegsMethodChooseStep } from "@/components/task-runners/heads-legs/HeadsLegsMethodChooseStep";
 import { HeadsLegsQuestionCheckStep } from "@/components/task-runners/heads-legs/HeadsLegsQuestionCheckStep";
+import { HeadsLegsDerivePreludeStep } from "@/components/task-runners/heads-legs/HeadsLegsDerivePreludeStep";
 import { MatchTotalStep } from "@/components/task-runners/heads-legs/MatchTotalStep";
 import { ScoreQuestionCheckStep } from "@/components/task-runners/heads-legs/ScoreQuestionCheckStep";
 import { ScoreReplacementStep } from "@/components/task-runners/heads-legs/ScoreReplacementStep";
@@ -272,9 +273,9 @@ function HeadsLegsProgressionPlayer({
           phaseIndex={step.screenPhaseIndex}
           phaseCount={step.screenPhaseCount}
           showPhaseHeader={showPhaseHeader}
-          stepTitle={!isReadStep && step.type !== "hl_intro" && step.type !== "hl_method_rule" && step.type !== "hl_question_check" && step.type !== "hl_score_question_check" && step.type !== "hl_score_replacement" && step.type !== "hl_match_total" ? step.title : undefined}
+          stepTitle={!isReadStep && step.type !== "hl_intro" && step.type !== "hl_method_rule" && step.type !== "hl_question_check" && step.type !== "hl_score_question_check" && step.type !== "hl_score_replacement" && step.type !== "hl_match_total" && step.type !== "hl_derive_prelude" ? step.title : undefined}
           hint={stepHintText && !isReadStep ? stepHintText : undefined}
-          showStepTitle={!isReadStep && step.type !== "hl_intro" && step.type !== "hl_method_rule" && step.type !== "hl_question_check" && step.type !== "hl_score_question_check" && step.type !== "hl_score_replacement" && step.type !== "hl_match_total"}
+          showStepTitle={!isReadStep && step.type !== "hl_intro" && step.type !== "hl_method_rule" && step.type !== "hl_question_check" && step.type !== "hl_score_question_check" && step.type !== "hl_score_replacement" && step.type !== "hl_match_total" && step.type !== "hl_derive_prelude"}
         >
           <HeadsLegsStepBody
             step={step}
@@ -368,6 +369,14 @@ function HeadsLegsStepBody({
         <MatchTotalStep
           stepId={step.id}
           instance={step.scoreRuleInstance}
+          onComplete={onAdvance}
+        />
+      );
+    case "hl_derive_prelude":
+      return (
+        <HeadsLegsDerivePreludeStep
+          stepId={step.id}
+          instance={step.deriveRuleInstance}
           onComplete={onAdvance}
         />
       );

@@ -71,6 +71,9 @@ const samples: Array<{ id: string; child: boolean; archivePreview: boolean; meth
     { id: "heads-legs-4-04", child: true, archivePreview: false, methodist: true },
     { id: "heads-legs-4-05", child: true, archivePreview: false, methodist: true },
     { id: "heads-legs-5-01", child: false, archivePreview: false, methodist: true },
+    { id: "heads-legs-5-03", child: false, archivePreview: false, methodist: true },
+    { id: "heads-legs-5-05", child: false, archivePreview: false, methodist: true },
+    { id: "heads-legs-5-07", child: false, archivePreview: false, methodist: true },
   ];
 
 console.log("=== QA: доступ к задачам ===\n");

@@ -12,6 +12,7 @@ import {
   headsLegsValueBaseRule,
   headsLegsProductionBaseRule,
   headsLegsScoreBaseRule,
+  headsLegsDeriveBaseRule,
   getMethodRule,
 } from "../src/data/method-rules";
 import { HEADS_LEGS_TASKS } from "../src/data/heads-legs/build-task";
@@ -35,7 +36,18 @@ import {
   TRANSFER_PATTERN_PILOT,
   TRANSFER_PATTERN_PILOT_METHOD_IDS,
 } from "../src/data/heads-legs/transfer-pattern/models";
+import {
+  DERIVE_PATTERN_PILOT,
+  DERIVE_PATTERN_PILOT_METHOD_IDS,
+} from "../src/data/heads-legs/derive-pattern/models";
+import {
+  PATTERN5_BLOCKED_TASK_IDS,
+  PATTERN5_COMPLETENESS_AUDIT,
+  PATTERN5_METHODIST_ONLY_UNTIL_RUNNER,
+} from "../src/data/heads-legs/pattern-5/completeness-audit";
+import { HEADS_LEGS_CHILD_ROUTE_MAX_NUMBER } from "../src/data/task-publishing/config";
 import { getScoreAudit, isMatchTotalPilot } from "../src/data/heads-legs/score-pattern/completeness-audit";
+import { canAccessTask } from "../src/lib/task-access-mode";
 import { isNonStandardProductionPilot } from "../src/data/heads-legs/production-pattern/completeness-audit";
 import { ALL_PILOT_METHOD_IDS } from "../src/data/heads-legs/pilot/resolve";
 import { buildHeadsLegsPlayerSteps, isHeadsLegsProgressionTask } from "../src/data/heads-legs/base-pattern/build-player-steps";
@@ -688,6 +700,157 @@ for (const methodId of SCORE_PATTERN_PILOT_METHOD_IDS) {
 ok(
   `pilot score pattern: ${SCORE_PATTERN_PILOT_METHOD_IDS.length} задач (${SCORE_PATTERN_PILOT_METHOD_IDS.join(", ")})`,
 );
+
+console.log("\n--- heads-legs derive pattern (Wave A) ---\n");
+
+if (!getMethodRule("heads-legs-derive-base")) {
+  fail("heads-legs-derive-base rule не найдено");
+} else {
+  ok("heads-legs-derive-base в registry");
+}
+
+for (const term of FORBIDDEN_UI_TERMS) {
+  const inDeriveRule = headsLegsDeriveBaseRule.fullRule.some((l) => l.includes(term));
+  if (inDeriveRule) fail(`derive fullRule содержит «${term}»`);
+}
+if (!headsLegsDeriveBaseRule.fullRule.some((l) => l.includes("недостающ"))) {
+  fail("derive fullRule без шага про недостающие данные");
+} else {
+  ok("derive fullRule без служебных терминов");
+}
+
+function auditDerivePilot(methodId: string) {
+  const task = Object.values(HEADS_LEGS_TASKS).find((t) => t.headsLegsMeta?.methodTaskId === methodId);
+  if (!task) {
+    fail(`pilot ${methodId}: задача не найдена`);
+    return;
+  }
+  const pilot = DERIVE_PATTERN_PILOT[methodId];
+  const meta = task.headsLegsMeta!;
+  const ri = meta.ruleInstance;
+
+  if (pilot.flowMode !== "derive") {
+    fail(`${methodId}: flowMode !== derive`);
+  }
+  if (ri?.ruleId !== "heads-legs-derive-base") {
+    fail(`${task.id}: derive без heads-legs-derive-base rule`);
+  }
+  if (meta.progressionProfile !== pilot.progressionProfile) {
+    fail(`${task.id}: progressionProfile !== ${pilot.progressionProfile}`);
+  }
+
+  const steps = buildHeadsLegsPlayerSteps(task);
+  if (steps.some((s) => s.type === "hl_method_rule" || s.type === "hl_intro" && s.id.includes("-hl-intro"))) {
+    fail(`${task.id}: derive не должен показывать rule/intro profile-1`);
+  }
+  if (!steps.some((s) => s.type === "read_condition")) {
+    fail(`${task.id}: derive без read_condition`);
+  }
+  if (!steps.some((s) => s.type === "hl_derive_prelude")) {
+    fail(`${task.id}: derive без hl_derive_prelude`);
+  }
+  if (!steps.some((s) => s.type === "hl_intro" && s.id.includes("-derive-transition"))) {
+    fail(`${task.id}: derive без transition`);
+  }
+  if (!steps.some((s) => s.type === "single_select" && s.id.includes("-assume"))) {
+    fail(`${task.id}: derive без assume`);
+  }
+  if (!steps.some((s) => s.type === "hl_question_check")) {
+    fail(`${task.id}: derive без question_check`);
+  }
+  if (!steps.some((s) => s.type === "word_solution")) {
+    fail(`${task.id}: derive без word_solution`);
+  }
+  if (!steps.some((s) => s.type === "auto_explanation" && s.id.includes("-preview"))) {
+    fail(`${task.id}: derive без preview`);
+  }
+  if (steps.length !== 7) {
+    fail(`${task.id}: derive ожидает 7 экранов, получено ${steps.length}`);
+  }
+
+  if (methodId === "5.3") {
+    ok("heads-legs-5-03: derive 7 экранов, derive-base rule");
+  }
+}
+
+for (const methodId of DERIVE_PATTERN_PILOT_METHOD_IDS) {
+  auditDerivePilot(methodId);
+}
+
+ok(
+  `pilot derive pattern: ${DERIVE_PATTERN_PILOT_METHOD_IDS.length} задач (${DERIVE_PATTERN_PILOT_METHOD_IDS.join(", ")})`,
+);
+
+console.log("\n--- heads-legs pattern 5 publishing guard ---\n");
+
+const task53 = HEADS_LEGS_TASKS["heads-legs-5-03"];
+if (!task53) {
+  fail("heads-legs-5-03 не найдена");
+} else {
+  if (task53.number <= HEADS_LEGS_CHILD_ROUTE_MAX_NUMBER && isChildVisible(task53.publishing!)) {
+    fail("heads-legs-5-03 не должна быть в childRoute при лимите 31");
+  } else {
+    ok(`heads-legs-5-03: не childRoute при max=${HEADS_LEGS_CHILD_ROUTE_MAX_NUMBER}`);
+  }
+  if (!canAccessTask(task53, "methodist")) {
+    fail("heads-legs-5-03 должна открываться в methodist mode");
+  } else {
+    ok("heads-legs-5-03: methodist mode OK");
+  }
+  if (canAccessTask(task53, "child")) {
+    fail("heads-legs-5-03 не должна открываться в child mode");
+  } else {
+    ok("heads-legs-5-03: child mode blocked");
+  }
+}
+
+for (const taskId of ["heads-legs-5-05", "heads-legs-5-07"]) {
+  const task = HEADS_LEGS_TASKS[taskId];
+  if (!task) {
+    fail(`${taskId} не найдена`);
+    continue;
+  }
+  if (isChildVisible(task.publishing!)) {
+    fail(`${taskId} не должна быть в childRoute`);
+  } else {
+    ok(`${taskId}: childRoute blocked`);
+  }
+}
+
+const unsupportedReserve = PATTERN5_COMPLETENESS_AUDIT.filter(
+  (r) => r.solutionMode === "unsupported_for_now" && r.publishDecision === "reserve",
+);
+if (unsupportedReserve.length) {
+  fail(
+    `unsupported_for_now не может быть reserve: ${unsupportedReserve.map((r) => r.taskId).join(", ")}`,
+  );
+} else {
+  ok("unsupported_for_now задачи не в reserve");
+}
+
+if (!PATTERN5_METHODIST_ONLY_UNTIL_RUNNER.includes("heads-legs-5-05")) {
+  fail("5.5 должна быть в PATTERN5_METHODIST_ONLY_UNTIL_RUNNER");
+} else {
+  ok("5.5 в methodistOnly guard");
+}
+
+if (!PATTERN5_BLOCKED_TASK_IDS.includes("heads-legs-5-07")) {
+  fail("5.7 должна быть в PATTERN5_BLOCKED_TASK_IDS");
+} else {
+  ok("5.7 в blocked guard");
+}
+
+const pattern5ChildLeaks = PATTERN5_COMPLETENESS_AUDIT.filter((r) => {
+  const task = HEADS_LEGS_TASKS[r.taskId];
+  return task && isChildVisible(task.publishing!);
+});
+if (pattern5ChildLeaks.length) {
+  fail(
+    `pattern 5 не должен публиковаться в childRoute: ${pattern5ChildLeaks.map((r) => r.taskId).join(", ")}`,
+  );
+} else {
+  ok("pattern 5 не опубликован в childRoute");
+}
 
 console.log(`\n=== Итого: ${errors} ошибок ===`);
 process.exit(errors > 0 ? 1 : 0);

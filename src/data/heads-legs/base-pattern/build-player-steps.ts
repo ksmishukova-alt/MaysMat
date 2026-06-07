@@ -8,6 +8,7 @@ import {
 } from "@/data/method-rules";
 import type {
   HeadsLegsAnswerTransform,
+  HeadsLegsDeriveRuleInstance,
   HeadsLegsProductionRuleInstance,
   HeadsLegsScoreRuleInstance,
   HeadsLegsValueRuleInstance,
@@ -19,6 +20,10 @@ import {
   shouldShowRuleScreen,
 } from "../base-pattern/progression";
 import { resolveHeadsLegsPilot } from "../pilot/resolve";
+import {
+  DERIVE_53_READ_HINT,
+  DERIVE_TRANSITION_TEMPLATE,
+} from "../derive-pattern/models";
 import { TRANSFER_43_READ_HINT } from "../transfer-pattern/models";
 import { shouldInjectQuestionCheck } from "../value-pattern/progression";
 import {
@@ -99,6 +104,16 @@ export type HeadsLegsExtendedPlayerStep =
     }
   | {
       id: string;
+      type: "hl_derive_prelude";
+      title: string;
+      deriveRuleInstance: HeadsLegsDeriveRuleInstance;
+      screenPhaseId?: string;
+      screenPhaseTitle?: string;
+      screenPhaseIndex?: number;
+      screenPhaseCount?: number;
+    }
+  | {
+      id: string;
       type: "hl_match_total";
       title: string;
       scoreRuleInstance: HeadsLegsScoreRuleInstance;
@@ -124,7 +139,9 @@ function applyPhaseMeta(steps: HeadsLegsExtendedPlayerStep[]): HeadsLegsExtended
             ? "Шаг замены"
             : step.type === "hl_match_total"
               ? "Очки за матч"
-              : step.type === "read_condition"
+              : step.type === "hl_derive_prelude"
+                ? "Подготовка"
+                : step.type === "read_condition"
                 ? "Понимаем задачу"
                 : step.type === "hl_choose_method"
                   ? "Выбираем шаг"
@@ -183,7 +200,7 @@ function injectQuestionCheckBeforeWords(
 function filterStepsForPilot(
   steps: PlayerStep[],
   profile: 1 | 2 | 3 | 4,
-  flowMode?: "standard" | "enumeration" | "multiple_answers",
+  flowMode?: "standard" | "enumeration" | "multiple_answers" | "transfer" | "derive",
 ): PlayerStep[] {
   if (flowMode === "multiple_answers" && profile === 4) {
     return filterMultipleAnswersSteps(steps);
@@ -253,6 +270,58 @@ export function buildHeadsLegsPlayerSteps(task: Task): HeadsLegsExtendedPlayerSt
     );
     return applyPhaseMeta(
       [readWithHint, assume, word, preview].filter(Boolean) as HeadsLegsExtendedPlayerStep[],
+    );
+  }
+
+  if (pilot.flowMode === "derive") {
+    const deriveRi =
+      pilot.ruleInstance.ruleId === "heads-legs-derive-base"
+        ? pilot.ruleInstance
+        : undefined;
+    if (!deriveRi) {
+      return applyPhaseMeta([readStep, ...filterStepsForPilot(rawContent, profile, pilot.flowMode)]);
+    }
+
+    const readWithHint =
+      meta.methodTaskId === "5.3"
+        ? { ...readStep, hint: DERIVE_53_READ_HINT }
+        : readStep;
+    const assume = rawContent.find(
+      (s) => s.type === "single_select" && s.id.includes("-assume"),
+    );
+    const word = rawContent.find((s) => s.type === "word_solution");
+    const preview = rawContent.find(
+      (s) => s.type === "auto_explanation" && s.id.includes("-preview"),
+    );
+
+    return applyPhaseMeta(
+      [
+        readWithHint,
+        {
+          id: `${task.id}-hl-derive-prelude`,
+          type: "hl_derive_prelude",
+          title: "Что сначала нужно получить?",
+          deriveRuleInstance: deriveRi,
+          screenPhaseId: "derive-prelude",
+        },
+        {
+          id: `${task.id}-hl-derive-transition`,
+          type: "hl_intro",
+          title: "Знакомый метод",
+          template: DERIVE_TRANSITION_TEMPLATE,
+          screenPhaseId: "derive-transition",
+        },
+        assume,
+        {
+          id: `${task.id}-hl-question`,
+          type: "hl_question_check",
+          title: "Проверь вопрос задачи",
+          questionAsks: deriveRi.questionAsks,
+          screenPhaseId: "question-check",
+        },
+        word,
+        preview,
+      ].filter(Boolean) as HeadsLegsExtendedPlayerStep[],
     );
   }
 

@@ -180,7 +180,7 @@ async function completeDragSelect(page: Page, task: Task): Promise<boolean> {
 
 async function completeAssumeSelect(page: Page, task: Task): Promise<boolean> {
   const assumePrompt = page.getByText(
-    /Выбери (пробное )?предположение|Представим, что все \d+ (объектов|девочек)/,
+    /Выбери (пробное )?предположение|Представим, что все \d+ (объектов|девочек|существ)/,
   );
   if (!(await assumePrompt.first().isVisible().catch(() => false))) return false;
 
@@ -331,6 +331,24 @@ async function completeGenericStep(page: Page, task: Task): Promise<boolean> {
   }
   if (await page.getByTestId("question-check-step").isVisible().catch(() => false)) {
     return clickIfVisible(page, "Понятно, записываю ответ");
+  }
+  if (await page.getByTestId("derive-prelude-step").isVisible().catch(() => false)) {
+    const choiceBtn = page
+      .locator("button")
+      .filter({ hasText: "Сколько всего существ и сколько зубов" })
+      .first();
+    if (await choiceBtn.isVisible().catch(() => false)) {
+      await choiceBtn.click();
+      await clickIfVisible(page, "Проверить");
+    }
+    const objects = page.getByTestId("derive-totals-objects");
+    if (await objects.isVisible().catch(() => false)) {
+      await objects.fill("29");
+      await page.getByTestId("derive-totals-feature").fill("352");
+      await clickIfVisible(page, "Проверить");
+      return true;
+    }
+    return clickIfVisible(page, "Проверить");
   }
   if (await page.getByTestId("score-question-check-step").isVisible().catch(() => false)) {
     return clickIfVisible(page, "Понятно, записываю ответ");

@@ -12,7 +12,15 @@ import {
   MANUAL_PUBLISHING,
   type ManualPublishingOverride,
 } from "./config";
+import {
+  PATTERN5_BLOCKED_TASK_IDS,
+  PATTERN5_METHODIST_ONLY_UNTIL_RUNNER,
+  requiresPattern5Runner,
+} from "@/data/heads-legs/pattern-5/completeness-audit";
 import type { QaIssue, TaskPublishingMeta, VisualStatus } from "./types";
+
+/** Явный allowlist pattern 5 в child route — пуст до smoke и поднятия лимита */
+const PATTERN5_CHILD_ROUTE_ALLOWLIST = new Set<string>([]);
 
 const EXTERNAL_REF_RE = /см\.\s*задач|см\.\s*решение|задача\s*#\d|задача\s*1#/i;
 const INCOMPLETE_COND_RE = /не превосходит\s*\.|не превосходит\s*$/i;
@@ -118,6 +126,19 @@ function defaultTier(task: Task, issues: QaIssue[]): TaskPublishingMeta["publish
   if (issues.includes("requires_manual_review")) return "hidden";
   if (task.dirichletMeta?.themeId === DIRICHLET_ARCHIVE_THEME) return "archive";
   if (issues.length > 0) return "methodistOnly";
+
+  if (task.headsLegsMeta) {
+    const mid = task.headsLegsMeta.methodTaskId;
+    if (mid && requiresPattern5Runner(mid)) {
+      if (
+        PATTERN5_BLOCKED_TASK_IDS.includes(task.id) ||
+        PATTERN5_METHODIST_ONLY_UNTIL_RUNNER.includes(task.id) ||
+        !PATTERN5_CHILD_ROUTE_ALLOWLIST.has(task.id)
+      ) {
+        return "methodistOnly";
+      }
+    }
+  }
 
   if (task.headsLegsMeta && task.number <= HEADS_LEGS_CHILD_ROUTE_MAX_NUMBER) return "childRoute";
   const mid = task.dirichletMeta?.methodTaskId;

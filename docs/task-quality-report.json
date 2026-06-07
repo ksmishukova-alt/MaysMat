@@ -1,10 +1,10 @@
 {
-  "generatedAt": "2026-06-06T19:11:10.752Z",
+  "generatedAt": "2026-06-07T15:49:34.612Z",
   "totalTasks": 270,
   "ready": 181,
   "needsReview": 85,
   "blocked": 4,
-  "childRouteVisible": 41,
+  "childRouteVisible": 44,
   "issuesByType": {
     "contains_external_reference": 25,
     "contains_N_equals_N": 4,
@@ -294,6 +294,36 @@
       "childVisible": true
     },
     {
+      "id": "heads-legs-4-03",
+      "branchId": "modeling-heads-legs",
+      "methodTaskId": "4.3",
+      "publishTier": "childRoute",
+      "qaStatus": "ready",
+      "issues": [],
+      "routeOrder": 29,
+      "childVisible": true
+    },
+    {
+      "id": "heads-legs-4-04",
+      "branchId": "modeling-heads-legs",
+      "methodTaskId": "4.4",
+      "publishTier": "childRoute",
+      "qaStatus": "ready",
+      "issues": [],
+      "routeOrder": 30,
+      "childVisible": true
+    },
+    {
+      "id": "heads-legs-4-05",
+      "branchId": "modeling-heads-legs",
+      "methodTaskId": "4.5",
+      "publishTier": "childRoute",
+      "qaStatus": "ready",
+      "issues": [],
+      "routeOrder": 31,
+      "childVisible": true
+    },
+    {
       "id": "dirichlet-t1-01",
       "branchId": "proof-dirichlet",
       "methodTaskId": "M0.1",
@@ -422,33 +452,6 @@
       "issues": [],
       "routeOrder": 113,
       "childVisible": true
-    },
-    {
-      "id": "heads-legs-4-03",
-      "branchId": "modeling-heads-legs",
-      "methodTaskId": "4.3",
-      "publishTier": "methodistOnly",
-      "qaStatus": "ready",
-      "issues": [],
-      "childVisible": false
-    },
-    {
-      "id": "heads-legs-4-04",
-      "branchId": "modeling-heads-legs",
-      "methodTaskId": "4.4",
-      "publishTier": "methodistOnly",
-      "qaStatus": "ready",
-      "issues": [],
-      "childVisible": false
-    },
-    {
-      "id": "heads-legs-4-05",
-      "branchId": "modeling-heads-legs",
-      "methodTaskId": "4.5",
-      "publishTier": "methodistOnly",
-      "qaStatus": "ready",
-      "issues": [],
-      "childVisible": false
     },
     {
       "id": "heads-legs-5-01",

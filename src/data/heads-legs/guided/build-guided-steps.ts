@@ -21,6 +21,7 @@ import { buildTransferAssumeStep43 } from "./custom/steps-4-3";
 
 function assumptionObjectPhrase(condition: string, totalObjects: number | null | undefined): string {
   if (totalObjects != null) {
+    if (/существ/i.test(condition)) return ` все ${totalObjects} существ`;
     if (/девоч/i.test(condition)) return ` все ${totalObjects} девочек`;
     if (/клумб/i.test(condition)) return ` все ${totalObjects} клумб`;
     if (/голов/i.test(condition)) return ` все ${totalObjects} животных`;
@@ -45,17 +46,19 @@ function resolveAssumeEntityIndex(
   meta: HeadsLegsTaskMeta,
 ): 0 | 1 {
   const ri = meta.ruleInstance;
-  if (ri?.ruleId === "heads-legs-score-base") {
+  if (ri && "assumeKind" in ri) {
     const key = ri.assumeKind.toLowerCase();
     const byKind = entities.findIndex((e) => entityMatchesAssumeKind(e.label, key));
     if (byKind >= 0) return byKind as 0 | 1;
-    if (/2|двой/i.test(key)) {
-      const idx = entities.findIndex((e) => /2|двой/i.test(e.label));
-      if (idx >= 0) return idx as 0 | 1;
-    }
-    if (/3|трой/i.test(key)) {
-      const idx = entities.findIndex((e) => /3|трой/i.test(e.label));
-      if (idx >= 0) return idx as 0 | 1;
+    if (ri.ruleId === "heads-legs-score-base") {
+      if (/2|двой/i.test(key)) {
+        const idx = entities.findIndex((e) => /2|двой/i.test(e.label));
+        if (idx >= 0) return idx as 0 | 1;
+      }
+      if (/3|трой/i.test(key)) {
+        const idx = entities.findIndex((e) => /3|трой/i.test(e.label));
+        if (idx >= 0) return idx as 0 | 1;
+      }
     }
   }
   // По умолчанию — первый вид (обычно меньший вклад / «простой» вариант)

@@ -12,6 +12,7 @@ export type {
   HeadsLegsValueRuleInstance,
   HeadsLegsProductionRuleInstance,
   HeadsLegsScoreRuleInstance,
+  HeadsLegsDeriveRuleInstance,
   ScoreMode,
   HeadsLegsMethodRuleInstance,
   HeadsLegsValueAnswerTransform,
@@ -100,6 +101,28 @@ export const headsLegsProductionBaseRule: MethodRule = {
   ],
 };
 
+export const headsLegsDeriveBaseRule: MethodRule = {
+  id: "heads-legs-derive-base",
+  title: "Головы и ноги",
+  childTitle: "Сначала получим недостающее",
+  anchorPhrase:
+    "Иногда в условии не сразу дано всё, что нужно для метода. Сначала получим недостающие данные, а потом решим знакомым способом: представим, что все одного вида.",
+  helpButtonLabel: "Запутался? Вспомни правило",
+  fullRule: [
+    "Прочитай условие и пойми, какие данные нужны для метода замены.",
+    "Получи недостающие числа из условия.",
+    "Теперь реши знакомым способом: представим, что все одного вида.",
+    "Посчитаем, сколько признаков получилось бы.",
+    "Сравним с тем, что дано в условии.",
+    "Найдём разницу.",
+    "Поймём, на сколько один объект отличается от другого.",
+    "Разделим разницу на шаг замены.",
+    "Найдём количество объектов второго вида.",
+    "Найдём количество объектов первого вида.",
+    "Проверим, что спрашивали в задаче.",
+  ],
+};
+
 export const headsLegsScoreBaseRule: MethodRule = {
   id: "heads-legs-score-base",
   title: "Баллы: прибавили или вычли",
@@ -126,6 +149,7 @@ export const METHOD_RULES: Record<string, MethodRule> = {
   "heads-legs-value-base": headsLegsValueBaseRule,
   "heads-legs-production-base": headsLegsProductionBaseRule,
   "heads-legs-score-base": headsLegsScoreBaseRule,
+  "heads-legs-derive-base": headsLegsDeriveBaseRule,
 };
 
 export function getMethodRule(ruleId: string): MethodRule | undefined {
@@ -414,6 +438,9 @@ export function buildHeadsLegsRuleExample(instance: HeadsLegsMethodRuleInstance)
   }
   if (instance.ruleId === "heads-legs-score-base") {
     return buildScoreRuleExample(instance);
+  }
+  if (instance.ruleId === "heads-legs-derive-base") {
+    return buildHeadsLegsRuleExample({ ...instance, ruleId: "heads-legs-base" });
   }
 
   const feat = assumeFeature(instance);
