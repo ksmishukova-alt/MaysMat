@@ -23,7 +23,8 @@ Tasks 4.03–4.05 and 5.03 are available without `?mode=methodist`.
 
 ## Not yet published
 
-- **5.6** (`heads-legs-5-06`, Световые мечи) — `publicationCandidate`, methodist-only preview; not in child route.
+- **5.2** (`heads-legs-5-02`, Караван Бант и Дjav) — derive-base `unit_conversion`, methodist-only; dual-path assume.
+- **5.6** (`heads-legs-5-06`, Световые мечи) — `publicationCandidate`, methodist-only preview; dual-path assume; not in child route.
 - **5.5** (`heads-legs-5-05`) — blocked from child route.
 - **5.7** (`heads-legs-5-07`) — blocked from child route.
 - **Derive-base (Wave B)** — frozen; no derive-base tasks in child route.
@@ -68,4 +69,30 @@ Heads-Legs child route = **32 tasks**. Pattern 5 derive-base remains frozen.
 
 ## Next recommended step
 
-Do **not** publish 5.6 yet. Run a separate methodological smoke of derive-base candidates (**5.6**, **5.2**; 5.1 later). Choose the first true derive-base task for Wave B only after manual screen review. Do not change childRoute or allowlist until then.
+Do **not** publish 5.6 or 5.2 in child route yet. P1 backlog: single-path assume in published 1.x–3.x tasks — use dual-path or explicit training-path wording in a separate wave.
+
+---
+
+## 2026-06 update (dual-path derive-base)
+
+Added dual-path assume for derive-base candidates **5.2** and **5.6**.
+
+Both paths are now accepted and lead to separate word-solution branches.
+
+5.2 and 5.6 remain **methodistOnly**; childRoute/allowlist unchanged.
+
+Added screen-by-screen methodology audit for all 51 Heads-Legs tasks.
+
+Verified commit: `f9b0e4f` — Add dual-path assume and screen methodology audit for heads-legs
+
+Production smoke (https://album-myshleniya.vercel.app, post-`f9b0e4f`):
+
+| Route | Result |
+|-------|--------|
+| `/tasks/heads-legs-5-03` | Published; 4-screen transfer-flow; no derive-text |
+| `/tasks/heads-legs-5-02` | Not published — «Задача недоступна» |
+| `/tasks/heads-legs-5-02?mode=methodist` | Dual-path assume; Jawa path → «Не хватает ног»; Bantu path → «Лишних ног»; branches do not mix |
+| `/tasks/heads-legs-5-06` | Not published — «Задача недоступна» |
+| `/tasks/heads-legs-5-06?mode=methodist` | Dual-path assume; Jedi path → «Не хватает кристаллов»; Sith path → «Лишних кристаллов» |
+
+Production smoke — **passed** (2026-06-05, post-`f9b0e4f`).
