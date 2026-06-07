@@ -21,6 +21,18 @@ export function normalizeBlank(s: string): string {
     .replace(/[х]/g, "x");
 }
 
+/** Каноническая запись примера: без пробелов, единые символы умножения, деления и минуса */
+export function normalizeExpression(s: string): string {
+  return s
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, "")
+    .replace(/[х]/g, "x")
+    .replace(/[×*·⋅]/g, "x")
+    .replace(/[÷/:]/g, "/")
+    .replace(/[−–—]/g, "-");
+}
+
 /** Полный пример: есть знак = и операция до него */
 export function looksLikeFullExpression(user: string): boolean {
   const raw = user.trim();
@@ -34,9 +46,9 @@ export function blankMatchesStrict(
   accept: (string | number) | (string | number)[] | undefined,
 ): boolean {
   if (!accept) return user.trim().length > 0;
-  const norm = normalizeBlank(user);
+  const norm = normalizeExpression(user);
   const list = Array.isArray(accept) ? accept : [accept];
-  return list.some((a) => normalizeBlank(String(a)) === norm);
+  return list.some((a) => normalizeExpression(String(a)) === norm);
 }
 
 export function blankMatches(
