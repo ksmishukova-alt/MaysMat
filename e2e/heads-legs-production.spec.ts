@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 import { openTaskFresh, expectFinishScreen } from "./helpers/page-setup";
-import { advanceUntilVisible, playTaskToFinish } from "./helpers/step-autopilot";
+import { advanceUntilVisible, advanceOneStep, playTaskToFinish } from "./helpers/step-autopilot";
 import {
   PRODUCTION_CHOOSE_METHOD_LABELS,
   PRODUCTION_CHOOSE_METHOD_ACTIONS,
@@ -66,12 +66,34 @@ test.describe("Heads-Legs production pattern pilot", () => {
   });
 
   test("3.05 — compare_results в hub", async ({ page }) => {
-    test.setTimeout(120_000);
+    test.setTimeout(180_000);
     await openTaskFresh(page, "heads-legs-3-05");
 
     await page.getByRole("button", { name: "Прочитал, дальше" }).click();
     await page.waitForTimeout(1_100);
-    await advanceUntilVisible(page, "heads-legs-3-05", "method-step-hub", 40);
+
+    for (let i = 0; i < 90; i++) {
+      if (await page.getByTestId("method-step-hub").isVisible().catch(() => false)) break;
+
+      if (await page.getByText("На что отвечаем?").isVisible().catch(() => false)) {
+        await page.getByRole("button", { name: /Сколько мышей поймали/ }).click();
+        await page.getByRole("button", { name: "Проверить" }).click();
+        await page.waitForTimeout(1_100);
+        continue;
+      }
+
+      if (await page.getByText("Кто поймал больше?").isVisible().catch(() => false)) {
+        await page.getByRole("button", { name: /Котята — на 4 мышки больше/ }).click();
+        await page.getByRole("button", { name: "Проверить" }).click();
+        await page.waitForTimeout(1_100);
+        continue;
+      }
+
+      const ok = await advanceOneStep(page, "heads-legs-3-05");
+      if (!ok) await page.waitForTimeout(400);
+    }
+
+    await expect(page.getByTestId("method-step-hub")).toBeVisible();
 
     await page
       .getByRole("button", { name: PRODUCTION_CHOOSE_METHOD_LABELS.check_question })

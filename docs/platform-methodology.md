@@ -376,7 +376,7 @@ publishTier: "childRoute" | "training" | "methodistOnly" | "archive" | "hidden";
 
 Задача в childRoute только если: `qaStatus = ready`, подходящий runner, ruleInstance, progressionProfile, solutionMode, ручной smoke, e2e, нет методических блокеров.
 
-**В репозитории:** `src/data/task-publishing/config.ts`, `HEADS_LEGS_CHILD_ROUTE_MAX_NUMBER = 28` (4.03 **не** в child route до отдельного инкремента).
+**В репозитории:** `src/data/task-publishing/config.ts`, `HEADS_LEGS_CHILD_ROUTE_MAX_NUMBER = 31` (4.03–4.05 в child route).
 
 ---
 

@@ -1,7 +1,7 @@
 import type { PublishTier, QaIssue, QaStatus, TaskPublishingMeta, VisualStatus } from "./types";
 
-/** Первая волна детского маршрута: «Головы и ноги» (28 задач, этапы 1–4) */
-export const HEADS_LEGS_CHILD_ROUTE_MAX_NUMBER = 28;
+/** Первая волна детского маршрута: «Головы и ноги» (31 задача, этапы 1–4 включая 4.03–4.05) */
+export const HEADS_LEGS_CHILD_ROUTE_MAX_NUMBER = 31;
 
 /** Базовый Дирихле — OK / исправленные задачи первой волны (methodTaskId → routeOrder) */
 export const DIRICHLET_CHILD_ROUTE: Record<string, number> = {

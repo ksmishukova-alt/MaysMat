@@ -52,9 +52,9 @@ test.describe("Heads-Legs score pattern pilot", () => {
     await expectFinishScreen(page, "heads-legs-4-02");
   });
 
-  test("4.03 — transfer: 4 экрана, нейтральная рамка", async ({ page }) => {
+  test("4.03 — transfer: 4 экрана, нейтральная рамка (child route)", async ({ page }) => {
     test.setTimeout(120_000);
-    await openTaskFresh(page, "heads-legs-4-03", "methodist");
+    await openTaskFresh(page, "heads-legs-4-03");
 
     await expect(page.getByTestId("task-runner-shell")).toBeVisible();
     await expect(page.getByText("Та же замена: по 2 или по 3")).not.toBeVisible();
@@ -86,7 +86,7 @@ test.describe("Heads-Legs score pattern pilot", () => {
 
   test("4.04 — match_total special mode", async ({ page }) => {
     test.setTimeout(120_000);
-    await openTaskFresh(page, "heads-legs-4-04", "methodist");
+    await openTaskFresh(page, "heads-legs-4-04");
 
     await expect(page.getByTestId("task-runner-shell")).toBeVisible();
     await page.getByRole("button", { name: "Понятно, решаю" }).click();
@@ -110,7 +110,7 @@ test.describe("Heads-Legs score pattern pilot", () => {
 
   test("4.05 — plus_minus hub (profile 3)", async ({ page }) => {
     test.setTimeout(180_000);
-    await openTaskFresh(page, "heads-legs-4-05", "methodist");
+    await openTaskFresh(page, "heads-legs-4-05");
 
     await expect(page.getByTestId("task-runner-shell")).toBeVisible();
     await page.getByRole("button", { name: "Прочитал, дальше" }).click();

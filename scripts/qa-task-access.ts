@@ -67,6 +67,10 @@ const samples: Array<{ id: string; child: boolean; archivePreview: boolean; meth
     { id: "dirichlet-t3-22", child: true, archivePreview: false, methodist: true },
     { id: "dirichlet-t3-18", child: true, archivePreview: false, methodist: true },
     { id: "dirichlet-t3-24", child: true, archivePreview: false, methodist: true },
+    { id: "heads-legs-4-03", child: true, archivePreview: false, methodist: true },
+    { id: "heads-legs-4-04", child: true, archivePreview: false, methodist: true },
+    { id: "heads-legs-4-05", child: true, archivePreview: false, methodist: true },
+    { id: "heads-legs-5-01", child: false, archivePreview: false, methodist: true },
   ];
 
 console.log("=== QA: доступ к задачам ===\n");

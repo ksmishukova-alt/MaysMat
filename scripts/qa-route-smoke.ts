@@ -200,6 +200,34 @@ if (!branchViaAlias || branchViaAlias.id !== "proof-constructions") {
   }
 }
 
+// 3d. heads-legs — волна 4.03–4.05 в child route
+{
+  const tasks = branchTasks("modeling-heads-legs");
+  const listed = filterBranchTasksForList(tasks, { methodologyBank: false, showArchive: false });
+  const waveIds = ["heads-legs-4-03", "heads-legs-4-04", "heads-legs-4-05"] as const;
+
+  if (listed.length !== 31) {
+    fail(`heads-legs: ожидалось 31 child-route задач, найдено ${listed.length}`);
+  } else {
+    ok("heads-legs: 31 задач в child route");
+  }
+
+  for (const id of waveIds) {
+    const task = allTasks[id];
+    if (!task) {
+      fail(`${id}: не найдена`);
+      continue;
+    }
+    if (!canAccessTask(task, "child")) {
+      fail(`${id}: должна открываться без mode=methodist`);
+    }
+    if (!listed.some((t) => t.id === id)) {
+      fail(`${id}: нет в списке /branch/heads-legs`);
+    }
+  }
+  ok(`heads-legs wave: ${waveIds.join(", ")} в child route`);
+}
+
 // 4. /branch/constructions — архив скрыт по умолчанию
 {
   const tasks = branchTasks("proof-constructions");
@@ -263,6 +291,10 @@ const directCases: Array<{
   { id: "dirichlet-t3-22", child: true, archivePreview: false, methodist: true },
   { id: "dirichlet-t3-18", child: true, archivePreview: false, methodist: true },
   { id: "dirichlet-t3-24", child: true, archivePreview: false, methodist: true },
+  { id: "heads-legs-4-03", child: true, archivePreview: false, methodist: true },
+  { id: "heads-legs-4-04", child: true, archivePreview: false, methodist: true },
+  { id: "heads-legs-4-05", child: true, archivePreview: false, methodist: true },
+  { id: "heads-legs-5-01", child: false, archivePreview: false, methodist: true },
 ];
 
 for (const c of directCases) {

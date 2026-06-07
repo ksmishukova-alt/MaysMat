@@ -200,9 +200,6 @@ async function completeAssumeSelect(page: Page, task: Task): Promise<boolean> {
 async function completeSingleSelect(page: Page, task: Task): Promise<boolean> {
   if (await completeAssumeSelect(page, task)) return true;
 
-  const cards = page.locator("button:has(span.text-5xl)");
-  if ((await cards.count()) === 0) return false;
-
   const checkBtn = page.getByRole("button", { name: "Проверить" });
   if (!(await checkBtn.isVisible().catch(() => false))) return false;
 
