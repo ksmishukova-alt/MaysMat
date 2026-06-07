@@ -3,7 +3,7 @@ import type { TableRow } from "@/data/tasks";
 /** Норма признака и подпись столбца — когда авто-разбор ошибается */
 export const FEATURE_TABLE_OVERRIDES: Record<
   string,
-  { columnLabel: string; rows: TableRow[] }
+  { columnLabel: string; rows: TableRow[]; stepTitle?: string; stepHint?: string }
 > = {
   "1.1": {
     columnLabel: "Ног",
@@ -154,6 +154,8 @@ export const FEATURE_TABLE_OVERRIDES: Record<
   },
   "5.6": {
     columnLabel: "Кристаллов",
+    stepTitle: "Сколько кристаллов нужно на меч?",
+    stepHint: "Укажи, сколько кристаллов требуется для каждого вида меча по условию.",
     rows: [
       { id: "f1", label: "Меч Джедая", emoji: "⚔️", answer: 1 },
       { id: "f2", label: "Меч Ситха", emoji: "🗡️", answer: 2 },

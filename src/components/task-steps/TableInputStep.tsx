@@ -39,7 +39,7 @@ export function TableInputStep({
     if (ok) {
       setSuccess(true);
     } else {
-      setError("Проверь количество ног у каждого участника");
+      setError(`Проверь значение в столбце «${columnLabel}».`);
     }
   };
 

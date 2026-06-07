@@ -73,3 +73,45 @@ test.describe("Heads-Legs transfer 5.3 (Wave A fix)", () => {
     await expectFinishScreen(page, "heads-legs-1-10");
   });
 });
+
+test.describe("Heads-Legs derive 5.6 (methodist smoke)", () => {
+  test("5.06 — derive prelude без «кто участвует»", async ({ page }) => {
+    test.setTimeout(120_000);
+    await openTaskFresh(page, "heads-legs-5-06", "methodist");
+
+    await expect(page.getByTestId("task-runner-shell")).toBeVisible();
+    await expect(page.getByText("Задача недоступна")).not.toBeVisible();
+    await expect(page.getByText("Кто участвует в задаче?")).not.toBeVisible();
+
+    await page.getByRole("button", { name: "Прочитал, дальше" }).click();
+    await page.waitForTimeout(1_100);
+
+    await expect(page.getByTestId("derive-prelude-step")).toBeVisible();
+    await expect(
+      page.getByText(/сколько всего мечей \(из 17 рукоятей\)/i),
+    ).toBeVisible();
+
+    await page
+      .getByRole("button", { name: /сколько всего мечей \(из 17 рукоятей\)/i })
+      .click();
+    await page.getByRole("button", { name: "Проверить" }).click();
+    await page.waitForTimeout(400);
+
+    await expect(page.getByTestId("derive-count-input")).toBeVisible();
+    await page.getByTestId("derive-count-input").fill("17");
+    await page.getByRole("button", { name: "Проверить" }).click();
+    await page.waitForTimeout(400);
+
+    await expect(page.getByText(/сколько кристаллов требуется/i)).toBeVisible();
+    await page.getByTestId("derive-feature-f1").fill("1");
+    await page.getByTestId("derive-feature-f2").fill("2");
+    await page.getByRole("button", { name: "Проверить" }).click();
+    await page.waitForTimeout(400);
+
+    await page.getByTestId("derive-totals-feature").fill("32");
+    await page.getByRole("button", { name: "Проверить" }).click();
+    await page.waitForTimeout(1_100);
+
+    await expect(page.getByText(/знакомым методом замены/i)).toBeVisible();
+  });
+});

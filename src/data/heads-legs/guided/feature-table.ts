@@ -34,19 +34,16 @@ export function featureColumnLabel(condition: string, methodTaskId?: string): st
 export function featureStepMeta(condition: string, methodTaskId?: string): CountedFeatureMeta {
 
   if (methodTaskId && FEATURE_TABLE_OVERRIDES[methodTaskId]) {
-
-    const col = FEATURE_TABLE_OVERRIDES[methodTaskId].columnLabel;
-
+    const override = FEATURE_TABLE_OVERRIDES[methodTaskId];
+    const col = override.columnLabel;
     return {
-
       columnLabel: col,
-
-      stepTitle: `③ Сколько ${col.toLowerCase()} у каждого?`,
-
-      stepHint: `Укажи, сколько ${col.toLowerCase()} даёт каждый вид из условия.`,
-
+      stepTitle:
+        override.stepTitle ?? `③ Сколько ${col.toLowerCase()} у каждого?`,
+      stepHint:
+        override.stepHint ??
+        `Укажи, сколько ${col.toLowerCase()} требуется для каждого вида по условию.`,
     };
-
   }
 
   return inferCountedFeature(condition);

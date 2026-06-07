@@ -807,6 +807,30 @@ ok(
   `pilot derive pattern: ${DERIVE_PATTERN_PILOT_METHOD_IDS.length} задач (${DERIVE_PATTERN_PILOT_METHOD_IDS.join(", ") || "нет"})`,
 );
 
+const task56 = HEADS_LEGS_TASKS["heads-legs-5-06"];
+if (DERIVE_PATTERN_PILOT["5.6"]) {
+  if (!task56) {
+    fail("heads-legs-5-06 не найдена");
+  } else {
+    if (isChildVisible(task56.publishing!)) {
+      fail("heads-legs-5-06: derive pilot не должен быть в childRoute");
+    } else {
+      ok("heads-legs-5-06: derive pilot methodist-only (не childRoute)");
+    }
+    const steps56 = buildHeadsLegsPlayerSteps(task56);
+    if (steps56.some((s) => s.type === "drag_select" && s.id.includes("-objects"))) {
+      fail("heads-legs-5-06: derive не должен начинаться с «кто участвует»");
+    } else {
+      ok("heads-legs-5-06: без drag_select участников");
+    }
+    if (!steps56.some((s) => s.type === "hl_derive_prelude")) {
+      fail("heads-legs-5-06: derive pilot без hl_derive_prelude");
+    } else {
+      ok("heads-legs-5-06: hl_derive_prelude подключён");
+    }
+  }
+}
+
 const audit53 = getPattern5Audit("5.3");
 if (audit53 && hasExplicitStandardReplacementData(audit53)) {
   if (DERIVE_PATTERN_PILOT["5.3"]) {

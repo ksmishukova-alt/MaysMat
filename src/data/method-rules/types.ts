@@ -99,6 +99,13 @@ export interface HeadsLegsScoreRuleInstance {
   showRuleScreen?: boolean;
 }
 
+/** Нормы признака в derive-prelude (напр. кристаллов на меч) */
+export interface HeadsLegsDeriveFeatureNorms {
+  columnLabel: string;
+  stepHint: string;
+  rows: Array<{ id: string; label: string; emoji: string; answer: number }>;
+}
+
 /** Prelude + стандартная замена (паттерн 5) */
 export interface HeadsLegsDeriveRuleInstance {
   ruleId: "heads-legs-derive-base";
@@ -114,6 +121,11 @@ export interface HeadsLegsDeriveRuleInstance {
   questionAsks: string;
   preludeQuestion: string;
   preludeChoices: Array<{ id: string; label: string; correct: boolean }>;
+  /** Вывод числа из условия (напр. 17 мечей из рукоятей) */
+  preludeDerivePrompt?: string;
+  preludeDeriveAnswer?: number;
+  /** Таблица «сколько требуется» на объект — один раз в prelude */
+  preludeFeatureNorms?: HeadsLegsDeriveFeatureNorms;
   assumeKindPhrase?: string;
   objectsLabel?: string;
   sceneIntro?: string;
