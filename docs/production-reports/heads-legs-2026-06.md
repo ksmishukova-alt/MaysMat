@@ -2,13 +2,12 @@
 
 ## Summary
 
-The Heads-Legs branch has published patterns 1–4 in the child route.
+The Heads-Legs branch has published patterns 1–4 plus one pattern-5 transfer task in the child route.
 
-Current child route limit:
+Current child route:
 
-`HEADS_LEGS_CHILD_ROUTE_MAX_NUMBER = 31`
-
-This means tasks 1.01 through 4.05 are available in the child route, corresponding to catalog tasks №1–31.
+- **32 published UI tasks** (UI #32 = `heads-legs-5-03`, transfer_replacement)
+- `HEADS_LEGS_CHILD_ROUTE_MAX_NUMBER = 31` (auto-by-catalog); 5.3 is an allowlist exception with `routeOrder: 32`
 
 ## Published scope
 
@@ -17,35 +16,56 @@ Published in child route:
 - Pattern 1 — base heads-and-legs replacement model;
 - Pattern 2 — value / quantity / cost model;
 - Pattern 3 — production / “who did how much” model;
-- Pattern 4 — transfer + score / plus-minus pilot.
+- Pattern 4 — transfer + score / plus-minus pilot;
+- **Pattern 5 (partial)** — `heads-legs-5-03` (Банты и Ранкоры) as **transfer_replacement**, not derive-base.
 
-Tasks 4.03–4.05 are now available without `?mode=methodist`.
+Tasks 4.03–4.05 and 5.03 are available without `?mode=methodist`.
 
 ## Not yet published
 
-Pattern 5 is not published.
+- **5.6** (`heads-legs-5-06`, Световые мечи) — `publicationCandidate`, methodist-only preview; not in child route.
+- **5.5** (`heads-legs-5-05`) — blocked from child route.
+- **5.7** (`heads-legs-5-07`) — blocked from child route.
+- **Derive-base (Wave B)** — frozen; no derive-base tasks in child route.
 
-Tasks starting from catalog №32, including `heads-legs-5-01` and beyond, remain methodist-only / “coming soon” in the child route.
+Tasks UI #33+ remain “coming soon” in the child route.
+
+## 2026-06 update
+
+Published `heads-legs-5-03` as UI task **#32**.
+
+This task is classified as **transfer_replacement**, not derive-base.
+
+Derive-base remains frozen.
+
+5.6 is still `publicationCandidate`; 5.5 and 5.7 remain blocked.
+
+Verified commit: `1a5d257` — Publish heads-legs 5.03 transfer candidate as child route UI #32
+
+Production smoke (https://album-myshleniya.vercel.app):
+
+| Route | Result |
+|-------|--------|
+| `/branch/heads-legs` | Task 32 «Банты и Ранкоры» — «Начать», not «скоро» |
+| `/tasks/heads-legs-5-03` | Opens without `?mode=methodist`; 4-screen transfer-flow |
+| `/tasks/heads-legs-5-06` | Not published — «Задача недоступна» (methodist preview OK) |
+| `/tasks/heads-legs-5-05` | Blocked — «Задача недоступна» |
+| `/tasks/heads-legs-5-07` | Blocked — «Задача недоступна» |
 
 ## QA and coverage
 
-Current verified commit:
-
-`6ad7fa7` — Publish heads-legs score pattern tasks 4.03-4.05
-
 Coverage:
 
-- 25 Playwright e2e tests;
+- Playwright e2e (heads-legs child route + derive guard);
 - `qa:method-rules` — green;
-- `qa:task-quality` — green;
 - `qa:task-access` — green;
-- `qa:smoke` — green;
-- production smoke — passed.
+- `qa:smoke` — green (32 child-route tasks);
+- production smoke — **passed** (2026-06-05).
 
 ## Status
 
-Heads-Legs patterns 1–4 are published and covered.
+Heads-Legs child route = **32 tasks**. Pattern 5 derive-base remains frozen.
 
 ## Next recommended step
 
-Plan pattern 5 as a separate increment. Do not expand the child route further until pattern 5 passes audit, implementation, QA, e2e, and production smoke.
+Do **not** publish 5.6 yet. Run a separate methodological smoke of derive-base candidates (**5.6**, **5.2**; 5.1 later). Choose the first true derive-base task for Wave B only after manual screen review. Do not change childRoute or allowlist until then.
