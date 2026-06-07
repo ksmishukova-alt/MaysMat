@@ -210,7 +210,9 @@ function HeadsLegsProgressionPlayer({
           Головы и ноги · Задача {displayNumber}
         </div>
         <h2 className="text-xl font-bold">{task.title}</h2>
-        <p className="mt-1 text-sm text-gray-500">{branchSubtitle}</p>
+        {pilot?.flowMode !== "transfer" ? (
+          <p className="mt-1 text-sm text-gray-500">{branchSubtitle}</p>
+        ) : null}
         {!hideHeaderCondition ? (
           <p className="mt-4 whitespace-pre-line text-base leading-relaxed text-gray-700">
             {highlightConditionText(task.condition, "heads-legs")}

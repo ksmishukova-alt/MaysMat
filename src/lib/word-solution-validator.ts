@@ -16,7 +16,27 @@ export function normalizeBlank(s: string): string {
     .toLowerCase()
     .replace(/\s+/g, " ")
     .replace(/×/g, "x")
-    .replace(/÷/g, "/");
+    .replace(/÷/g, "/")
+    .replace(/[−–—]/g, "-")
+    .replace(/[х]/g, "x");
+}
+
+/** Полный пример: есть знак = и операция до него */
+export function looksLikeFullExpression(user: string): boolean {
+  const raw = user.trim();
+  if (!/=/.test(raw)) return false;
+  const left = raw.split("=")[0] ?? "";
+  return /[×xX*·⋅+\-−÷/:]/.test(left);
+}
+
+export function blankMatchesStrict(
+  user: string,
+  accept: (string | number) | (string | number)[] | undefined,
+): boolean {
+  if (!accept) return user.trim().length > 0;
+  const norm = normalizeBlank(user);
+  const list = Array.isArray(accept) ? accept : [accept];
+  return list.some((a) => normalizeBlank(String(a)) === norm);
 }
 
 export function blankMatches(

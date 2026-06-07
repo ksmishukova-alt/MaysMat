@@ -117,6 +117,10 @@ export interface WordSolutionStep extends TaskStepBase {
   solutionLines?: SolutionLine[];
   acceptedAnswers: AcceptedAnswer;
   hintLevels?: [string?, string?, string?];
+  /** Только пропуски — без textarea «полное решение» */
+  blanksOnly?: boolean;
+  /** Для type=expression: принимать только полный пример (12 × 2 = 24), не «24» */
+  requireExpressionFormat?: boolean;
 }
 
 /** Discriminated union — каждый тип шага со своими полями */

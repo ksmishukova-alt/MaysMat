@@ -57,7 +57,7 @@ test.describe("Heads-Legs score pattern pilot", () => {
     await openTaskFresh(page, "heads-legs-4-03", "methodist");
 
     await expect(page.getByTestId("task-runner-shell")).toBeVisible();
-    await expect(page.getByText("Та же замена: по 2 или по 3")).toBeVisible();
+    await expect(page.getByText("Та же замена: по 2 или по 3")).not.toBeVisible();
     await expect(page.getByText(/Баллы: прибавили или вычли/i)).not.toBeVisible();
     await expect(page.getByTestId("method-rule-screen")).not.toBeVisible();
     await expect(page.getByText(/знакомый тип задачи/i)).toBeVisible();

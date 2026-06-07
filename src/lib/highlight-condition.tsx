@@ -46,48 +46,38 @@ function keywordPattern(variant: ConditionHighlightVariant): RegExp {
 
 
 
+const MONTH_AFTER_NUMBER =
+  /^\s*(?:январ|феврал|март|апрел|ма[йя]|июн|июл|август|сентябр|октябр|ноябр|декабр)/i;
+
 export function highlightConditionText(
-
   text: string,
-
   variant: ConditionHighlightVariant = "heads-legs",
-
 ): ReactNode[] {
-
   const nodes: ReactNode[] = [];
-
   let key = 0;
-
   const KEYWORD_RE = keywordPattern(variant);
 
-
-
   const segments = text.split(NUMBER_RE);
-
-  for (const segment of segments) {
-
+  for (let si = 0; si < segments.length; si++) {
+    const segment = segments[si];
     if (!segment) continue;
 
     if (/^\d/.test(segment)) {
+      const following = segments[si + 1] ?? "";
+      if (MONTH_AFTER_NUMBER.test(following)) {
+        nodes.push(<span key={`t-${key++}`}>{segment}</span>);
+        continue;
+      }
 
       nodes.push(
-
         <mark
-
           key={`n-${key++}`}
-
           className="rounded bg-amber-100 px-0.5 font-semibold text-amber-900"
-
         >
-
           {segment}
-
         </mark>,
-
       );
-
       continue;
-
     }
 
 

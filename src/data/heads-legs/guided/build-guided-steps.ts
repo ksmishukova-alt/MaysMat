@@ -208,7 +208,7 @@ export function buildGuidedSteps(meta: HeadsLegsTaskMeta): DiscriminatedTaskStep
       meta.methodTaskId === "4.3" ? "Запиши решение с пропусками" : wordStepTitle(mode, flow.profile),
     hint:
       meta.methodTaskId === "4.3"
-        ? "Запиши решение с пропусками. Проверь каждый шаг."
+        ? "В каждый пропуск — полный пример, например 12 × 2 = 24."
         : flow.profile === "diagnostic"
           ? "Объясни, какого числа не хватает и приведи примеры вариантов."
           : flow.profile === "enumeration"
@@ -218,6 +218,9 @@ export function buildGuidedSteps(meta: HeadsLegsTaskMeta): DiscriminatedTaskStep
     solutionLines: lines,
     acceptedAnswers: meta.acceptedAnswers,
     hintLevels: meta.hintLevels,
+    ...(meta.methodTaskId === "4.3"
+      ? { blanksOnly: true, requireExpressionFormat: true }
+      : {}),
   });
 
   if (flow.solutionPreview && lines.length > 0) {

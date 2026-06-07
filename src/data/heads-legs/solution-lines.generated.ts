@@ -3497,25 +3497,8 @@ export const HEADS_LEGS_SOLUTION_LINES: Record<string, SolutionLine[]> = {
   ],
   "4.3": [
     {
-      "template": "Представим, что все [12] девочек получили по [2] открытки.",
-      "blanks": [
-        {
-          "id": "4.3-b-0-0",
-          "type": "number",
-          "accept": [
-            "12",
-            12
-          ]
-        },
-        {
-          "id": "4.3-b-0-1",
-          "type": "number",
-          "accept": [
-            "2",
-            2
-          ]
-        }
-      ]
+      "template": "Представим, что все 12 девочек получили по 2 открытки.",
+      "blanks": []
     },
     {
       "template": "Тогда открыток было бы: [12 × 2 = 24].",
@@ -3525,23 +3508,16 @@ export const HEADS_LEGS_SOLUTION_LINES: Record<string, SolutionLine[]> = {
           "type": "expression",
           "accept": [
             "12 × 2 = 24",
-            "12 x 2 = 24"
-          ]
+            "12 x 2 = 24",
+            "12 * 2 = 24"
+          ],
+          "placeholder": "12 × 2 = 24"
         }
       ]
     },
     {
-      "template": "По условию открыток [25].",
-      "blanks": [
-        {
-          "id": "4.3-b-2-0",
-          "type": "number",
-          "accept": [
-            "25",
-            25
-          ]
-        }
-      ]
+      "template": "По условию открыток 25.",
+      "blanks": []
     },
     {
       "template": "Разница: [25 − 24 = 1].",
@@ -3552,7 +3528,8 @@ export const HEADS_LEGS_SOLUTION_LINES: Record<string, SolutionLine[]> = {
           "accept": [
             "25 − 24 = 1",
             "25 - 24 = 1"
-          ]
+          ],
+          "placeholder": "25 − 24 = 1"
         }
       ]
     },
@@ -3565,7 +3542,8 @@ export const HEADS_LEGS_SOLUTION_LINES: Record<string, SolutionLine[]> = {
           "accept": [
             "3 − 2 = 1",
             "3 - 2 = 1"
-          ]
+          ],
+          "placeholder": "3 − 2 = 1"
         }
       ]
     },
@@ -3578,7 +3556,8 @@ export const HEADS_LEGS_SOLUTION_LINES: Record<string, SolutionLine[]> = {
           "accept": [
             "1 ÷ 1 = 1",
             "1 / 1 = 1"
-          ]
+          ],
+          "placeholder": "1 ÷ 1 = 1"
         }
       ]
     }

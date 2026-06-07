@@ -31,7 +31,10 @@ export function WordSolutionStep({ step, runnerContext = "heads-legs", onComplet
   };
 
   const submit = () => {
-    const result = validateWordSolutionFull(text, mode, accepted, lines, blanks);
+    const result = validateWordSolutionFull(text, mode, accepted, lines, blanks, {
+      blanksOnly: step.blanksOnly,
+      requireExpressionFormat: step.requireExpressionFormat,
+    });
     if (result.ok) {
       onComplete();
     } else {
@@ -67,18 +70,26 @@ export function WordSolutionStep({ step, runnerContext = "heads-legs", onComplet
             );
           }
           const wide = blank.type === "expression" || blank.type === "conclusion";
+          const expressionHint =
+            blank.type === "expression" && step.requireExpressionFormat
+              ? "12 × 2 = 24"
+              : (blank.placeholder ?? "…");
           return (
-            <input
-              key={blank.id}
-              type="text"
-              value={blanks[blank.id] ?? ""}
-              onChange={(e) => setBlanks((b) => ({ ...b, [blank.id]: e.target.value }))}
-              className={`mx-1 inline-block rounded border border-lavender-200 px-1 py-0.5 text-center ${
-                wide ? "min-w-[140px]" : "w-20"
-              }`}
-              placeholder={blank.placeholder ?? "…"}
-              aria-label={`Пропуск ${li + 1}`}
-            />
+            <span key={blank.id} className="inline-flex flex-wrap items-center gap-1">
+              {blank.type === "expression" && step.requireExpressionFormat ? (
+                <span className="text-xs font-medium text-brand-purple">Запиши пример:</span>
+              ) : null}
+              <input
+                type="text"
+                value={blanks[blank.id] ?? ""}
+                onChange={(e) => setBlanks((b) => ({ ...b, [blank.id]: e.target.value }))}
+                className={`mx-1 inline-block rounded border border-lavender-200 px-2 py-1 text-sm ${
+                  wide ? "min-w-[180px]" : "w-20"
+                }`}
+                placeholder={expressionHint}
+                aria-label={`Пропуск ${li + 1}`}
+              />
+            </span>
           );
         })}
       </div>
@@ -138,16 +149,19 @@ export function WordSolutionStep({ step, runnerContext = "heads-legs", onComplet
     return (
       <div className="space-y-4" data-testid="word-solution-step">
         <p className="text-sm text-gray-600">
-          {mode === "B" && "Дополни пропуски в готовом тексте решения."}
-          {mode === "E" && "Запиши перебор: заполни строки проверки и итог."}
+          {step.requireExpressionFormat
+            ? "Запиши каждый шаг в виде полного примера: числа, знак действия и результат через «=»."
+            : mode === "B"
+              ? "Дополни пропуски в готовом тексте решения."
+              : "Запиши перебор: заполни строки проверки и итог."}
         </p>
         {lines.map((line, li) => renderLine(line, li))}
-        {mode === "B" && lines.length > 0 ? (
+        {!step.blanksOnly && mode === "B" && lines.length > 0 ? (
           <p className="text-xs text-gray-400">
             Или запиши полное решение ниже (не короче 3–4 предложений).
           </p>
         ) : null}
-        {mode === "B" && lines.length > 0 ? (
+        {!step.blanksOnly && mode === "B" && lines.length > 0 ? (
           <textarea
             value={text}
             onChange={(e) => setText(e.target.value)}
