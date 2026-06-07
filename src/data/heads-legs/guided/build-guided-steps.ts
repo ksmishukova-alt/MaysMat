@@ -18,6 +18,7 @@ import {
   skipsDefaultParticipant,
 } from "./custom";
 import { buildTransferAssumeStep43 } from "./custom/steps-4-3";
+import { buildTransferMethodStep53 } from "./custom/steps-5-3";
 
 function assumptionObjectPhrase(condition: string, totalObjects: number | null | undefined): string {
   if (totalObjects != null) {
@@ -192,6 +193,8 @@ export function buildGuidedSteps(meta: HeadsLegsTaskMeta): DiscriminatedTaskStep
 
   if (meta.methodTaskId === "4.3") {
     steps.push(buildTransferAssumeStep43(meta.id));
+  } else if (meta.methodTaskId === "5.3") {
+    steps.push(buildTransferMethodStep53(meta.id));
   } else if (hasCustomMiddleSteps(meta.methodTaskId)) {
     const custom = buildCustomMiddleSteps(meta.methodTaskId, meta.id);
     if (custom) steps.push(...custom);
@@ -208,11 +211,17 @@ export function buildGuidedSteps(meta: HeadsLegsTaskMeta): DiscriminatedTaskStep
     id: `${meta.id}-words`,
     type: "word_solution",
     title:
-      meta.methodTaskId === "4.3" ? "Запиши решение с пропусками" : wordStepTitle(mode, flow.profile),
+      meta.methodTaskId === "4.3"
+        ? "Запиши решение с пропусками"
+        : meta.methodTaskId === "5.3"
+          ? "Запиши примеры"
+          : wordStepTitle(mode, flow.profile),
     hint:
       meta.methodTaskId === "4.3"
         ? "В каждый пропуск — полный пример, например 12 × 2 = 24."
-        : flow.profile === "diagnostic"
+        : meta.methodTaskId === "5.3"
+          ? "Запиши ход решения примерами: 29 × 8 = 232, 352 − 232 = 120 и дальше."
+          : flow.profile === "diagnostic"
           ? "Объясни, какого числа не хватает и приведи примеры вариантов."
           : flow.profile === "enumeration"
             ? "Запиши проверку вариантов и итоговый ответ."
@@ -221,7 +230,7 @@ export function buildGuidedSteps(meta: HeadsLegsTaskMeta): DiscriminatedTaskStep
     solutionLines: lines,
     acceptedAnswers: meta.acceptedAnswers,
     hintLevels: meta.hintLevels,
-    ...(meta.methodTaskId === "4.3"
+    ...(meta.methodTaskId === "4.3" || meta.methodTaskId === "5.3"
       ? { blanksOnly: true, requireExpressionFormat: true }
       : {}),
   });
@@ -231,7 +240,7 @@ export function buildGuidedSteps(meta: HeadsLegsTaskMeta): DiscriminatedTaskStep
       id: `${meta.id}-preview`,
       type: "auto_explanation",
       explanationRole: "preview",
-      title: meta.methodTaskId === "4.3" ? "Ответ" : "Что мы сделали?",
+      title: meta.methodTaskId === "4.3" || meta.methodTaskId === "5.3" ? "Ответ" : "Что мы сделали?",
       hint: "Прочитай готовый текст — так пишут на контрольной.",
       template: buildSolutionPreviewLines(lines),
     });

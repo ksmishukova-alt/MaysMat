@@ -332,22 +332,10 @@ async function completeGenericStep(page: Page, task: Task): Promise<boolean> {
   if (await page.getByTestId("question-check-step").isVisible().catch(() => false)) {
     return clickIfVisible(page, "Понятно, записываю ответ");
   }
-  if (await page.getByTestId("derive-prelude-step").isVisible().catch(() => false)) {
-    const choiceBtn = page
-      .locator("button")
-      .filter({ hasText: "Сколько всего существ и сколько зубов" })
-      .first();
-    if (await choiceBtn.isVisible().catch(() => false)) {
-      await choiceBtn.click();
-      await clickIfVisible(page, "Проверить");
-    }
-    const objects = page.getByTestId("derive-totals-objects");
-    if (await objects.isVisible().catch(() => false)) {
-      await objects.fill("29");
-      await page.getByTestId("derive-totals-feature").fill("352");
-      await clickIfVisible(page, "Проверить");
-      return true;
-    }
+  if (await page.getByText("Какой метод здесь подходит?").isVisible().catch(() => false)) {
+    await page
+      .getByRole("button", { name: /А\. Представить, что все существа одного вида/ })
+      .click();
     return clickIfVisible(page, "Проверить");
   }
   if (await page.getByTestId("score-question-check-step").isVisible().catch(() => false)) {

@@ -71,6 +71,7 @@ export function customPlacement(methodTaskId: string): CustomPlacement | null {
 export function skipsDefaultParticipant(methodTaskId: string): boolean {
   return (
     methodTaskId === "4.3" ||
+    methodTaskId === "5.3" ||
     methodTaskId === "6.1" ||
     methodTaskId === "6.2" ||
     methodTaskId === "6.3" ||

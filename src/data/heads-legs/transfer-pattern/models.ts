@@ -24,9 +24,34 @@ export const TRANSFER_PATTERN_PILOT: Record<string, HeadsLegsPilotMeta> = {
       showRuleScreen: false,
     },
   },
+  "5.3": {
+    patternKind: "base",
+    flowMode: "transfer",
+    progressionProfile: 4,
+    ruleInstance: {
+      ruleId: "heads-legs-base",
+      totalObjects: 29,
+      totalFeature: 352,
+      firstKind: "Ранкоры",
+      firstFeature: 8,
+      secondKind: "Банты",
+      secondFeature: 18,
+      featureName: "зубов",
+      assumeKind: "Ранкоры",
+      assumeKindPhrase: "Ранкорами",
+      objectsLabel: "существ",
+      replacementStep: 10,
+      sceneIntro: "В зверинце есть Банты и Ранкоры.",
+      featureLines: ["У Ранкора 8 зубов.", "У Банта 18 зубов."],
+      showRuleScreen: false,
+    },
+  },
 };
 
 export const TRANSFER_PATTERN_PILOT_METHOD_IDS = Object.keys(TRANSFER_PATTERN_PILOT);
 
 export const TRANSFER_43_READ_HINT =
   "Это уже знакомый тип задачи: есть два варианта — по 2 открытки или по 3 открытки.\nПопробуй решить почти самостоятельно.";
+
+export const TRANSFER_53_READ_HINT =
+  "Прочитай задачу. Это знакомый тип: два вида существ и разное количество зубов у каждого.";

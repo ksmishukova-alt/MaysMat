@@ -50,6 +50,12 @@ const FLOW_BY_TASK: Partial<Record<string, Partial<TaskFlowOptions>>> = {
     calcWorksheets: false,
     solutionPreview: true,
   },
+  "5.3": {
+    featureTable: false,
+    assumptionStep: false,
+    calcWorksheets: false,
+    solutionPreview: true,
+  },
   "6.1": {
     profile: "structural",
     featureTable: false,

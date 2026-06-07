@@ -20,11 +20,8 @@ import {
   shouldShowRuleScreen,
 } from "../base-pattern/progression";
 import { resolveHeadsLegsPilot } from "../pilot/resolve";
-import {
-  DERIVE_53_READ_HINT,
-  DERIVE_TRANSITION_TEMPLATE,
-} from "../derive-pattern/models";
-import { TRANSFER_43_READ_HINT } from "../transfer-pattern/models";
+import { DERIVE_TRANSITION_TEMPLATE } from "../derive-pattern/models";
+import { TRANSFER_43_READ_HINT, TRANSFER_53_READ_HINT } from "../transfer-pattern/models";
 import { shouldInjectQuestionCheck } from "../value-pattern/progression";
 import {
   filterMultipleAnswersSteps,
@@ -257,10 +254,26 @@ export function buildHeadsLegsPlayerSteps(task: Task): HeadsLegsExtendedPlayerSt
   const rawContent = base.slice(1);
 
   if (pilot.flowMode === "transfer") {
-    const readWithHint =
-      meta.methodTaskId === "4.3"
-        ? { ...readStep, hint: TRANSFER_43_READ_HINT }
-        : readStep;
+    let readWithHint = readStep;
+    if (meta.methodTaskId === "4.3") {
+      readWithHint = { ...readStep, hint: TRANSFER_43_READ_HINT };
+    } else if (meta.methodTaskId === "5.3") {
+      readWithHint = { ...readStep, hint: TRANSFER_53_READ_HINT };
+    }
+
+    if (meta.methodTaskId === "5.3") {
+      const methodStep = rawContent.find(
+        (s) => s.type === "single_select" && s.id.includes("-transfer-method"),
+      );
+      const word = rawContent.find((s) => s.type === "word_solution");
+      const preview = rawContent.find(
+        (s) => s.type === "auto_explanation" && s.id.includes("-preview"),
+      );
+      return applyPhaseMeta(
+        [readWithHint, methodStep, word, preview].filter(Boolean) as HeadsLegsExtendedPlayerStep[],
+      );
+    }
+
     const assume = rawContent.find(
       (s) => s.type === "single_select" && s.id.includes("-assume"),
     );
@@ -282,10 +295,6 @@ export function buildHeadsLegsPlayerSteps(task: Task): HeadsLegsExtendedPlayerSt
       return applyPhaseMeta([readStep, ...filterStepsForPilot(rawContent, profile, pilot.flowMode)]);
     }
 
-    const readWithHint =
-      meta.methodTaskId === "5.3"
-        ? { ...readStep, hint: DERIVE_53_READ_HINT }
-        : readStep;
     const assume = rawContent.find(
       (s) => s.type === "single_select" && s.id.includes("-assume"),
     );
@@ -296,7 +305,7 @@ export function buildHeadsLegsPlayerSteps(task: Task): HeadsLegsExtendedPlayerSt
 
     return applyPhaseMeta(
       [
-        readWithHint,
+        readStep,
         {
           id: `${task.id}-hl-derive-prelude`,
           type: "hl_derive_prelude",

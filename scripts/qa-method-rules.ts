@@ -40,11 +40,14 @@ import {
   DERIVE_PATTERN_PILOT,
   DERIVE_PATTERN_PILOT_METHOD_IDS,
 } from "../src/data/heads-legs/derive-pattern/models";
+import { hasExplicitStandardReplacementData } from "../src/data/heads-legs/derive-pattern/eligibility";
 import {
+  getPattern5Audit,
   PATTERN5_BLOCKED_TASK_IDS,
   PATTERN5_COMPLETENESS_AUDIT,
   PATTERN5_METHODIST_ONLY_UNTIL_RUNNER,
 } from "../src/data/heads-legs/pattern-5/completeness-audit";
+import { resolveHeadsLegsPilot } from "../src/data/heads-legs/pilot/resolve";
 import { HEADS_LEGS_CHILD_ROUTE_MAX_NUMBER } from "../src/data/task-publishing/config";
 import { getScoreAudit, isMatchTotalPilot } from "../src/data/heads-legs/score-pattern/completeness-audit";
 import { canAccessTask } from "../src/lib/task-access-mode";
@@ -534,8 +537,15 @@ for (const methodId of TRANSFER_PATTERN_PILOT_METHOD_IDS) {
   if (!steps.some((s) => s.type === "read_condition")) {
     fail(`${task.id}: transfer без read_condition`);
   }
-  if (!steps.some((s) => s.type === "single_select" && s.id.includes("-assume"))) {
-    fail(`${task.id}: transfer без assume`);
+  const hasAssume = steps.some((s) => s.type === "single_select" && s.id.includes("-assume"));
+  const hasMethodChoice = steps.some(
+    (s) => s.type === "single_select" && s.id.includes("-transfer-method"),
+  );
+  if (!hasAssume && !hasMethodChoice) {
+    fail(`${task.id}: transfer без assume или transfer-method`);
+  }
+  if (hasAssume && hasMethodChoice) {
+    fail(`${task.id}: transfer не может иметь и assume, и transfer-method`);
   }
   if (!steps.some((s) => s.type === "word_solution")) {
     fail(`${task.id}: transfer без word_solution`);
@@ -546,9 +556,20 @@ for (const methodId of TRANSFER_PATTERN_PILOT_METHOD_IDS) {
   if (steps.length !== 4) {
     fail(`${task.id}: transfer ожидает 4 экрана, получено ${steps.length}`);
   }
+  if (steps.some((s) => s.type === "hl_derive_prelude")) {
+    fail(`${task.id}: transfer не должен использовать derive-prelude`);
+  }
 
   if (methodId === "4.3") {
     ok("heads-legs-4-03: transfer 4 экрана, base rule");
+  }
+  if (methodId === "5.3") {
+    if (!hasMethodChoice) fail("heads-legs-5-03: transfer без выбора метода");
+    if (meta.ruleInstance?.ruleId !== "heads-legs-base") {
+      fail("heads-legs-5-03: transfer должен использовать heads-legs-base");
+    } else {
+      ok("heads-legs-5-03: transfer 4 экрана, method choice, base rule");
+    }
   }
 }
 
@@ -767,10 +788,6 @@ function auditDerivePilot(methodId: string) {
   if (steps.length !== 7) {
     fail(`${task.id}: derive ожидает 7 экранов, получено ${steps.length}`);
   }
-
-  if (methodId === "5.3") {
-    ok("heads-legs-5-03: derive 7 экранов, derive-base rule");
-  }
 }
 
 for (const methodId of DERIVE_PATTERN_PILOT_METHOD_IDS) {
@@ -778,8 +795,32 @@ for (const methodId of DERIVE_PATTERN_PILOT_METHOD_IDS) {
 }
 
 ok(
-  `pilot derive pattern: ${DERIVE_PATTERN_PILOT_METHOD_IDS.length} задач (${DERIVE_PATTERN_PILOT_METHOD_IDS.join(", ")})`,
+  `pilot derive pattern: ${DERIVE_PATTERN_PILOT_METHOD_IDS.length} задач (${DERIVE_PATTERN_PILOT_METHOD_IDS.join(", ") || "нет"})`,
 );
+
+const audit53 = getPattern5Audit("5.3");
+if (audit53 && hasExplicitStandardReplacementData(audit53)) {
+  if (DERIVE_PATTERN_PILOT["5.3"]) {
+    fail("5.3: derive-base запрещён — все данные для замены уже в условии");
+  }
+  const pilot53 = resolveHeadsLegsPilot("5.3");
+  if (pilot53?.flowMode === "derive") {
+    fail("5.3: flowMode не должен быть derive");
+  }
+  const steps53 = buildHeadsLegsPlayerSteps(HEADS_LEGS_TASKS["heads-legs-5-03"]!);
+  if (steps53.some((s) => s.type === "hl_derive_prelude")) {
+    fail("heads-legs-5-03: не должна иметь derive-prelude");
+  } else {
+    ok("5.3: explicit replacement data → не derive-base");
+  }
+}
+
+for (const methodId of DERIVE_PATTERN_PILOT_METHOD_IDS) {
+  const audit = getPattern5Audit(methodId);
+  if (audit && hasExplicitStandardReplacementData(audit)) {
+    fail(`${methodId}: derive-base нельзя при явных totalObjects/totalFeature в условии`);
+  }
+}
 
 console.log("\n--- heads-legs pattern 5 publishing guard ---\n");
 
@@ -801,6 +842,11 @@ if (!task53) {
     fail("heads-legs-5-03 не должна открываться в child mode");
   } else {
     ok("heads-legs-5-03: child mode blocked");
+  }
+  if (task53.headsLegsMeta?.ruleInstance?.ruleId !== "heads-legs-base") {
+    fail("heads-legs-5-03: ruleInstance должен быть heads-legs-base (transfer)");
+  } else {
+    ok("heads-legs-5-03: heads-legs-base transfer rule");
   }
 }
 
