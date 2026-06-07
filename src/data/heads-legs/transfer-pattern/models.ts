@@ -55,3 +55,9 @@ export const TRANSFER_43_READ_HINT =
 
 export const TRANSFER_53_READ_HINT =
   "Прочитай задачу. Это знакомый тип: два вида существ и разное количество зубов у каждого.";
+
+/** Подсказка шага word_solution — только формат записи, без чисел из условия */
+export const TRANSFER_WORD_SOLUTION_HINT =
+  "В каждый пропуск — полный пример: числа, знак действия и результат через «=» (образец: 12 × 2 = 24).";
+
+export const TRANSFER_WORD_SOLUTION_TITLE = "Запиши решение с пропусками";

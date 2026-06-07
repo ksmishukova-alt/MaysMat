@@ -19,6 +19,10 @@ import {
 } from "./custom";
 import { buildTransferAssumeStep43 } from "./custom/steps-4-3";
 import { buildTransferMethodStep53 } from "./custom/steps-5-3";
+import {
+  TRANSFER_WORD_SOLUTION_HINT,
+  TRANSFER_WORD_SOLUTION_TITLE,
+} from "../transfer-pattern/models";
 
 function assumptionObjectPhrase(condition: string, totalObjects: number | null | undefined): string {
   if (totalObjects != null) {
@@ -211,17 +215,13 @@ export function buildGuidedSteps(meta: HeadsLegsTaskMeta): DiscriminatedTaskStep
     id: `${meta.id}-words`,
     type: "word_solution",
     title:
-      meta.methodTaskId === "4.3"
-        ? "Запиши решение с пропусками"
-        : meta.methodTaskId === "5.3"
-          ? "Запиши примеры"
-          : wordStepTitle(mode, flow.profile),
+      meta.methodTaskId === "4.3" || meta.methodTaskId === "5.3"
+        ? TRANSFER_WORD_SOLUTION_TITLE
+        : wordStepTitle(mode, flow.profile),
     hint:
-      meta.methodTaskId === "4.3"
-        ? "В каждый пропуск — полный пример, например 12 × 2 = 24."
-        : meta.methodTaskId === "5.3"
-          ? "Запиши ход решения примерами: 29 × 8 = 232, 352 − 232 = 120 и дальше."
-          : flow.profile === "diagnostic"
+      meta.methodTaskId === "4.3" || meta.methodTaskId === "5.3"
+        ? TRANSFER_WORD_SOLUTION_HINT
+        : flow.profile === "diagnostic"
           ? "Объясни, какого числа не хватает и приведи примеры вариантов."
           : flow.profile === "enumeration"
             ? "Запиши проверку вариантов и итоговый ответ."
