@@ -13,7 +13,7 @@ export default function DiagnosticPlayPage({
 }) {
   return (
     <AppShell>
-      <Header subtitle="Мини-игра · play" />
+      <Header subtitle="Мини-игра · МышМат" />
       <PlayInner params={params} />
     </AppShell>
   );

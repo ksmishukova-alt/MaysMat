@@ -207,7 +207,7 @@ export function DiagnosticFlow() {
         <p className="text-lg font-semibold">
           Баллы блока: {blockScore} / {block.maxScore}
         </p>
-        <p className="mt-2 text-sm text-gray-500">Правильность задач учтена; детали — в финальном отчёте.</p>
+        <p className="mt-2 text-sm text-gray-500">Подробный отчёт будет в самом конце.</p>
         <button
           type="button"
           data-testid="diagnostic-next-block"

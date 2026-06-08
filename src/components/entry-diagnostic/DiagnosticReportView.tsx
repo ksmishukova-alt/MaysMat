@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import type { DiagnosticReport } from "@/data/entry-diagnostic/types";
+import { humanizeErrorClusterKey } from "@/lib/entry-diagnostic/error-labels";
 
 export function DiagnosticReportView({ report }: { report: DiagnosticReport }) {
   return (
@@ -67,7 +68,7 @@ export function DiagnosticReportView({ report }: { report: DiagnosticReport }) {
           <ul className="flex flex-wrap gap-2">
             {Object.entries(report.errorClusters).map(([k, v]) => (
               <li key={k} className="rounded-full bg-gray-100 px-3 py-1 text-xs">
-                {k}: {v}
+                {humanizeErrorClusterKey(k)}: {v}
               </li>
             ))}
           </ul>
@@ -78,7 +79,7 @@ export function DiagnosticReportView({ report }: { report: DiagnosticReport }) {
         href="/diagnostic/play/counting-road"
         className="inline-block min-h-11 rounded-xl border border-brand-purple px-4 py-2 text-sm text-brand-purple"
       >
-        Мини-игра «Счётная дорога» (play)
+        Мини-игра «Счётная дорога»
       </Link>
     </div>
   );

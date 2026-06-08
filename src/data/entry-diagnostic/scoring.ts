@@ -18,7 +18,7 @@ export function routeRecommendationForBlockScore(score: number): string {
   if (score <= 1) return "полный обучающий маршрут";
   if (score <= 3) return "базовый короткий блок";
   if (score <= 5) return "тренировка на перенос";
-  return "пропустить обучение, challenge позже";
+  return "сложные задачи позже";
 }
 
 export function buildDiagnosticReport(

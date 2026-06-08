@@ -172,8 +172,8 @@ export function GeometryGridBoard({ task, response, onPatch, onRecordError }: Ru
     <div data-board="geometry" className="space-y-3">
       <div className="flex gap-2">
         {[
-          { id: "fence", label: "Забор (P)" },
-          { id: "tile", label: "Плитка (S)" },
+          { id: "fence", label: "Забор (периметр)" },
+          { id: "tile", label: "Плитка (площадь)" },
         ].map((m) => (
           <button
             key={m.id}

@@ -12,6 +12,12 @@ import {
 } from "@/lib/entry-diagnostic/error-telemetry";
 import { isDiagnosticFastMode } from "@/lib/entry-diagnostic/fast-mode";
 
+const DIFFICULTY_LABEL: Record<DiagnosticTask["difficulty"], string> = {
+  D1: "Уровень 1",
+  D2: "Уровень 2",
+  D3: "Уровень 3",
+};
+
 export const RUNNER_LABELS: Record<RunnerKind, string> = {
   reading_comprehension_visual: "Чтение условия",
   story_add_sub_visual: "Сложение и вычитание в сюжете",
@@ -106,7 +112,7 @@ export function DiagnosticRunnerCore({
       phaseCount={15}
       showStepTitle
       stepTitle={task.taskText}
-      subStepLabel={`${task.difficulty} · ${stepIndex + 1}/${steps.length}`}
+      subStepLabel={`${DIFFICULTY_LABEL[task.difficulty]} · шаг ${stepIndex + 1} из ${steps.length}`}
     >
       <div
         data-testid="diagnostic-runner"

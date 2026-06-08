@@ -29,7 +29,7 @@ export function MiniGameShell({
         </span>
       </div>
       {mode === "diagnostic" ? (
-        <p className="text-xs text-amber-700">Режим диагностики: без подсказок по ходу игры.</p>
+        <p className="text-xs text-amber-700">Играем без подсказок — просто реши задание.</p>
       ) : null}
       <div className="mt-4">{children}</div>
       {footer}

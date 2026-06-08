@@ -7,7 +7,7 @@ import { Header } from "@/components/Header";
 export default function DiagnosticLandingPage() {
   return (
     <AppShell>
-      <Header subtitle="Entry Diagnostic v2" />
+      <Header subtitle="Входная диагностика · МышМат" />
       <div className="rounded-2xl bg-white p-8 shadow-card">
         <h1 className="text-2xl font-bold text-gray-900">Диагностика МышМата</h1>
         <p className="mt-3 max-w-xl text-sm leading-relaxed text-gray-600">
