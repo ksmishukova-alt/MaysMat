@@ -154,7 +154,7 @@ export function DiagnosticRunnerCore({
           </button>
         </div>
         <p className="mt-3 text-xs text-gray-400">
-          Диагностика: правильность не показываем до конца.
+          Правильные ответы покажем только в конце.
         </p>
       </div>
     </TaskScreenShell>
