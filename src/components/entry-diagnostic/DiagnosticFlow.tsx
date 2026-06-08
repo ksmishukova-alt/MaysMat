@@ -82,6 +82,9 @@ export function DiagnosticFlow() {
       selfCorrection: meta.selfCorrection,
       computationErrors: meta.computationErrors,
       orderErrors: meta.orderErrors,
+      readingErrors: meta.readingErrors,
+      dataErrors: meta.dataErrors,
+      unitErrors: meta.unitErrors,
     };
 
     let next = appendEvent(session, {
@@ -108,6 +111,7 @@ export function DiagnosticFlow() {
     roundsCompleted: number;
     catchErrors: number;
     semanticErrors: number;
+    motorErrors: number;
   }) => {
     if (!session || !block) return;
     const mg = getMiniGameById(block.miniGameId);
@@ -128,6 +132,7 @@ export function DiagnosticFlow() {
           startedAt: Date.now(),
           finishedAt: Date.now(),
           ...result,
+          motorErrors: result.motorErrors ?? result.catchErrors,
         },
       ],
       phase: "block_summary",

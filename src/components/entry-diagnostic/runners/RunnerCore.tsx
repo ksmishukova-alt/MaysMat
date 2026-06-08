@@ -5,6 +5,11 @@ import type { DiagnosticTask, RunnerKind, ScreenStep } from "@/data/entry-diagno
 import { TaskScreenShell } from "@/components/task-steps/TaskScreenShell";
 import { InteractiveRunnerBoard } from "@/components/entry-diagnostic/runners/boards";
 import { EmbeddedCalculatorPanel } from "@/components/entry-diagnostic/runners/boards/boards-advanced";
+import {
+  emptyErrorTelemetry,
+  pushUnique,
+  type ErrorTelemetryBuckets,
+} from "@/lib/entry-diagnostic/error-telemetry";
 import { isDiagnosticFastMode } from "@/lib/entry-diagnostic/fast-mode";
 
 export const RUNNER_LABELS: Record<RunnerKind, string> = {
@@ -39,6 +44,9 @@ export interface RunnerSubmitMeta {
   selfCorrection: boolean;
   computationErrors: string[];
   orderErrors: string[];
+  readingErrors: string[];
+  dataErrors: string[];
+  unitErrors: string[];
 }
 
 export function DiagnosticRunnerCore({
@@ -51,9 +59,18 @@ export function DiagnosticRunnerCore({
   const [response, setResponse] = useState<Record<string, unknown>>({});
   const [initialActionCount, setInitialActionCount] = useState<number | undefined>();
   const [planSteps, setPlanSteps] = useState<string[]>([]);
+  const [planEdited, setPlanEdited] = useState(false);
+  const [errors, setErrors] = useState<ErrorTelemetryBuckets>(emptyErrorTelemetry);
 
   const steps = task.screenSequence;
   const step = steps[stepIndex];
+
+  const recordError = (bucket: keyof ErrorTelemetryBuckets, code: string) => {
+    setErrors((prev) => ({
+      ...prev,
+      [bucket]: pushUnique(prev[bucket], code),
+    }));
+  };
 
   const patchField = (key: string, value: unknown) => {
     setResponse((prev) => ({ ...prev, [key]: value }));
@@ -75,9 +92,8 @@ export function DiagnosticRunnerCore({
           initialActionCount != null &&
           finalActionCount != null &&
           initialActionCount !== finalActionCount,
-        selfCorrection: false,
-        computationErrors: [],
-        orderErrors: runnerKind.includes("expression") ? [] : [],
+        selfCorrection: planEdited,
+        ...errors,
       },
     );
   };
@@ -104,12 +120,22 @@ export function DiagnosticRunnerCore({
           planSteps={planSteps}
           runnerKind={runnerKind}
           onPatch={patchField}
+          onRecordError={recordError}
           onHypothesis={(n) => {
+            if (initialActionCount != null && initialActionCount !== n) {
+              recordError("orderErrors", "action_count_revised");
+            }
             setInitialActionCount((prev) => (prev == null ? n : prev));
             patchField("actionCount", n);
           }}
-          onAddPlanStep={() => setPlanSteps((p) => [...p, `действие ${p.length + 1}`])}
-          onRemovePlanStep={() => setPlanSteps((p) => p.slice(0, -1))}
+          onAddPlanStep={() => {
+            setPlanSteps((p) => [...p, `действие ${p.length + 1}`]);
+            setPlanEdited(true);
+          }}
+          onRemovePlanStep={() => {
+            setPlanSteps((p) => p.slice(0, -1));
+            setPlanEdited(true);
+          }}
         />
         <div className="mt-6 flex justify-end">
           <button
@@ -136,6 +162,7 @@ function RunnerStepBody({
   planSteps,
   runnerKind,
   onPatch,
+  onRecordError,
   onHypothesis,
   onAddPlanStep,
   onRemovePlanStep,
@@ -146,6 +173,7 @@ function RunnerStepBody({
   planSteps: string[];
   runnerKind: RunnerKind;
   onPatch: (key: string, value: unknown) => void;
+  onRecordError: (bucket: keyof ErrorTelemetryBuckets, code: string) => void;
   onHypothesis: (n: number) => void;
   onAddPlanStep: () => void;
   onRemovePlanStep: () => void;
@@ -162,6 +190,7 @@ function RunnerStepBody({
             runnerKind={runnerKind}
             response={response}
             onPatch={onPatch}
+            onRecordError={onRecordError}
           />
         </div>
       );
@@ -264,7 +293,11 @@ function RunnerStepBody({
       return (
         <div>
           <p className="mb-2 text-sm">{step.prompt}</p>
-          <EmbeddedCalculatorPanel response={response} onPatch={onPatch} />
+          <EmbeddedCalculatorPanel
+            response={response}
+            onPatch={onPatch}
+            onRecordError={onRecordError}
+          />
         </div>
       );
     case "confirm_submit":

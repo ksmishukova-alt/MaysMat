@@ -21,7 +21,13 @@
 - [x] visual_board во всех задачах (default + plan + expression)
 - [x] E2e full 1–15 проходит с новыми компонентами
 
-## PR 3 — polish (optional)
+## PR 3 — polish ✅
+
+- [x] Runner visuals: деление уголком, столбик, умножение, геометрия, дроби, проценты, гирлянда
+- [x] Брендовые mini-game frames (16 названий)
+- [x] Error telemetry: order/computation/reading/data/unit + motor vs semantic
+- [x] Responsive e2e (desktop/tablet/mobile)
+- [x] Nav link `/diagnostic`
 
 Replace generic frame with specialized components:
 

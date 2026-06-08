@@ -57,6 +57,19 @@ export function buildDiagnosticReport(
     for (const e of a.orderErrors) {
       errorClusters[e] = (errorClusters[e] ?? 0) + 1;
     }
+    for (const e of a.readingErrors) {
+      errorClusters[e] = (errorClusters[e] ?? 0) + 1;
+    }
+    for (const e of a.dataErrors) {
+      errorClusters[e] = (errorClusters[e] ?? 0) + 1;
+    }
+    for (const e of a.unitErrors) {
+      errorClusters[e] = (errorClusters[e] ?? 0) + 1;
+    }
+  }
+  for (const m of miniGameAttempts) {
+    if (m.motorErrors) errorClusters["mini_motor"] = (errorClusters["mini_motor"] ?? 0) + m.motorErrors;
+    if (m.semanticErrors) errorClusters["mini_semantic"] = (errorClusters["mini_semantic"] ?? 0) + m.semanticErrors;
   }
 
   const strengths = scoreByBlock

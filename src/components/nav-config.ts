@@ -10,6 +10,7 @@ export interface NavItem {
 export const NAV_ITEMS: NavItem[] = [
   { href: "/", label: "Главная", icon: "🏠", mobilePrimary: true },
   { href: "/tasks", label: "Задачи", icon: "📝", badgeKey: "daily", mobilePrimary: true },
+  { href: "/diagnostic", label: "Диагностика", icon: "🩺" },
   { href: "/album", label: "Альбом", icon: "📚", mobilePrimary: true },
   { href: "/achievements", label: "Достижения", icon: "🏆", mobilePrimary: true },
   { href: "/profile", label: "Профиль", icon: "👤" },

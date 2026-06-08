@@ -110,6 +110,9 @@ export interface TaskAttemptRecord {
   selfCorrection: boolean;
   computationErrors: string[];
   orderErrors: string[];
+  readingErrors: string[];
+  dataErrors: string[];
+  unitErrors: string[];
 }
 
 export interface MiniGameAttemptRecord {
@@ -122,6 +125,8 @@ export interface MiniGameAttemptRecord {
   roundsCompleted: number;
   catchErrors: number;
   semanticErrors: number;
+  /** Ошибки моторики (промах по карточке), отдельно от semantic */
+  motorErrors: number;
 }
 
 export interface AttemptEvent {

@@ -5,6 +5,7 @@ export interface MiniGameResult {
   roundsCompleted: number;
   catchErrors: number;
   semanticErrors: number;
+  motorErrors: number;
 }
 
 export interface DiagnosticMiniGameProps {

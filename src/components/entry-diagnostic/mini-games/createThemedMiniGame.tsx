@@ -5,6 +5,7 @@ import type { DiagnosticMiniGameProps } from "./types";
 import { getMiniGameSpec } from "@/data/entry-diagnostic/mini-games/specs";
 import { useMiniGameState } from "./useMiniGameState";
 import { MiniGameShell } from "./MiniGameShell";
+import { BrandFrame, MINI_GAME_BRAND } from "./branded-renders";
 
 export interface ThemedMiniGameProps extends DiagnosticMiniGameProps {
   themeClass: string;
@@ -43,6 +44,8 @@ export function ThemedMiniGame({
 
   if (!spec) return <p>Игра не настроена</p>;
 
+  const brand = MINI_GAME_BRAND[config.miniGameId];
+
   return (
     <MiniGameShell
       config={config}
@@ -60,8 +63,9 @@ export function ThemedMiniGame({
               onComplete({
                 score: state.score,
                 roundsCompleted: state.round,
-                catchErrors: state.catchErrors,
+                catchErrors: state.motorErrors,
                 semanticErrors: state.semanticErrors,
+                motorErrors: state.motorErrors,
               })
             }
           >
@@ -70,14 +74,19 @@ export function ThemedMiniGame({
         ) : null
       }
     >
-      <p className={`mb-4 rounded-xl p-3 text-sm ${themeClass}`}>
-        {emoji} {spec.instruction}
-      </p>
-      {renderTargets({
-        targets: spec.targets,
-        pick: state.pick,
-        showFeedback: state.showFeedback,
-      })}
+      <BrandFrame
+        brandTitle={brand?.title ?? config.title}
+        accentClass={brand?.accent ?? themeClass}
+      >
+        <p className="mb-4 text-center text-sm">
+          {brand?.decor ?? emoji} {spec.instruction}
+        </p>
+        {renderTargets({
+          targets: spec.targets,
+          pick: state.pick,
+          showFeedback: state.showFeedback,
+        })}
+      </BrandFrame>
     </MiniGameShell>
   );
 }
