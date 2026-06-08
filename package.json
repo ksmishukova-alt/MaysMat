@@ -25,6 +25,8 @@
     "generate:heads-legs-wave-p1": "npx tsx scripts/generate-heads-legs-wave-p1-audit.ts",
     "smoke:dual-path": "npx tsx scripts/smoke-dual-path-local.ts",
     "smoke:explicit-training": "npx tsx scripts/smoke-explicit-training-production.ts",
+    "qa:entry-diagnostic": "npx tsx scripts/qa-entry-diagnostic.ts",
+    "test:entry-diagnostic": "npx tsx scripts/test-entry-diagnostic-unit.ts",
     "test:e2e": "playwright test"
   },
   "dependencies": {
