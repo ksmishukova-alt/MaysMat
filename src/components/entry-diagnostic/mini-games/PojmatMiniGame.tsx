@@ -7,49 +7,30 @@ import { BrandFrame, MINI_GAME_BRAND } from "./branded-renders";
 import { usePojmatGameState } from "./usePojmatGameState";
 import { PojmatCatchArena } from "./PojmatCatchArena";
 
-function PojmatDiagnosticGrid({
-  round,
-  onPick,
-}: {
-  round: (typeof POJMAT_ROUNDS)[number];
-  onPick: (cardId: string) => void;
-}) {
-  return (
-    <>
-      <p className="mb-2 text-center text-xs text-gray-500">Выбери карточку с главным вопросом</p>
-      <p className="mb-4 rounded-xl border border-lavender-200 bg-lavender-50/80 p-4 text-center text-sm leading-relaxed text-gray-800">
-        {round.conditionText}
-      </p>
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-        {round.cards.map((card) => (
-          <button
-            key={card.id}
-            type="button"
-            data-testid={`mini-target-${card.id}`}
-            aria-label={card.label}
-            onClick={() => onPick(card.id)}
-            className="min-h-20 rounded-2xl border-2 border-lavender-200 bg-white p-4 text-left text-sm font-medium leading-snug shadow-sm transition hover:border-brand-purple/50 hover:bg-lavender-50/50"
-          >
-            {card.label}
-          </button>
-        ))}
-      </div>
-    </>
-  );
-}
-
 export function PojmatMiniGame(props: DiagnosticMiniGameProps) {
   const state = usePojmatGameState(props);
-  const round = POJMAT_ROUNDS[state.roundIndex];
+  const round = POJMAT_ROUNDS[state.roundIndex % POJMAT_ROUNDS.length];
   const brand = MINI_GAME_BRAND.pojmat;
 
-  if (!round) {
-    return <p className="text-sm text-gray-500">Игра завершена</p>;
+  if (!round || state.finished) {
+    return props.mode === "play" && state.finished ? (
+      <div>
+        <p className="text-sm text-gray-600">Игра завершена! Очки: {state.score}</p>
+        <button
+          type="button"
+          data-testid="mini-game-finish"
+          className="mt-4 min-h-11 rounded-xl bg-brand-purple px-6 py-2 text-sm text-white"
+          onClick={() => state.finishNow()}
+        >
+          Завершить игру
+        </button>
+      </div>
+    ) : (
+      <p className="text-sm text-gray-500">Игра завершена</p>
+    );
   }
 
-  const handlePick = (cardId: string) => {
-    state.pick(cardId, round.correctId, round.trapId);
-  };
+  const handlePick = (cardId: string) => state.pick(cardId, round.correctId, round.trapId);
 
   return (
     <MiniGameShell
@@ -59,7 +40,7 @@ export function PojmatMiniGame(props: DiagnosticMiniGameProps) {
       round={state.roundIndex}
       totalRounds={state.totalRounds}
       footer={
-        props.mode === "play" && state.finished ? (
+        props.mode === "play" && state.roundIndex >= state.totalRounds ? (
           <button
             type="button"
             data-testid="mini-game-finish"
@@ -72,11 +53,13 @@ export function PojmatMiniGame(props: DiagnosticMiniGameProps) {
       }
     >
       <BrandFrame brandTitle={brand?.title ?? props.config.title} accentClass={brand?.accent ?? ""}>
-        {props.mode === "play" ? (
-          <PojmatCatchArena round={round} onCatch={handlePick} />
-        ) : (
-          <PojmatDiagnosticGrid round={round} onPick={handlePick} />
-        )}
+        <PojmatCatchArena
+          key={`${state.roundIndex}-${props.mode}`}
+          round={round}
+          mode={props.mode}
+          speedMultiplier={state.speedMultiplier}
+          onCatch={handlePick}
+        />
       </BrandFrame>
     </MiniGameShell>
   );

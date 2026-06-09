@@ -19,10 +19,14 @@ export function usePojmatGameState({
   const [motorErrors, setMotorErrors] = useState(0);
   const [semanticErrors, setSemanticErrors] = useState(0);
   const [finished, setFinished] = useState(false);
+  const [consecutiveCorrect, setConsecutiveCorrect] = useState(0);
   const durationSec = diagnosticMiniGameDurationSec(config.diagnostic.durationSec);
   const [timeLeft, setTimeLeft] = useState(mode === "diagnostic" ? durationSec : 120);
 
   const totalRounds = mode === "diagnostic" ? Math.min(2, POJMAT_ROUNDS.length) : config.rounds;
+
+  const speedMultiplier =
+    mode === "play" ? 1 + Math.min(consecutiveCorrect, 6) * 0.25 : 1;
 
   const finishNow = useCallback(
     (nextRound = roundIndex, nextMotor = motorErrors, nextSemantic = semanticErrors, nextScore = score) => {
@@ -62,6 +66,7 @@ export function usePojmatGameState({
       let nextSemantic = semanticErrors;
 
       if (!ok) {
+        setConsecutiveCorrect(0);
         const kind = miniGameErrorEventKind(cardId, correctId, trapId);
         if (kind === "motor") {
           nextMotor += 1;
@@ -70,6 +75,8 @@ export function usePojmatGameState({
           nextSemantic += 1;
           onEvent("mini_semantic_error", { blockId, label: cardId, round: roundIndex, errorKind: "semantic" });
         }
+      } else {
+        setConsecutiveCorrect((s) => s + 1);
       }
 
       let nextScore = score;
@@ -114,6 +121,7 @@ export function usePojmatGameState({
     timeLeft,
     totalRounds,
     finished,
+    speedMultiplier,
     pick,
     finishNow: () => finishNow(roundIndex, motorErrors, semanticErrors, score),
   };

@@ -1,4 +1,5 @@
 import { makePlanTask, makeReadingTask, makeTask, makeExpressionTask, toBlock, type BlockSeed } from "../seed-helpers";
+import { BLOCK_01_READING_TASKS } from "../mini-games/pojmat-rounds";
 
 const B01 = "block-01";
 const seeds: BlockSeed[] = [
@@ -9,50 +10,17 @@ const seeds: BlockSeed[] = [
     skill: "reading_comprehension",
     runnerKind: "reading_comprehension_visual",
     miniGameId: "pojmat",
-    tasks: [
+    tasks: BLOCK_01_READING_TASKS.map((t) =>
       makeReadingTask(
         B01,
-        "D1",
-        "У Маши 12 яблок, у Пети 8. Сколько всего яблок у детей?",
-        "О чём спрашивают в задаче?",
-        [
-          { id: "together", label: "Сколько яблок у Маши и Пети вместе?" },
-          { id: "masha", label: "Сколько яблок у Маши?" },
-          { id: "peti", label: "Сколько яблок у Пети?" },
-          { id: "extra", label: "Сколько яблок лишние?" },
-        ],
-        "together",
-        ["reading_error", "question_focus_error"],
+        t.difficulty,
+        t.conditionText,
+        t.questionPrompt,
+        t.cards,
+        t.correctId,
+        t.errorTypes,
       ),
-      makeReadingTask(
-        B01,
-        "D2",
-        "В корзине 24 конфеты: 10 шоколадных, остальные — карамельки. Сколько карамелек?",
-        "Какой вопрос подходит к задаче?",
-        [
-          { id: "caramel", label: "Сколько карамелек в корзине?" },
-          { id: "choco", label: "Сколько шоколадных конфет?" },
-          { id: "total", label: "Сколько конфет всего?" },
-          { id: "extra", label: "Сколько конфет лишних?" },
-        ],
-        "caramel",
-        ["reading_error", "data_error"],
-      ),
-      makeReadingTask(
-        B01,
-        "D3",
-        "На полке 5 красных, 7 синих и 3 зелёных книг. Сколько книг не красных?",
-        "Какой ответ подходит к вопросу?",
-        [
-          { id: "not_red", label: "Сколько книг не красных?" },
-          { id: "red", label: "Сколько красных книг?" },
-          { id: "blue", label: "Сколько синих книг?" },
-          { id: "green", label: "Сколько зелёных книг?" },
-        ],
-        "not_red",
-        ["reading_error", "extra_data_error", "question_focus_error"],
-      ),
-    ],
+    ) as BlockSeed["tasks"],
   },
   {
     blockId: "block-02",

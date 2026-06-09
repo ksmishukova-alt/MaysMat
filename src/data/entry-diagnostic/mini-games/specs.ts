@@ -13,10 +13,10 @@ export interface MiniGameSpec {
 export const MINI_GAME_SPECS: Record<string, MiniGameSpec> = {
   pojmat: {
     miniGameId: "pojmat",
-    instruction: "Выбери карточку с главным вопросом задачи",
+    instruction: "Поймай карточку с правильным смыслом вопроса",
     correctTarget: "together",
-    targets: ["together", "masha", "peti", "extra"],
-    semanticTrap: "extra",
+    targets: ["together", "non_choco", "blue_green"],
+    semanticTrap: "left",
   },
   parkomat: {
     miniGameId: "parkomat",

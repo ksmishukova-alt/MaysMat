@@ -1,4 +1,5 @@
 import type { Page } from "@playwright/test";
+import { POJMAT_ROUNDS } from "../../src/data/entry-diagnostic/mini-games/pojmat-rounds";
 import { getMiniGameSpec } from "../../src/data/entry-diagnostic/mini-games/specs";
 
 export async function completeTaskSteps(page: Page) {
@@ -56,21 +57,36 @@ export async function completeTaskSteps(page: Page) {
   }
 }
 
+/** Ловля в ПойМАТ: дождаться карточку в зоне и поймать */
+async function catchPojmatCard(page: Page, correctId: string) {
+  for (let attempt = 0; attempt < 40; attempt++) {
+    const enabled = page.locator(`[data-testid="mini-target-${correctId}"]:not([disabled])`);
+    if ((await enabled.count()) > 0) {
+      await enabled.first().click();
+      await page.waitForTimeout(150);
+      return;
+    }
+    await page.waitForTimeout(100);
+  }
+}
+
 export async function completeMiniGame(page: Page, miniGameId: string) {
+  if (miniGameId === "pojmat") {
+    for (let r = 0; r < 2; r++) {
+      const round = POJMAT_ROUNDS[r];
+      if (!round) break;
+      await catchPojmatCard(page, round.correctId);
+      await page.waitForTimeout(400);
+    }
+    return;
+  }
+
   const spec = getMiniGameSpec(miniGameId);
   if (!spec) return;
   const target = page.getByTestId(`mini-target-${spec.correctTarget}`);
   await target.scrollIntoViewIfNeeded();
   await target.click({ force: true });
   await page.waitForTimeout(200);
-  if (miniGameId === "pojmat") {
-    await page.waitForTimeout(400);
-    const target2 = page.getByTestId("mini-target-caramel");
-    if (await target2.isVisible().catch(() => false)) {
-      await target2.click({ force: true });
-    }
-  } else {
-    await target.click({ force: true });
-  }
+  await target.click({ force: true });
   await page.waitForTimeout(600);
 }
