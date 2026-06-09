@@ -81,7 +81,7 @@ async function catchPojmatRound(page: Page, correctId: string) {
   await page
     .locator(`[data-testid="pojmat-catch-arena"] [data-testid="mini-target-${correctId}"]`)
     .waitFor({ state: "detached", timeout: 20_000 });
-  await page.waitForTimeout(250);
+  await page.waitForTimeout(550);
 }
 
 export async function completeMiniGame(page: Page, miniGameId: string) {

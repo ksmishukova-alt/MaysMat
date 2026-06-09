@@ -23,7 +23,7 @@ export function usePojmatGameState({
   const durationSec = diagnosticMiniGameDurationSec(config.diagnostic.durationSec);
   const [timeLeft, setTimeLeft] = useState(mode === "diagnostic" ? durationSec : 120);
 
-  const totalRounds = mode === "diagnostic" ? Math.min(2, POJMAT_ROUNDS.length) : config.rounds;
+  const totalRounds = config.rounds;
 
   const speedMultiplier =
     mode === "play" ? 1 + Math.min(consecutiveCorrect, 6) * 0.25 : 1;
@@ -90,8 +90,6 @@ export function usePojmatGameState({
 
       if (mode === "diagnostic") {
         if (durationSec <= 3 && nextRound >= 2) {
-          finishNow(nextRound, nextMotor, nextSemantic, nextScore);
-        } else if (nextRound >= totalRounds) {
           finishNow(nextRound, nextMotor, nextSemantic, nextScore);
         }
       } else if (nextRound >= totalRounds) {

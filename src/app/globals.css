@@ -101,4 +101,52 @@ body {
   .island-submerged {
     animation: island-submerged-pulse 2.8s ease-in-out infinite;
   }
+
+  @keyframes pojmat-catch-in {
+    0% {
+      transform: translateY(0) scale(1);
+      opacity: 1;
+    }
+    65% {
+      transform: translateY(18px) scale(0.92);
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(36px) scale(0.25);
+      opacity: 0;
+    }
+  }
+
+  @keyframes pojmat-basket-pop {
+    0%,
+    100% {
+      transform: scale(1);
+    }
+    45% {
+      transform: scale(1.1);
+    }
+  }
+
+  @keyframes pojmat-sparkle {
+    0% {
+      transform: scale(0.4);
+      opacity: 0.9;
+    }
+    100% {
+      transform: scale(1.6);
+      opacity: 0;
+    }
+  }
+
+  .pojmat-catch-in {
+    animation: pojmat-catch-in 0.48s cubic-bezier(0.34, 1.2, 0.64, 1) forwards;
+  }
+
+  .pojmat-basket-pop {
+    animation: pojmat-basket-pop 0.48s ease-out;
+  }
+
+  .pojmat-sparkle {
+    animation: pojmat-sparkle 0.5s ease-out forwards;
+  }
 }
