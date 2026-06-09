@@ -6,6 +6,7 @@ import type { MiniGameMode } from "@/data/entry-diagnostic/types";
 import type { PojmatRound } from "@/data/entry-diagnostic/mini-games/pojmat-rounds";
 import { isDiagnosticFastMode } from "@/lib/entry-diagnostic/fast-mode";
 import { POJMAT_VISUAL_ASSETS } from "./pojmat-assets";
+import { PojmatConditionPlate } from "./PojmatConditionPlate";
 
 const LANES = 4;
 const LANE_BORDER = ["border-violet-400", "border-sky-400", "border-amber-400", "border-emerald-400"];
@@ -242,28 +243,7 @@ export function PojmatCatchArena({
           sizes="(max-width: 768px) 100vw, 480px"
         />
 
-        <div
-          data-testid="pojmat-condition-plate"
-          className="pointer-events-none absolute left-1/2 top-3 z-30 w-[94%] max-w-md -translate-x-1/2 sm:top-4"
-        >
-          <div className="flex gap-2.5 rounded-2xl border border-stone-200/90 bg-[#fefcf6]/96 p-2.5 shadow-md backdrop-blur-[2px] sm:gap-3 sm:p-3">
-            <div
-              className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl border border-amber-100 bg-gradient-to-b from-amber-50 to-orange-50 sm:h-16 sm:w-16"
-              aria-hidden
-            >
-              <span className="text-2xl leading-none sm:text-3xl">🧺</span>
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="text-xs font-bold leading-snug text-sky-950 sm:text-sm">
-                {round.conditionText}
-              </p>
-              <div className="my-1.5 border-t border-dashed border-stone-300/90 sm:my-2" />
-              <p className="text-[11px] font-medium leading-snug text-brand-purple sm:text-xs">
-                Поймай карточку с правильным смыслом вопроса
-              </p>
-            </div>
-          </div>
-        </div>
+        <PojmatConditionPlate round={round} />
 
         {cards.map((card) => {
           const laneStyle = LANE_BORDER[card.lane % LANE_BORDER.length];
