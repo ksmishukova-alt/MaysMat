@@ -5,7 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { MiniGameMode } from "@/data/entry-diagnostic/types";
 import type { PojmatRound } from "@/data/entry-diagnostic/mini-games/pojmat-rounds";
 import { isDiagnosticFastMode } from "@/lib/entry-diagnostic/fast-mode";
-import { POJMAT_VISUAL_ASSETS } from "./pojmat-assets";
+import { POJMAT_VISUAL_ASSETS, pojmatPlateBottomInset } from "./pojmat-assets";
 import { PojmatConditionPlate } from "./PojmatConditionPlate";
 
 const LANES = 4;
@@ -50,7 +50,7 @@ function buildInitialCards(round: PojmatRound, mode: MiniGameMode, uidStart: num
       id: card.id,
       label: card.label,
       lane: assigned[i] ?? laneOrder[i],
-      y: -12 - i * 2,
+      y: -18 - i * 2,
     }));
   }
   return round.cards.map((card, i) => ({
@@ -58,7 +58,7 @@ function buildInitialCards(round: PojmatRound, mode: MiniGameMode, uidStart: num
     id: card.id,
     label: card.label,
     lane: laneOrder[i],
-    y: -12 - i * 2,
+    y: -18 - i * 2,
   }));
 }
 
@@ -245,24 +245,29 @@ export function PojmatCatchArena({
 
         <PojmatConditionPlate round={round} />
 
-        {cards.map((card) => {
-          const laneStyle = LANE_BORDER[card.lane % LANE_BORDER.length];
-          return (
-            <div
-              key={card.uid}
-              className="pointer-events-none absolute z-10 w-[23%]"
-              style={{ left: `${card.lane * 25 + 1}%`, top: `${card.y}%` }}
-            >
+        <div
+          className="pointer-events-none absolute inset-0 z-10"
+          style={{ clipPath: `inset(${pojmatPlateBottomInset()} 0 0 0)` }}
+        >
+          {cards.map((card) => {
+            const laneStyle = LANE_BORDER[card.lane % LANE_BORDER.length];
+            return (
               <div
-                data-testid={`mini-target-${card.id}`}
-                data-lane={card.lane}
-                className={`w-full rounded-xl border-2 border-dashed bg-white/95 text-center font-medium shadow-lg ${laneStyle} ${cfg.cardText} ${cfg.cardPad}`}
+                key={card.uid}
+                className="absolute w-[23%]"
+                style={{ left: `${card.lane * 25 + 1}%`, top: `${card.y}%` }}
               >
-                {card.label}
+                <div
+                  data-testid={`mini-target-${card.id}`}
+                  data-lane={card.lane}
+                  className={`w-full rounded-xl border-2 border-dashed bg-white/95 text-center font-medium shadow-lg ${laneStyle} ${cfg.cardText} ${cfg.cardPad}`}
+                >
+                  {card.label}
+                </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
 
         {catchFx ? (
           <div
