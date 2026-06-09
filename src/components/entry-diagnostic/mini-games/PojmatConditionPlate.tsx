@@ -23,13 +23,19 @@ export function PojmatConditionPlate({ round }: { round: PojmatRound }) {
       data-testid="pojmat-condition-plate"
       className="pointer-events-none absolute left-1/2 top-2.5 z-30 w-[96%] max-w-xl -translate-x-1/2 sm:top-3"
     >
-      <div className="relative mx-auto w-full" style={{ aspectRatio: "1024 / 341" }}>
+      <div
+        className="relative mx-auto w-full overflow-hidden rounded-[1.1rem] bg-[#fdf8f0] sm:rounded-[1.25rem]"
+        style={{
+          aspectRatio: "1024 / 341",
+          boxShadow: "0 2px 4px rgba(55, 42, 28, 0.14)",
+        }}
+      >
         <Image
           src={POJMAT_VISUAL_ASSETS.conditionPlateEmpty}
           alt=""
           fill
           priority
-          className="object-contain drop-shadow-md"
+          className="object-contain"
           sizes="(max-width: 768px) 96vw, 560px"
         />
 
