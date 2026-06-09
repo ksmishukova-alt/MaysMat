@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { ENTRY_DIAGNOSTIC_BLOCKS } from "../src/data/entry-diagnostic/blocks/index";
 import { getMiniGameSpec } from "../src/data/entry-diagnostic/mini-games/specs";
-import { completeMiniGame, completeTaskSteps } from "./helpers/diagnostic-autopilot";
+import { completeMiniGame, completeTaskSteps, advanceBlockToMiniGame } from "./helpers/diagnostic-autopilot";
 
 test.describe("Entry Diagnostic v2", () => {
   test.beforeEach(async ({ page }) => {
@@ -17,7 +17,7 @@ test.describe("Entry Diagnostic v2", () => {
     await page.getByTestId("diagnostic-enter").click();
     await page.getByTestId("diagnostic-start").click();
     await expect(page.getByTestId("diagnostic-runner")).toBeVisible();
-    await expect(page.getByText(/Чтение условия/i)).toBeVisible();
+    await expect(page.getByText(/Читаем задачу/i)).toBeVisible();
   });
 
   test("report page loads when no session", async ({ page }) => {
@@ -35,6 +35,7 @@ test.describe("Entry Diagnostic v2", () => {
         await expect(page.getByTestId("diagnostic-runner")).toBeVisible({ timeout: 15_000 });
         await completeTaskSteps(page);
       }
+      await advanceBlockToMiniGame(page);
       await expect(page.getByTestId("diagnostic-minigame")).toBeVisible({ timeout: 10_000 });
       await completeMiniGame(page, block.miniGameId);
       await expect(page.getByTestId("diagnostic-next-block")).toBeVisible({ timeout: 15_000 });

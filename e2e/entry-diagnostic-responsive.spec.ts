@@ -1,6 +1,6 @@
 import { test, expect, devices } from "@playwright/test";
 import { ENTRY_DIAGNOSTIC_BLOCKS } from "../src/data/entry-diagnostic/blocks/index";
-import { completeMiniGame, completeTaskSteps } from "./helpers/diagnostic-autopilot";
+import { completeMiniGame, completeTaskSteps, advanceBlockToMiniGame } from "./helpers/diagnostic-autopilot";
 
 const VIEWPORTS = [
   { name: "desktop", ...devices["Desktop Chrome"] },
@@ -43,6 +43,7 @@ test.describe("Entry Diagnostic responsive", () => {
         await expect(page.getByTestId("diagnostic-runner")).toBeVisible({ timeout: 15_000 });
         await completeTaskSteps(page);
       }
+      await advanceBlockToMiniGame(page);
       await expect(page.getByTestId("diagnostic-minigame")).toBeVisible({ timeout: 10_000 });
       await completeMiniGame(page, block.miniGameId);
       await expect(page.getByTestId("diagnostic-next-block")).toBeVisible({ timeout: 15_000 });

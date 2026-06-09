@@ -82,7 +82,7 @@ export function ReadingComprehensionRunner({
   return (
     <DiagnosticScreenShell
       taskLabel={`Задание ${globalTaskIndex} из ${totalTasks}`}
-      blockTitle="Чтение условия"
+      blockTitle="Читаем задачу"
     >
       <div
         data-testid="diagnostic-runner"
@@ -90,18 +90,20 @@ export function ReadingComprehensionRunner({
         data-test-answer={isDiagnosticFastMode() ? JSON.stringify(task.answer) : undefined}
       >
         {step?.kind === "condition_read" ? (
-          <p className="text-lg leading-relaxed text-gray-900">{step.prompt}</p>
+          <p className="rounded-2xl border border-lavender-200 bg-lavender-50/60 px-4 py-4 text-lg leading-relaxed text-gray-900">
+            {step.prompt}
+          </p>
         ) : null}
 
         {step?.kind === "single_select" ? (
           <div>
             <p
-              className="mb-3 rounded-xl border border-lavender-200 bg-lavender-50/90 px-4 py-3 text-sm leading-relaxed text-gray-800"
+              className="mb-4 rounded-2xl border-2 border-lavender-200 bg-gradient-to-r from-lavender-50 to-purple-50/50 px-4 py-3.5 text-base leading-relaxed text-gray-800"
               data-testid="diagnostic-condition-banner"
             >
               {conditionText}
             </p>
-            <p className="mb-4 text-lg font-medium text-gray-900">{step.prompt}</p>
+            <p className="mb-4 text-lg font-semibold text-gray-900">{step.prompt}</p>
             <div className="grid gap-3 sm:grid-cols-2">
               {(step.options ?? []).map((opt) => {
                 const selected = response[step.fieldKey ?? "focus"] === opt.id;
@@ -112,10 +114,10 @@ export function ReadingComprehensionRunner({
                     data-testid={`diagnostic-choice-${opt.id}`}
                     aria-label={opt.label}
                     onClick={() => pickChoice(opt.id, correctChoiceId)}
-                    className={`min-h-14 rounded-2xl border-2 px-4 py-3 text-left text-sm leading-snug transition ${
+                    className={`min-h-[3.25rem] rounded-2xl border-2 px-4 py-3.5 text-left text-sm leading-snug shadow-sm transition ${
                       selected
-                        ? "border-brand-purple bg-lavender-50 font-medium text-brand-purple"
-                        : "border-gray-200 bg-white hover:border-lavender-300"
+                        ? "border-brand-purple bg-lavender-100 font-semibold text-brand-purple shadow-md"
+                        : "border-lavender-200 bg-white/90 hover:border-brand-purple/40 hover:bg-lavender-50/80"
                     }`}
                   >
                     {opt.label}
@@ -132,7 +134,7 @@ export function ReadingComprehensionRunner({
             data-testid="diagnostic-task-continue"
             disabled={!canContinue}
             onClick={advance}
-            className="min-h-11 rounded-xl bg-brand-purple px-8 py-2.5 text-sm font-medium text-white disabled:opacity-40"
+            className="min-h-12 rounded-2xl bg-brand-purple px-8 py-2.5 text-sm font-semibold text-white shadow-sm disabled:opacity-40"
           >
             {continueLabel}
           </button>

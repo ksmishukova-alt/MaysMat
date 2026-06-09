@@ -84,6 +84,12 @@ async function catchPojmatRound(page: Page, correctId: string) {
   await page.waitForTimeout(550);
 }
 
+/** Переходы после заданий блока → правила → mini-game */
+export async function advanceBlockToMiniGame(page: Page) {
+  await page.getByTestId("diagnostic-pre-minigame-continue").click();
+  await page.getByTestId("diagnostic-minigame-rules-start").click();
+}
+
 export async function completeMiniGame(page: Page, miniGameId: string) {
   if (miniGameId === "pojmat") {
     for (let r = 0; r < 2; r++) {

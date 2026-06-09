@@ -7,7 +7,7 @@ import { chromium } from "@playwright/test";
 import fs from "node:fs";
 import path from "node:path";
 import { ENTRY_DIAGNOSTIC_BLOCKS } from "../src/data/entry-diagnostic/blocks/index";
-import { completeMiniGame, completeTaskSteps } from "../e2e/helpers/diagnostic-autopilot";
+import { completeMiniGame, completeTaskSteps, advanceBlockToMiniGame } from "../e2e/helpers/diagnostic-autopilot";
 
 const OUT = path.join(process.cwd(), "docs", "product-review", "entry-diagnostic");
 const BASE = process.env.PLAYWRIGHT_BASE_URL ?? "http://localhost:3000";
@@ -42,6 +42,7 @@ async function main() {
     for (let t = 0; t < 3; t++) {
       await completeTaskSteps(page);
     }
+    await advanceBlockToMiniGame(page);
     await completeMiniGame(page, ENTRY_DIAGNOSTIC_BLOCKS[b].miniGameId);
     await page.getByTestId("diagnostic-next-block").click();
   }
@@ -53,6 +54,7 @@ async function main() {
     for (let t = 0; t < 3; t++) {
       await completeTaskSteps(page);
     }
+    await advanceBlockToMiniGame(page);
     await completeMiniGame(page, ENTRY_DIAGNOSTIC_BLOCKS[b].miniGameId);
     await page.getByTestId("diagnostic-next-block").click();
   }
@@ -83,10 +85,11 @@ async function main() {
     for (let t = 0; t < 3; t++) {
       await completeTaskSteps(page3);
     }
+    await advanceBlockToMiniGame(page3);
     await completeMiniGame(page3, block.miniGameId);
     if (block.blockIndex === 1) {
       await page3.waitForSelector('[data-testid="diagnostic-next-block"]');
-      await shot(page3, "07-block-summary");
+      await shot(page3, "07-block-transition");
     }
     await page3.getByTestId("diagnostic-next-block").click();
   }

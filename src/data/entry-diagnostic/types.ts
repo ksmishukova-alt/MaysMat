@@ -146,7 +146,16 @@ export interface DiagnosticSession {
   startedAt: number;
   finishedAt?: number;
   currentBlockIndex: number;
-  phase: "intro" | "task" | "minigame" | "block_summary" | "complete";
+  phase:
+    | "intro"
+    | "task"
+    | "pre_minigame"
+    | "minigame_rules"
+    | "minigame"
+    | "post_block"
+    | "complete"
+    /** @deprecated миграция старых сессий */
+    | "block_summary";
   currentTaskIndex: number;
   taskAttempts: TaskAttemptRecord[];
   miniGameAttempts: MiniGameAttemptRecord[];
