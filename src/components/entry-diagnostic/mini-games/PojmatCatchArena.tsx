@@ -294,7 +294,7 @@ export function PojmatCatchArena({
         <div
           data-testid="pojmat-mouse"
           data-lane={mouseLane}
-          className={`absolute bottom-0 z-20 flex w-[17%] flex-col items-center transition-[left] duration-150 ease-out ${basketPop ? "pojmat-basket-pop" : ""}`}
+          className={`absolute bottom-0 z-20 flex w-[19%] flex-col items-center transition-[left] duration-150 ease-out ${basketPop ? "pojmat-basket-pop" : ""}`}
           style={{ left: mouseLeft }}
           onPointerDown={(e) => {
             if (roundLockedRef.current) return;
@@ -318,9 +318,9 @@ export function PojmatCatchArena({
           <Image
             src={POJMAT_VISUAL_ASSETS.character}
             alt="МышМат"
-            width={112}
-            height={112}
-            className="h-auto w-full max-w-[7rem] drop-shadow-lg"
+            width={123}
+            height={123}
+            className="h-auto w-full max-w-[7.75rem] bg-transparent drop-shadow-lg"
             draggable={false}
           />
         </div>
