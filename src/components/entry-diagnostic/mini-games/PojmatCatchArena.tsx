@@ -215,14 +215,6 @@ export function PojmatCatchArena({
 
   return (
     <div data-testid="pojmat-catch-arena" data-correct-lane={correctLane}>
-      <div className="mb-3 rounded-2xl border border-purple-200 bg-white p-3 shadow-sm">
-        <p className="text-sm font-medium text-gray-800">
-          <span aria-hidden>🎯 </span>
-          Поймай карточку с главным вопросом задачи
-        </p>
-        <p className="mt-2 text-sm leading-relaxed text-gray-700">{round.conditionText}</p>
-      </div>
-
       <div
         ref={arenaRef}
         className={`relative ${cfg.arenaHeight} touch-none overflow-hidden rounded-2xl border-2 border-purple-300`}
@@ -249,6 +241,29 @@ export function PojmatCatchArena({
           className="object-cover object-center"
           sizes="(max-width: 768px) 100vw, 480px"
         />
+
+        <div
+          data-testid="pojmat-condition-plate"
+          className="pointer-events-none absolute left-1/2 top-3 z-30 w-[94%] max-w-md -translate-x-1/2 sm:top-4"
+        >
+          <div className="flex gap-2.5 rounded-2xl border border-stone-200/90 bg-[#fefcf6]/96 p-2.5 shadow-md backdrop-blur-[2px] sm:gap-3 sm:p-3">
+            <div
+              className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl border border-amber-100 bg-gradient-to-b from-amber-50 to-orange-50 sm:h-16 sm:w-16"
+              aria-hidden
+            >
+              <span className="text-2xl leading-none sm:text-3xl">🧺</span>
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-xs font-bold leading-snug text-sky-950 sm:text-sm">
+                {round.conditionText}
+              </p>
+              <div className="my-1.5 border-t border-dashed border-stone-300/90 sm:my-2" />
+              <p className="text-[11px] font-medium leading-snug text-brand-purple sm:text-xs">
+                Поймай карточку с правильным смыслом вопроса
+              </p>
+            </div>
+          </div>
+        </div>
 
         {cards.map((card) => {
           const laneStyle = LANE_BORDER[card.lane % LANE_BORDER.length];
