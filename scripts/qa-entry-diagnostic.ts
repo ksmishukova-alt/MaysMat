@@ -12,9 +12,9 @@ import {
   validateAllRules,
 } from "../src/data/entry-diagnostic";
 import { ENTRY_DIAGNOSTIC_MINI_GAMES } from "../src/data/entry-diagnostic/mini-games";
-import { assertRunnerRegistryComplete } from "../src/lib/entry-diagnostic/runner-registry";
-import { assertMiniGameRegistryComplete } from "../src/lib/entry-diagnostic/minigame-registry";
-import { assertRunnerBoardRegistryComplete } from "../src/lib/entry-diagnostic/runner-board-registry";
+import { assertRunnerRegistryComplete } from "../src/lib/entry-diagnostic/runner-registry-meta";
+import { assertMiniGameRegistryComplete } from "../src/lib/entry-diagnostic/minigame-registry-meta";
+import { assertRunnerBoardRegistryComplete } from "../src/lib/entry-diagnostic/runner-board-registry-meta";
 
 let errors = 0;
 

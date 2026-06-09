@@ -31,7 +31,7 @@ export const MINI_GAME_BRAND: Record<
   { title: string; accent: string; decor: string }
 > = {
   pojmat: { title: "МышМат: ПойМАТ!", accent: "border-purple-300 bg-purple-50/80", decor: "🎯" },
-  parkomat: { title: "МышМат: ПаркоМАТ", accent: "border-blue-300 bg-blue-50/80", decor: "🅿️" },
+  parkomat: { title: "МышМат: ПаркоМат", accent: "border-blue-300 bg-blue-50/80", decor: "🅿️" },
   razryad: { title: "МышМат: Чиню разряд!", accent: "border-orange-300 bg-orange-50/80", decor: "🔧" },
   warehouse: { title: "МышМат и Продуктовый склад", accent: "border-green-300 bg-green-50/80", decor: "📦" },
   bubbles: { title: "МышМат и Пузырьковый Сад", accent: "border-cyan-300 bg-cyan-50/80", decor: "🫧" },

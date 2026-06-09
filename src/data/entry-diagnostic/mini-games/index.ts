@@ -12,8 +12,8 @@ export const ENTRY_DIAGNOSTIC_MINI_GAMES: MiniGameConfig[] = [
   },
   {
     miniGameId: "parkomat",
-    title: "МышМат: ПаркоМАТ",
-    description: "Парковка: приехали / уехали",
+    title: "МышМат: ПаркоМат",
+    description: "Сложение и вычитание по смыслу ситуации",
     blockId: "block-02",
     diagnostic: { durationSec: 100, showFeedbackDuringGame: false, largeTargets: true },
     play: { showFeedbackDuringGame: true, scoringEnabled: true },

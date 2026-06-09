@@ -1,12 +1,7 @@
 import { PojmatMiniGame } from "./PojmatMiniGame";
+import { ParkomatMiniGame } from "./parkomat/ParkomatMiniGame";
 import { createThemedMiniGame } from "./createThemedMiniGame";
 
-export const ParkomatMiniGame = createThemedMiniGame(
-  "parkomat",
-  "🅿️",
-  "bg-blue-50 text-blue-900",
-  "row",
-);
 export const RazryadMiniGame = createThemedMiniGame(
   "razryad",
   "🔧",

@@ -1,6 +1,28 @@
 import type { Page } from "@playwright/test";
+import { PARKOMAT_ROUNDS } from "../../src/data/entry-diagnostic/mini-games/parkomat-rounds";
 import { POJMAT_ROUNDS } from "../../src/data/entry-diagnostic/mini-games/pojmat-rounds";
+import type { ParkomatGate } from "../../src/data/entry-diagnostic/mini-games/parkomat-rounds";
 import { getMiniGameSpec } from "../../src/data/entry-diagnostic/mini-games/specs";
+
+/** Intro → block intro → первое задание */
+export async function startDiagnosticRun(page: Page) {
+  await page.getByTestId("diagnostic-start").waitFor({ state: "visible", timeout: 30_000 });
+  await page.getByTestId("diagnostic-start").click();
+  const blockIntro = page.getByTestId("diagnostic-block-intro-start");
+  if (await blockIntro.isVisible().catch(() => false)) {
+    await blockIntro.click();
+  }
+  await page.getByTestId("diagnostic-runner").waitFor({ state: "visible", timeout: 15_000 });
+}
+
+/** Переход к следующей теме после mini-game */
+export async function advanceToNextBlock(page: Page) {
+  await page.getByTestId("diagnostic-next-block").click();
+  const blockIntro = page.getByTestId("diagnostic-block-intro-start");
+  if (await blockIntro.isVisible().catch(() => false)) {
+    await blockIntro.click();
+  }
+}
 
 export async function completeTaskSteps(page: Page) {
   const runner = page.getByTestId("diagnostic-runner");
@@ -52,7 +74,7 @@ export async function completeTaskSteps(page: Page) {
     const disabled = await btn.isDisabled().catch(() => false);
     if (disabled) break;
     await btn.click();
-    if (label.includes("Готово") || label.includes("Отправить")) break;
+    if (label.includes("Готово")) break;
     await page.waitForTimeout(120);
   }
 }
@@ -90,6 +112,13 @@ export async function advanceBlockToMiniGame(page: Page) {
   await page.getByTestId("diagnostic-minigame-rules-start").click();
 }
 
+async function answerParkomatRound(page: Page, correctGate: ParkomatGate) {
+  await page.getByTestId("parkomat-game").waitFor({ state: "visible", timeout: 10_000 });
+  const gateTestId = correctGate === "plus" ? "parkomat-gate-plus" : "parkomat-gate-minus";
+  await page.getByTestId(gateTestId).click();
+  await page.waitForTimeout(1_100);
+}
+
 export async function completeMiniGame(page: Page, miniGameId: string) {
   if (miniGameId === "pojmat") {
     for (let r = 0; r < 2; r++) {
@@ -97,6 +126,15 @@ export async function completeMiniGame(page: Page, miniGameId: string) {
       if (!round) break;
       await catchPojmatRound(page, round.correctId);
       await page.waitForTimeout(400);
+    }
+    return;
+  }
+
+  if (miniGameId === "parkomat") {
+    for (let r = 0; r < 2; r++) {
+      const round = PARKOMAT_ROUNDS[r];
+      if (!round) break;
+      await answerParkomatRound(page, round.correctGate);
     }
     return;
   }

@@ -148,6 +148,7 @@ export interface DiagnosticSession {
   currentBlockIndex: number;
   phase:
     | "intro"
+    | "block_intro"
     | "task"
     | "pre_minigame"
     | "minigame_rules"

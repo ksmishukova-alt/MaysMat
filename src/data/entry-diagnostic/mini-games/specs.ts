@@ -20,9 +20,10 @@ export const MINI_GAME_SPECS: Record<string, MiniGameSpec> = {
   },
   parkomat: {
     miniGameId: "parkomat",
-    instruction: "Куда ставим машину: приехала или уехала?",
-    correctTarget: "приехала",
-    targets: ["приехала", "уехала", "осталась", "итог"],
+    instruction: "Какой шлагбаум открыть: плюс или минус?",
+    correctTarget: "plus",
+    targets: ["plus", "minus"],
+    semanticTrap: "minus",
   },
   razryad: {
     miniGameId: "razryad",

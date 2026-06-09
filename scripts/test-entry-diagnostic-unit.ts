@@ -2,8 +2,8 @@
  * Unit tests: validation + scoring + registries
  * npm run test:entry-diagnostic
  */
-import { assertRunnerRegistryComplete } from "../src/lib/entry-diagnostic/runner-registry";
-import { assertMiniGameRegistryComplete } from "../src/lib/entry-diagnostic/minigame-registry";
+import { assertRunnerRegistryComplete } from "../src/lib/entry-diagnostic/runner-registry-meta";
+import { assertMiniGameRegistryComplete } from "../src/lib/entry-diagnostic/minigame-registry-meta";
 import {
   buildDiagnosticReport,
   scoreTaskAttempt,

@@ -35,25 +35,25 @@ export function makeTask(
   };
 }
 
-function defaultScreenSequence(difficulty: DiagnosticDifficulty, taskText: string) {
+function defaultScreenSequence(_difficulty: DiagnosticDifficulty, taskText: string) {
   return [
     { stepId: "read", kind: "read_prompt" as const, prompt: taskText },
     {
       stepId: "visual",
       kind: "visual_board" as const,
-      prompt: "Работа с визуальной моделью",
+      prompt: "Посмотри на картинку-помощник и подумай, как решать.",
     },
     {
       stepId: "answer",
       kind: "number_input" as const,
-      prompt: `Запиши ответ (${difficulty})`,
+      prompt: "Запиши ответ",
       fieldKey: "value",
       placeholder: "Число",
     },
     {
       stepId: "submit",
       kind: "confirm_submit" as const,
-      prompt: "Готово — перейти дальше",
+      prompt: "Если всё готово — нажми кнопку внизу.",
     },
   ];
 }
@@ -114,21 +114,21 @@ export function makePlanTask(
         {
           stepId: "plan-visual",
           kind: "visual_board",
-          prompt: "Маршрут решения задачи",
+          prompt: "Вот маршрут решения — посмотри на него.",
         },
         {
           stepId: "hypothesis",
           kind: "action_count_hypothesis",
-          prompt: "Сколько действий нужно? (это гипотеза — можно изменить позже)",
+          prompt: "Сколько действий понадобится? Можно изменить позже.",
           fieldKey: "actionCount",
         },
         {
           stepId: "plan",
           kind: "action_plan_builder",
-          prompt: "Собери план действий",
+          prompt: "Собери свой план действий",
           fieldKey: "plan",
         },
-        { stepId: "submit", kind: "confirm_submit", prompt: "Отправить план" },
+        { stepId: "submit", kind: "confirm_submit", prompt: "Если план готов — продолжай." },
       ],
     },
   );
@@ -154,21 +154,21 @@ export function makeExpressionTask(
         {
           stepId: "order",
           kind: "visual_board",
-          prompt: "Расставь порядок действий (× и : раньше + и −)",
+          prompt: "Сначала умножение и деление, потом сложение и вычитание.",
         },
         {
           stepId: "calc",
           kind: "embedded_calculator",
-          prompt: "Для больших вычислений используй встроенный помощник",
+          prompt: "Можешь посчитать на помощнике",
         },
         {
           stepId: "answer",
           kind: "number_input",
-          prompt: "Итоговый ответ",
+          prompt: "Запиши итоговый ответ",
           fieldKey: "value",
           placeholder: "Число",
         },
-        { stepId: "submit", kind: "confirm_submit", prompt: "Отправить ответ" },
+        { stepId: "submit", kind: "confirm_submit", prompt: "Если всё готово — продолжай." },
       ],
     },
   );

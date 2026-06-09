@@ -1,10 +1,22 @@
+import { ENTRY_DIAGNOSTIC_ASSETS } from "@/data/entry-diagnostic/visual-assets";
+
 /**
  * Визуальные ассеты ПойМАТ.
  */
 export const POJMAT_VISUAL_ASSETS = {
-  arenaBg: "/entry-diagnostic/pojmat/arena-bg.png",
-  character: "/entry-diagnostic/pojmat/myshmat.png",
-  conditionIconApples: "/entry-diagnostic/pojmat/condition-icon-apples.png",
+  arenaBgMobile: ENTRY_DIAGNOSTIC_ASSETS.pojmat.arena.mobile,
+  arenaBgDesktop: ENTRY_DIAGNOSTIC_ASSETS.pojmat.arena.desktop,
+  /** @deprecated используйте arenaBgMobile / arenaBgDesktop */
+  arenaBg: ENTRY_DIAGNOSTIC_ASSETS.pojmat.arena.mobile,
+  character: ENTRY_DIAGNOSTIC_ASSETS.characters.myshmatBasketLarge,
+  characterLegacy: ENTRY_DIAGNOSTIC_ASSETS.characters.myshmatLegacy,
+  conditionIconApples: ENTRY_DIAGNOSTIC_ASSETS.pojmat.conditionIconApples,
+  btnNavArrow: ENTRY_DIAGNOSTIC_ASSETS.icons.btnNavArrow,
+  btnArrowLeft: ENTRY_DIAGNOSTIC_ASSETS.icons.btnNavArrow,
+  btnArrowRight: ENTRY_DIAGNOSTIC_ASSETS.icons.btnNavArrow,
+  titleChip: ENTRY_DIAGNOSTIC_ASSETS.pojmat.titleChip,
+  chipTimer: ENTRY_DIAGNOSTIC_ASSETS.icons.chipTimer,
+  chipStarScore: ENTRY_DIAGNOSTIC_ASSETS.icons.chipStarScore,
 } as const;
 
 /** Плашка условия внутри арены */

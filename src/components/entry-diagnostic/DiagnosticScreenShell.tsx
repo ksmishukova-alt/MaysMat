@@ -2,28 +2,37 @@
 
 import Image from "next/image";
 import type { ReactNode } from "react";
+import { ProgressDots } from "@/components/entry-diagnostic/ui";
 
 /** Детская оболочка задания диагностики — мягкая рамка, без «белой формы» */
 export function DiagnosticScreenShell({
-  taskLabel,
+  blockIndex,
   blockTitle,
+  taskLabel,
+  showTopicProgress = true,
   children,
 }: {
-  taskLabel: string;
+  /** Тема 1…15 для ProgressDots */
+  blockIndex: number;
   blockTitle: string;
+  /** Доп. подпись, напр. «Задание 3 из 45» */
+  taskLabel?: string;
+  showTopicProgress?: boolean;
   children: ReactNode;
 }) {
   return (
     <div className="space-y-3">
+      {showTopicProgress ? <ProgressDots current={blockIndex} /> : null}
       <div className="flex flex-wrap items-baseline justify-between gap-2 px-0.5">
-        <p className="text-sm font-semibold text-brand-purple/90">{taskLabel}</p>
+        {taskLabel ? (
+          <p className="text-sm font-semibold text-brand-purple/90">{taskLabel}</p>
+        ) : (
+          <span />
+        )}
         <p className="text-xs font-medium text-gray-500">{blockTitle}</p>
       </div>
       <div className="relative overflow-hidden rounded-3xl border-2 border-lavender-200 bg-gradient-to-br from-lavender-50 via-white to-purple-50/40 p-2 shadow-card">
-        <div
-          className="pointer-events-none absolute -left-1 top-3 z-0 opacity-80"
-          aria-hidden
-        >
+        <div className="pointer-events-none absolute -left-1 top-3 z-0 opacity-80" aria-hidden>
           <Image
             src="/entry-diagnostic/pojmat/myshmat.png"
             alt=""

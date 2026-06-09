@@ -2,13 +2,17 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 import {
   ENTRY_DIAGNOSTIC_BLOCKS,
   getBlockByIndex,
   getMiniGameById,
 } from "@/data/entry-diagnostic";
-import { getMiniGameDiagnosticRules } from "@/data/entry-diagnostic/minigame-diagnostic-rules";
+import {
+  getMiniGameDiagnosticRules,
+  getMiniGameRuleItems,
+  getMiniGameRulesHeader,
+  getMiniGameRulesPreview,
+} from "@/data/entry-diagnostic/minigame-diagnostic-rules";
 import { scoreTaskAttempt } from "@/data/entry-diagnostic/scoring";
 import { validateTaskResponse } from "@/data/entry-diagnostic/validation";
 import type { DiagnosticSession, TaskAttemptRecord } from "@/data/entry-diagnostic/types";
@@ -21,9 +25,12 @@ import {
 } from "@/lib/entry-diagnostic/session";
 import { DiagnosticRunner, type RunnerSubmitMeta } from "./DiagnosticRunner";
 import { getMiniGameComponent } from "@/lib/entry-diagnostic/minigame-registry";
-import { DiagnosticScreenShell } from "@/components/entry-diagnostic/DiagnosticScreenShell";
-import { DiagnosticTransitionScreen } from "@/components/entry-diagnostic/DiagnosticTransitionScreen";
-import { DiagnosticMiniGameRulesScreen } from "@/components/entry-diagnostic/DiagnosticMiniGameRulesScreen";
+import { DiagnosticFocusLayout } from "@/components/entry-diagnostic/ui/DiagnosticFocusLayout";
+import { Intro } from "@/components/entry-diagnostic/ui/Intro";
+import { Celebration } from "@/components/entry-diagnostic/ui/Celebration";
+import { Rules } from "@/components/entry-diagnostic/ui/Rules";
+import { BlockIntro } from "@/components/entry-diagnostic/ui/BlockIntro";
+import { DIAGNOSTIC_MYSHMAT_POSE, ENTRY_DIAGNOSTIC_ASSETS } from "@/data/entry-diagnostic/visual-assets";
 
 function normalizePhase(session: DiagnosticSession): DiagnosticSession {
   if (session.phase === "block_summary") {
@@ -32,17 +39,22 @@ function normalizePhase(session: DiagnosticSession): DiagnosticSession {
   return session;
 }
 
+function bootstrapSession(): DiagnosticSession | null {
+  if (typeof window === "undefined") return null;
+  const existing = loadDiagnosticSession();
+  if (existing?.phase === "complete") return null;
+  return existing ? normalizePhase(existing) : createDiagnosticSession();
+}
+
 export function DiagnosticFlow() {
   const router = useRouter();
-  const [session, setSession] = useState<DiagnosticSession | null>(null);
+  const [session, setSession] = useState<DiagnosticSession | null>(bootstrapSession);
 
   useEffect(() => {
     const existing = loadDiagnosticSession();
     if (existing?.phase === "complete") {
       router.replace("/diagnostic/result");
-      return;
     }
-    setSession(existing ? normalizePhase(existing) : createDiagnosticSession());
   }, [router]);
 
   const block = useMemo(
@@ -58,11 +70,16 @@ export function DiagnosticFlow() {
   const startDiagnostic = () => {
     const s = createDiagnosticSession();
     const next = patchSession(
-      { ...s, phase: "task", currentBlockIndex: 1, currentTaskIndex: 0 },
+      { ...s, phase: "block_intro", currentBlockIndex: 1, currentTaskIndex: 0 },
       {},
     );
     appendEvent(next, { eventType: "diagnostic_start", payload: {} });
     persist(next);
+  };
+
+  const startBlock = () => {
+    if (!session) return;
+    persist({ ...session, phase: "task", currentTaskIndex: 0 });
   };
 
   const submitTask = (response: Record<string, unknown>, meta: RunnerSubmitMeta) => {
@@ -166,65 +183,55 @@ export function DiagnosticFlow() {
       ...session,
       currentBlockIndex: session.currentBlockIndex + 1,
       currentTaskIndex: 0,
-      phase: "task",
+      phase: "block_intro",
     });
   };
 
   if (!session) {
     return (
-      <div className="flex min-h-[40vh] items-center justify-center text-sm text-gray-500">
-        Загрузка…
-      </div>
+      <DiagnosticFocusLayout phase="intro">
+        <div className="flex min-h-[40vh] items-center justify-center text-lg font-bold text-[#17256f]">
+          Загрузка…
+        </div>
+      </DiagnosticFocusLayout>
     );
   }
 
   if (session.phase === "intro") {
+    return <Intro onStart={startDiagnostic} onBack={() => router.push("/diagnostic")} />;
+  }
+
+  if (session.phase === "block_intro") {
+    if (!block) {
+      return (
+        <DiagnosticFocusLayout phase="next">
+          <p className="text-red-600">Блок не найден</p>
+        </DiagnosticFocusLayout>
+      );
+    }
     return (
-      <div
-        data-testid="diagnostic-intro"
-        className="relative overflow-hidden rounded-3xl border-2 border-lavender-200 bg-gradient-to-b from-lavender-50 to-white p-6 shadow-card sm:p-8"
-      >
-        <div className="pointer-events-none absolute -right-2 top-0 opacity-95" aria-hidden>
-          <Image
-            src="/entry-diagnostic/pojmat/myshmat.png"
-            alt=""
-            width={112}
-            height={112}
-            className="drop-shadow-md"
-          />
-        </div>
-        <h1 className="text-2xl font-bold text-gray-900">Привет! Это диагностика МышМата.</h1>
-        <div className="mt-4 max-w-lg space-y-3 text-sm leading-relaxed text-gray-700 sm:text-base">
-          <p>
-            Мы посмотрим, какие математические темы у тебя уже сильные, а какие стоит потренировать.
-          </p>
-          <p>Будет 15 тем. В каждой теме — несколько заданий и маленькая игра.</p>
-          <p>Во время диагностики подсказок не будет, а результат появится в конце.</p>
-          <p>В полные версии игр потом можно будет играть отдельно и соревноваться с друзьями.</p>
-        </div>
-        <button
-          type="button"
-          data-testid="diagnostic-start"
-          onClick={startDiagnostic}
-          className="mt-8 min-h-12 rounded-2xl bg-brand-purple px-8 py-3 text-sm font-semibold text-white shadow-sm"
-        >
-          Начать диагностику
-        </button>
-      </div>
+      <BlockIntro
+        currentTheme={block.blockIndex}
+        themeTitle={block.title}
+        onStart={startBlock}
+      />
     );
   }
 
   if (!block) {
-    return <p className="text-red-500">Блок не найден</p>;
+    return (
+      <DiagnosticFocusLayout phase="task">
+        <p className="text-red-600">Блок не найден</p>
+      </DiagnosticFocusLayout>
+    );
   }
 
   if (session.phase === "pre_minigame") {
     return (
-      <DiagnosticTransitionScreen
+      <Celebration
         testId="diagnostic-pre-minigame"
-        message="Тема завершена! Сейчас будет мини-игра МышМата."
-        buttonLabel="Дальше"
-        onContinue={() => persist({ ...session, phase: "minigame_rules" })}
+        continueTestId="diagnostic-pre-minigame-continue"
+        onNext={() => persist({ ...session, phase: "minigame_rules" })}
       />
     );
   }
@@ -232,10 +239,13 @@ export function DiagnosticFlow() {
   if (session.phase === "minigame_rules") {
     const mgConfig = getMiniGameById(block.miniGameId);
     if (!mgConfig) return null;
-    const rules = getMiniGameDiagnosticRules(block.miniGameId, mgConfig.title);
+    const rulesMeta = getMiniGameDiagnosticRules(block.miniGameId, mgConfig.title);
     return (
-      <DiagnosticMiniGameRulesScreen
-        rules={rules}
+      <Rules
+        title={rulesMeta.title}
+        rules={getMiniGameRuleItems(block.miniGameId, mgConfig.title)}
+        headerImageSrc={getMiniGameRulesHeader(block.miniGameId)}
+        previewSrc={getMiniGameRulesPreview(block.miniGameId)}
         onStart={() => persist({ ...session, phase: "minigame" })}
       />
     );
@@ -244,16 +254,26 @@ export function DiagnosticFlow() {
   if (session.phase === "post_block") {
     const isLast = session.currentBlockIndex >= ENTRY_DIAGNOSTIC_BLOCKS.length;
     return (
-      <DiagnosticTransitionScreen
+      <Celebration
+        layoutPhase="next"
         testId="diagnostic-post-block"
-        message={
+        title="Готово!"
+        text={
           isLast
-            ? "Готово! Сейчас посмотрим итог диагностики."
-            : "Готово! Переходим к следующей теме."
+            ? "Сейчас посмотрим итог диагностики."
+            : "Переходим к следующей теме."
         }
-        buttonLabel={isLast ? "К отчёту" : "Дальше"}
+        badgeSrc={ENTRY_DIAGNOSTIC_ASSETS.icons.badgeCheck}
+        mascotSrc={DIAGNOSTIC_MYSHMAT_POSE.postBlock}
+        hintIconSrc={!isLast ? ENTRY_DIAGNOSTIC_ASSETS.icons.giftNextTopic : undefined}
+        hintText={
+          !isLast
+            ? "В следующей теме снова будут задания и мини-игра с МышМатом."
+            : undefined
+        }
+        buttonText={isLast ? "К отчёту" : "Дальше"}
         continueTestId="diagnostic-next-block"
-        onContinue={nextBlock}
+        onNext={nextBlock}
       />
     );
   }
@@ -263,20 +283,19 @@ export function DiagnosticFlow() {
     const MiniGame = mgConfig ? getMiniGameComponent(block.miniGameId) : undefined;
     if (!mgConfig || !MiniGame) return null;
     return (
-      <DiagnosticScreenShell
-        taskLabel={`Тема ${block.blockIndex} из 15`}
-        blockTitle="Мини-игра с МышМатом"
-      >
-        <MiniGame
-          config={mgConfig}
-          mode="diagnostic"
-          blockId={block.blockId}
-          onComplete={finishMiniGame}
-          onEvent={(eventType, payload) => {
-            setSession((s) => (s ? appendEvent(s, { eventType, blockId: block.blockId, payload }) : s));
-          }}
-        />
-      </DiagnosticScreenShell>
+      <DiagnosticFocusLayout phase="game">
+        <div className="diagnostic-minigame-wrap">
+          <MiniGame
+            config={mgConfig}
+            mode="diagnostic"
+            blockId={block.blockId}
+            onComplete={finishMiniGame}
+            onEvent={(eventType, payload) => {
+              setSession((s) => (s ? appendEvent(s, { eventType, blockId: block.blockId, payload }) : s));
+            }}
+          />
+        </div>
+      </DiagnosticFocusLayout>
     );
   }
 
@@ -288,6 +307,7 @@ export function DiagnosticFlow() {
       task={task}
       runnerKind={block.runnerKind}
       blockIndex={block.blockIndex}
+      blockTitle={block.title}
       globalTaskIndex={globalTaskIndex}
       totalTasks={45}
       onComplete={submitTask}

@@ -218,7 +218,7 @@ export function PojmatCatchArena({
     <div data-testid="pojmat-catch-arena" data-correct-lane={correctLane}>
       <div
         ref={arenaRef}
-        className={`relative ${cfg.arenaHeight} touch-none overflow-hidden rounded-xl border-2 border-purple-300`}
+        className={`relative ${cfg.arenaHeight} touch-none overflow-hidden rounded-xl`}
         onTouchStart={(e) => {
           touchStartX.current = e.touches[0]?.clientX ?? null;
         }}
@@ -235,12 +235,20 @@ export function PojmatCatchArena({
         }}
       >
         <Image
-          src={POJMAT_VISUAL_ASSETS.arenaBg}
+          src={POJMAT_VISUAL_ASSETS.arenaBgMobile}
           alt=""
           fill
           priority
-          className="object-cover object-center"
-          sizes="(max-width: 768px) 100vw, 480px"
+          className="object-cover object-center md:hidden"
+          sizes="100vw"
+        />
+        <Image
+          src={POJMAT_VISUAL_ASSETS.arenaBgDesktop}
+          alt=""
+          fill
+          priority
+          className="hidden object-cover object-center md:block"
+          sizes="(max-width: 1024px) 768px, 960px"
         />
 
         <PojmatConditionPlate round={round} />

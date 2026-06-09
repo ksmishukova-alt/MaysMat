@@ -54,3 +54,5 @@ export function assertRunnerRegistryComplete(): void {
     throw new Error("Runner registry has extra entries");
   }
 }
+
+export { assertRunnerRegistryComplete as assertRunnerRegistryCompleteStatic } from "./runner-registry-meta";

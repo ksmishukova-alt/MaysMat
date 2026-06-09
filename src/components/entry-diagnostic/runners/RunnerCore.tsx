@@ -1,8 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
 import type { DiagnosticTask, RunnerKind, ScreenStep } from "@/data/entry-diagnostic/types";
-import { TaskScreenShell } from "@/components/task-steps/TaskScreenShell";
 import { InteractiveRunnerBoard } from "@/components/entry-diagnostic/runners/boards";
 import { EmbeddedCalculatorPanel } from "@/components/entry-diagnostic/runners/boards/boards-advanced";
 import {
@@ -10,37 +9,15 @@ import {
   pushUnique,
   type ErrorTelemetryBuckets,
 } from "@/lib/entry-diagnostic/error-telemetry";
+import { AnswerButton, DiagnosticTaskShell, answerColorAt } from "@/components/entry-diagnostic/ui";
 import { isDiagnosticFastMode } from "@/lib/entry-diagnostic/fast-mode";
-
-const DIFFICULTY_LABEL: Record<DiagnosticTask["difficulty"], string> = {
-  D1: "Уровень 1",
-  D2: "Уровень 2",
-  D3: "Уровень 3",
-};
-
-export const RUNNER_LABELS: Record<RunnerKind, string> = {
-  reading_comprehension_visual: "Чтение условия",
-  story_add_sub_visual: "Сложение и вычитание в сюжете",
-  column_add_sub_visual: "Столбик: сложение и вычитание",
-  column_multiplication_visual: "Столбик: умножение",
-  long_division_visual: "Деление (школьная запись)",
-  remainder_interpretation_visual: "Остаток и смысл",
-  expression_order_visual_with_embedded_calculation: "Порядок действий + помощники",
-  text_problem_plan_visual: "План текстовой задачи",
-  motion_model_visual: "Путь · скорость · время",
-  geometry_grid_visual: "Геометрия на сетке",
-  fraction_model_visual: "Дроби",
-  percent_model_visual: "Проценты",
-  logic_if_then_visual: "Логика если-то",
-  systematic_search_visual: "Системный перебор",
-  pattern_cycle_visual: "Закономерности и циклы",
-};
+import { DIAGNOSTIC_MYSHMAT_POSE } from "@/data/entry-diagnostic/visual-assets";
 
 export interface DiagnosticRunnerProps {
   task: DiagnosticTask;
   runnerKind: RunnerKind;
   blockIndex: number;
-  /** Порядковый номер задания во всей диагностике (1–45) */
+  blockTitle: string;
   globalTaskIndex?: number;
   totalTasks?: number;
   onComplete: (response: Record<string, unknown>, meta: RunnerSubmitMeta) => void;
@@ -58,10 +35,71 @@ export interface RunnerSubmitMeta {
   unitErrors: string[];
 }
 
+/** Названия тем — для данных и отчёта, не показываем «уровень» в UI */
+export const RUNNER_LABELS: Record<RunnerKind, string> = {
+  reading_comprehension_visual: "Чтение условия",
+  story_add_sub_visual: "Сложение и вычитание в сюжете",
+  column_add_sub_visual: "Сложение и вычитание столбиком",
+  column_multiplication_visual: "Умножение столбиком",
+  long_division_visual: "Деление",
+  remainder_interpretation_visual: "Остаток и округление",
+  expression_order_visual_with_embedded_calculation: "Порядок действий",
+  text_problem_plan_visual: "План текстовой задачи",
+  motion_model_visual: "Путь, скорость, время",
+  geometry_grid_visual: "Геометрия на сетке",
+  fraction_model_visual: "Дроби",
+  percent_model_visual: "Проценты",
+  logic_if_then_visual: "Логика «если — то»",
+  systematic_search_visual: "Системный перебор",
+  pattern_cycle_visual: "Закономерности и циклы",
+};
+
+function stepInstruction(step: ScreenStep | undefined, taskText: string): string | undefined {
+  if (!step) return undefined;
+  if (step.kind === "read_prompt") return "Прочитай задачу внимательно.";
+  if (step.prompt === taskText) return undefined;
+  if (step.kind === "confirm_submit") return step.prompt;
+  return step.prompt;
+}
+
+function canAdvanceStep(
+  step: ScreenStep | undefined,
+  response: Record<string, unknown>,
+  planSteps: string[],
+): boolean {
+  if (!step) return false;
+  switch (step.kind) {
+    case "number_input":
+    case "text_input": {
+      const key = step.fieldKey ?? "value";
+      const val = response[key];
+      return val != null && String(val).trim() !== "";
+    }
+    case "single_select":
+      return response[step.fieldKey ?? "value"] != null;
+    case "action_count_hypothesis":
+      return typeof response.actionCount === "number";
+    case "action_plan_builder": {
+      const count = Number(response.actionCount ?? 1);
+      return planSteps.length >= Math.max(1, count);
+    }
+    default:
+      return true;
+  }
+}
+
+function continueLabel(step: ScreenStep | undefined): string {
+  if (step?.kind === "confirm_submit") return "Готово";
+  return "Далее →";
+}
+
 export function DiagnosticRunnerCore({
   task,
   runnerKind,
   blockIndex,
+  blockTitle,
+  globalTaskIndex = 1,
+  totalTasks = 45,
   onComplete,
 }: DiagnosticRunnerProps) {
   const [stepIndex, setStepIndex] = useState(0);
@@ -107,60 +145,51 @@ export function DiagnosticRunnerCore({
     );
   };
 
+  const mascotSrc =
+    step?.kind === "read_prompt" || step?.kind === "condition_read"
+      ? DIAGNOSTIC_MYSHMAT_POSE.taskRead
+      : DIAGNOSTIC_MYSHMAT_POSE.taskChoice;
+
   return (
-    <TaskScreenShell
-      showPhaseHeader
-      phaseTitle={`Блок ${blockIndex} · ${RUNNER_LABELS[runnerKind]}`}
-      phaseIndex={blockIndex}
-      phaseCount={15}
-      showStepTitle
-      stepTitle={task.taskText}
-      subStepLabel={`${DIFFICULTY_LABEL[task.difficulty]} · шаг ${stepIndex + 1} из ${steps.length}`}
+    <DiagnosticTaskShell
+      currentTask={globalTaskIndex}
+      totalTasks={totalTasks}
+      currentTheme={blockIndex}
+      themeTitle={blockTitle}
+      condition={task.taskText}
+      instruction={stepInstruction(step, task.taskText)}
+      onNext={advance}
+      nextDisabled={!canAdvanceStep(step, response, planSteps)}
+      nextLabel={continueLabel(step)}
+      mascotSrc={mascotSrc}
+      runnerKind={runnerKind}
+      testAnswer={isDiagnosticFastMode() ? JSON.stringify(task.answer) : undefined}
     >
-      <div
-        data-testid="diagnostic-runner"
-        data-runner-kind={runnerKind}
-        data-test-answer={isDiagnosticFastMode() ? JSON.stringify(task.answer) : undefined}
-      >
-        <RunnerStepBody
-          step={step}
-          task={task}
-          response={response}
-          planSteps={planSteps}
-          runnerKind={runnerKind}
-          onPatch={patchField}
-          onRecordError={recordError}
-          onHypothesis={(n) => {
-            if (initialActionCount != null && initialActionCount !== n) {
-              recordError("orderErrors", "action_count_revised");
-            }
-            setInitialActionCount((prev) => (prev == null ? n : prev));
-            patchField("actionCount", n);
-          }}
-          onAddPlanStep={() => {
-            setPlanSteps((p) => [...p, `действие ${p.length + 1}`]);
-            setPlanEdited(true);
-          }}
-          onRemovePlanStep={() => {
-            setPlanSteps((p) => p.slice(0, -1));
-            setPlanEdited(true);
-          }}
-        />
-        <div className="mt-6 flex justify-end">
-          <button
-            type="button"
-            data-testid="diagnostic-task-continue"
-            onClick={advance}
-            className="min-h-11 min-w-11 rounded-xl bg-brand-purple px-6 py-2.5 text-sm font-medium text-white"
-          >
-            {step?.kind === "confirm_submit" ? "Отправить и дальше" : "Дальше"}
-          </button>
-        </div>
-        <p className="mt-3 text-xs text-gray-400">
-          Правильные ответы покажем только в конце.
-        </p>
-      </div>
-    </TaskScreenShell>
+      <RunnerStepBody
+        step={step}
+        task={task}
+        response={response}
+        planSteps={planSteps}
+        runnerKind={runnerKind}
+        onPatch={patchField}
+        onRecordError={recordError}
+        onHypothesis={(n) => {
+          if (initialActionCount != null && initialActionCount !== n) {
+            recordError("orderErrors", "action_count_revised");
+          }
+          setInitialActionCount((prev) => (prev == null ? n : prev));
+          patchField("actionCount", n);
+        }}
+        onAddPlanStep={() => {
+          setPlanSteps((p) => [...p, `действие ${p.length + 1}`]);
+          setPlanEdited(true);
+        }}
+        onRemovePlanStep={() => {
+          setPlanSteps((p) => p.slice(0, -1));
+          setPlanEdited(true);
+        }}
+      />
+    </DiagnosticTaskShell>
   );
 }
 
@@ -176,7 +205,7 @@ function RunnerStepBody({
   onAddPlanStep,
   onRemovePlanStep,
 }: {
-  step: ScreenStep;
+  step: ScreenStep | undefined;
   task: DiagnosticTask;
   response: Record<string, unknown>;
   planSteps: string[];
@@ -187,13 +216,14 @@ function RunnerStepBody({
   onAddPlanStep: () => void;
   onRemovePlanStep: () => void;
 }) {
+  if (!step) return null;
+
   switch (step.kind) {
     case "read_prompt":
-      return <p className="text-sm leading-relaxed text-gray-700">{step.prompt}</p>;
+      return null;
     case "visual_board":
       return (
-        <div>
-          <p className="mb-3 text-sm text-gray-600">{step.prompt}</p>
+        <div className="diagnostic-card diagnostic-task__workspace">
           <InteractiveRunnerBoard
             task={task}
             runnerKind={runnerKind}
@@ -206,60 +236,57 @@ function RunnerStepBody({
     case "number_input":
     case "text_input":
       return (
-        <label className="block">
-          <span className="mb-2 block text-sm font-medium">{step.prompt}</span>
-          <input
-            type={step.kind === "number_input" ? "number" : "text"}
-            aria-label={step.prompt}
-            placeholder={step.placeholder}
-            value={String(response[step.fieldKey ?? "value"] ?? "")}
-            onChange={(e) =>
-              onPatch(
-                step.fieldKey ?? "value",
-                step.kind === "number_input" ? Number(e.target.value) : e.target.value,
-              )
-            }
-            className="min-h-11 w-full max-w-xs rounded-xl border border-lavender-200 px-4 py-2"
-          />
-        </label>
+        <div className="diagnostic-card diagnostic-task__workspace">
+          <label className="diagnostic-task-input">
+            <span className="diagnostic-task-input__label">{step.prompt}</span>
+            <input
+              type={step.kind === "number_input" ? "number" : "text"}
+              aria-label={step.prompt}
+              placeholder={step.placeholder}
+              value={String(response[step.fieldKey ?? "value"] ?? "")}
+              onChange={(e) =>
+                onPatch(
+                  step.fieldKey ?? "value",
+                  step.kind === "number_input" ? Number(e.target.value) : e.target.value,
+                )
+              }
+              className="diagnostic-task-input__field"
+            />
+          </label>
+        </div>
       );
     case "single_select":
       return (
-        <div>
-          <p className="mb-3 text-sm">{step.prompt}</p>
-          <div className="flex flex-wrap gap-2">
-            {(step.options ?? []).map((opt) => (
-              <button
+        <div className="diagnostic-answer-grid">
+          {(step.options ?? []).map((opt, index) => {
+            const selected = response[step.fieldKey ?? "value"] === opt.id;
+            return (
+              <AnswerButton
                 key={opt.id}
-                type="button"
+                testId={`diagnostic-choice-${opt.id}`}
+                aria-label={opt.label}
+                color={answerColorAt(index)}
+                selected={selected}
                 onClick={() => onPatch(step.fieldKey ?? "value", opt.id)}
-                className={`min-h-11 rounded-xl border-2 px-4 py-2 text-sm ${
-                  response[step.fieldKey ?? "value"] === opt.id
-                    ? "border-brand-purple bg-lavender-50"
-                    : "border-gray-200"
-                }`}
               >
                 {opt.label}
-              </button>
-            ))}
-          </div>
+              </AnswerButton>
+            );
+          })}
         </div>
       );
     case "action_count_hypothesis":
       return (
-        <div>
-          <p className="mb-3 text-sm">{step.prompt}</p>
-          <div className="flex flex-wrap gap-2">
+        <div className="diagnostic-card diagnostic-task__workspace">
+          <div className="diagnostic-hypothesis-grid">
             {[1, 2, 3, 4, 5].map((n) => (
               <button
                 key={n}
                 type="button"
                 aria-label={`${n} действий`}
                 onClick={() => onHypothesis(n)}
-                className={`min-h-11 min-w-11 rounded-xl border-2 px-4 py-2 text-sm font-medium ${
-                  response.actionCount === n
-                    ? "border-brand-purple bg-lavender-50"
-                    : "border-gray-200 bg-white"
+                className={`diagnostic-hypothesis-btn${
+                  response.actionCount === n ? " diagnostic-hypothesis-btn--active" : ""
                 }`}
               >
                 {n}
@@ -270,28 +297,23 @@ function RunnerStepBody({
       );
     case "action_plan_builder":
       return (
-        <div>
-          <p className="mb-3 text-sm">{step.prompt}</p>
-          <ul className="mb-3 space-y-2">
+        <div className="diagnostic-card diagnostic-task__workspace">
+          <ul className="diagnostic-plan-list">
             {planSteps.map((s, i) => (
-              <li key={i} className="rounded-lg bg-lavender-50 px-3 py-2 text-sm">
+              <li key={i} className="diagnostic-plan-list__item">
                 {i + 1}. {s}
               </li>
             ))}
           </ul>
-          <div className="flex gap-2">
-            <button
-              type="button"
-              onClick={onAddPlanStep}
-              className="min-h-11 rounded-xl border border-brand-purple px-4 text-sm text-brand-purple"
-            >
+          <div className="diagnostic-plan-actions">
+            <button type="button" onClick={onAddPlanStep} className="diagnostic-secondary-button">
               + Добавить действие
             </button>
             <button
               type="button"
               onClick={onRemovePlanStep}
               disabled={!planSteps.length}
-              className="min-h-11 rounded-xl border border-gray-200 px-4 text-sm disabled:opacity-40"
+              className="diagnostic-secondary-button diagnostic-secondary-button--muted"
             >
               − Убрать
             </button>
@@ -300,8 +322,7 @@ function RunnerStepBody({
       );
     case "embedded_calculator":
       return (
-        <div>
-          <p className="mb-2 text-sm">{step.prompt}</p>
+        <div className="diagnostic-card diagnostic-task__workspace">
           <EmbeddedCalculatorPanel
             response={response}
             onPatch={onPatch}
@@ -310,8 +331,12 @@ function RunnerStepBody({
         </div>
       );
     case "confirm_submit":
-      return <p className="text-sm text-gray-600">{step.prompt}</p>;
+      return null;
     default:
-      return <p className="text-sm">{step.prompt}</p>;
+      return step.prompt ? (
+        <div className="diagnostic-card diagnostic-task__workspace">
+          <p className="diagnostic-task__hint">{step.prompt}</p>
+        </div>
+      ) : null;
   }
 }

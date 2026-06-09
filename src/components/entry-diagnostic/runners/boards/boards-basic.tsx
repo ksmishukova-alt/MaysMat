@@ -16,9 +16,7 @@ function Chip({
     <button
       type="button"
       onClick={onClick}
-      className={`min-h-10 rounded-lg border px-3 py-2 text-sm ${
-        active ? "border-brand-purple bg-lavender-50" : "border-gray-200 bg-white"
-      }`}
+      className={`diagnostic-board-chip${active ? " diagnostic-board-chip--active" : ""}`}
     >
       {label}
     </button>
