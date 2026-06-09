@@ -52,7 +52,12 @@ export function PojmatMiniGame(props: DiagnosticMiniGameProps) {
         ) : null
       }
     >
-      <BrandFrame brandTitle={brand?.title ?? props.config.title} accentClass={brand?.accent ?? ""}>
+      <BrandFrame
+        brandTitle={brand?.title ?? props.config.title}
+        accentClass={brand?.accent ?? ""}
+        showTitle={false}
+        compact
+      >
         <PojmatCatchArena
           key={`${state.roundIndex}-${props.mode}`}
           round={round}

@@ -7,14 +7,20 @@ export function BrandFrame({
   brandTitle,
   accentClass,
   children,
+  showTitle = true,
+  compact = false,
 }: {
   brandTitle: string;
   accentClass: string;
   children: ReactNode;
+  showTitle?: boolean;
+  compact?: boolean;
 }) {
   return (
-    <div className={`rounded-2xl border-2 p-4 ${accentClass}`}>
-      <p className="mb-3 text-center text-sm font-bold tracking-wide">{brandTitle}</p>
+    <div className={`rounded-2xl border-2 ${compact ? "p-1.5" : "p-4"} ${accentClass}`}>
+      {showTitle ? (
+        <p className="mb-3 text-center text-sm font-bold tracking-wide">{brandTitle}</p>
+      ) : null}
       {children}
     </div>
   );

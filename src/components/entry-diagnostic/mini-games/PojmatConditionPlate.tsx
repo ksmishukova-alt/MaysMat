@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import type { PojmatRound } from "@/data/entry-diagnostic/mini-games/pojmat-rounds";
-import { POJMAT_LANE_LAYOUT, POJMAT_VISUAL_ASSETS } from "./pojmat-assets";
+import { POJMAT_PLATE_LAYOUT, POJMAT_VISUAL_ASSETS } from "./pojmat-assets";
 
 const CONDITION_ICONS: Partial<Record<string, string>> = {
   together: POJMAT_VISUAL_ASSETS.conditionIconApples,
@@ -13,21 +13,21 @@ const CONDITION_EMOJI: Partial<Record<string, string>> = {
   blue_green: "📚",
 };
 
-/** Плашка условия: кремовый фон по ширине дорожек + 5 мм, низ — на 5 мм ниже начала дорожек */
+/** Плашка условия: 2 мм сверху, 0,7 см по бокам, низ — перекрывает начало дорожек */
 export function PojmatConditionPlate({ round }: { round: PojmatRound }) {
   const iconSrc = CONDITION_ICONS[round.correctId];
   const iconEmoji = CONDITION_EMOJI[round.correctId];
-  const { leftPct, widthPct, topPct, marginMm } = POJMAT_LANE_LAYOUT;
+  const { topMm, sideCm, laneTopPct, laneOverlapMm } = POJMAT_PLATE_LAYOUT;
 
   return (
     <div
       data-testid="pojmat-condition-plate"
       className="pointer-events-none absolute z-30 flex overflow-hidden rounded-2xl border border-[#e8dcc8] bg-[#fdf8f0]"
       style={{
-        left: `calc(${leftPct}% - ${marginMm}mm)`,
-        width: `calc(${widthPct}% + ${marginMm * 2}mm)`,
-        top: `${marginMm}mm`,
-        height: `calc(${topPct}%)`,
+        left: `${sideCm}cm`,
+        width: `calc(100% - ${sideCm * 2}cm)`,
+        top: `${topMm}mm`,
+        height: `calc(${laneTopPct}% + ${laneOverlapMm}mm - ${topMm}mm)`,
         boxShadow: "0 2px 4px rgba(55, 42, 28, 0.14)",
       }}
     >
@@ -49,7 +49,7 @@ export function PojmatConditionPlate({ round }: { round: PojmatRound }) {
         ) : null}
       </div>
 
-      <div className="flex min-w-0 flex-1 flex-col justify-between px-2.5 py-2 sm:px-3 sm:py-2.5">
+      <div className="flex min-w-0 flex-1 flex-col justify-between bg-[#fdf8f0] px-2.5 py-2 sm:px-3 sm:py-2.5">
         <p className="text-[10px] font-bold leading-snug text-[#1a3568] sm:text-xs md:text-sm">
           {round.conditionText}
         </p>

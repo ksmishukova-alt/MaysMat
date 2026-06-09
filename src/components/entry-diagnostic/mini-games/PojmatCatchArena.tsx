@@ -73,7 +73,7 @@ function arenaConfig(mode: MiniGameMode) {
     fastBoost: fast && diagnostic ? 1.6 : 1,
     cardText: diagnostic ? "text-xs sm:text-sm leading-snug" : "text-[11px] leading-tight",
     cardPad: diagnostic ? "px-2.5 py-3" : "px-2 py-2",
-    arenaHeight: diagnostic ? "h-[22rem] sm:h-[26rem]" : "h-80",
+    arenaHeight: diagnostic ? "h-[24rem] sm:h-[28rem]" : "h-[21rem] sm:h-80",
     fallLimit: 118,
   };
 }
@@ -218,7 +218,7 @@ export function PojmatCatchArena({
     <div data-testid="pojmat-catch-arena" data-correct-lane={correctLane}>
       <div
         ref={arenaRef}
-        className={`relative ${cfg.arenaHeight} touch-none overflow-hidden rounded-2xl border-2 border-purple-300`}
+        className={`relative ${cfg.arenaHeight} touch-none overflow-hidden rounded-xl border-2 border-purple-300`}
         onTouchStart={(e) => {
           touchStartX.current = e.touches[0]?.clientX ?? null;
         }}
