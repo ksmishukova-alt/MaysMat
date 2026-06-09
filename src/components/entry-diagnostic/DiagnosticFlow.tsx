@@ -174,7 +174,10 @@ export function DiagnosticFlow() {
       <div className="rounded-2xl bg-white p-8 shadow-card">
         <h1 className="text-2xl font-bold">Входная диагностика</h1>
         <p className="mt-3 text-sm text-gray-600">
-          15 блоков · 3 задания в каждом · мини-игра МышМата. Без подсказок по ходу — отчёт в конце.
+          15 тем · по 3 задания · мини-игра с МышМатом после каждой темы.
+        </p>
+        <p className="mt-2 text-sm text-gray-500">
+          Во время диагностики подсказок не будет — результат появится в конце.
         </p>
         <button
           type="button"
@@ -227,12 +230,8 @@ export function DiagnosticFlow() {
     const MiniGame = mgConfig ? getMiniGameComponent(block.miniGameId) : undefined;
     if (!mgConfig || !MiniGame) return null;
     return (
-      <TaskScreenShell
-        showPhaseHeader
-        phaseTitle={`Блок ${block.blockIndex} · мини-игра`}
-        showStepTitle
-        stepTitle={block.title}
-      >
+      <div className="space-y-3">
+        <p className="px-1 text-xs text-gray-400">{block.title}</p>
         <MiniGame
           config={mgConfig}
           mode="diagnostic"
@@ -242,17 +241,20 @@ export function DiagnosticFlow() {
             setSession((s) => (s ? appendEvent(s, { eventType, blockId: block.blockId, payload }) : s));
           }}
         />
-      </TaskScreenShell>
+      </div>
     );
   }
 
   const task = block.tasks[session.currentTaskIndex];
+  const globalTaskIndex = (block.blockIndex - 1) * 3 + session.currentTaskIndex + 1;
   return (
     <DiagnosticRunner
       key={task.taskId}
       task={task}
       runnerKind={block.runnerKind}
       blockIndex={block.blockIndex}
+      globalTaskIndex={globalTaskIndex}
+      totalTasks={45}
       onComplete={submitTask}
     />
   );

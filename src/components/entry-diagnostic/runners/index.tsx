@@ -6,6 +6,8 @@ import {
   type DiagnosticRunnerProps,
 } from "@/components/entry-diagnostic/runners/RunnerCore";
 
+export { ReadingComprehensionRunner } from "./ReadingComprehensionRunner";
+
 function makeRunner(kind: RunnerKind) {
   return function Runner(props: DiagnosticRunnerProps) {
     return (
@@ -16,7 +18,6 @@ function makeRunner(kind: RunnerKind) {
   };
 }
 
-export const ReadingComprehensionRunner = makeRunner("reading_comprehension_visual");
 export const StoryAddSubRunner = makeRunner("story_add_sub_visual");
 export const ColumnAddSubRunner = makeRunner("column_add_sub_visual");
 export const ColumnMultiplicationRunner = makeRunner("column_multiplication_visual");

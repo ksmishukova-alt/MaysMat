@@ -9,6 +9,13 @@ export async function completeTaskSteps(page: Page) {
   for (let guard = 0; guard < 12; guard++) {
     if (!(await runner.isVisible().catch(() => false))) break;
 
+    if (answer.focus != null) {
+      const choice = page.getByTestId(`diagnostic-choice-${answer.focus}`);
+      if (await choice.isVisible().catch(() => false)) {
+        await choice.click();
+      }
+    }
+
     const numInput = page.locator('input[type="number"]');
     if (await numInput.isVisible().catch(() => false)) {
       const val = answer.value ?? answer.actionCount;
@@ -17,7 +24,7 @@ export async function completeTaskSteps(page: Page) {
 
     const textInput = page.locator('input[type="text"]');
     if (await textInput.isVisible().catch(() => false)) {
-      const key = Object.keys(answer).find((k) => typeof answer[k] === "string");
+      const key = Object.keys(answer).find((k) => typeof answer[k] === "string" && k !== "focus");
       if (key) await textInput.fill(String(answer[key]));
     }
 
@@ -39,9 +46,12 @@ export async function completeTaskSteps(page: Page) {
     }
 
     const btn = page.getByTestId("diagnostic-task-continue");
+    if (!(await btn.isVisible().catch(() => false))) break;
     const label = (await btn.textContent()) ?? "";
+    const disabled = await btn.isDisabled().catch(() => false);
+    if (disabled) break;
     await btn.click();
-    if (label.includes("Отправить")) break;
+    if (label.includes("Готово") || label.includes("Отправить")) break;
     await page.waitForTimeout(120);
   }
 }
@@ -53,6 +63,14 @@ export async function completeMiniGame(page: Page, miniGameId: string) {
   await target.scrollIntoViewIfNeeded();
   await target.click({ force: true });
   await page.waitForTimeout(200);
-  await target.click({ force: true });
+  if (miniGameId === "pojmat") {
+    await page.waitForTimeout(400);
+    const target2 = page.getByTestId("mini-target-caramel");
+    if (await target2.isVisible().catch(() => false)) {
+      await target2.click({ force: true });
+    }
+  } else {
+    await target.click({ force: true });
+  }
   await page.waitForTimeout(600);
 }

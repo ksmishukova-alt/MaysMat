@@ -23,6 +23,7 @@ export type RunnerKind =
 export type MiniGameMode = "diagnostic" | "play";
 
 export type ScreenStepKind =
+  | "condition_read"
   | "read_prompt"
   | "visual_board"
   | "number_input"

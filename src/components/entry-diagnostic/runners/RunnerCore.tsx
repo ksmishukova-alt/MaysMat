@@ -40,6 +40,9 @@ export interface DiagnosticRunnerProps {
   task: DiagnosticTask;
   runnerKind: RunnerKind;
   blockIndex: number;
+  /** Порядковый номер задания во всей диагностике (1–45) */
+  globalTaskIndex?: number;
+  totalTasks?: number;
   onComplete: (response: Record<string, unknown>, meta: RunnerSubmitMeta) => void;
 }
 

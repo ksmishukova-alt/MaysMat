@@ -1,11 +1,6 @@
+import { PojmatMiniGame } from "./PojmatMiniGame";
 import { createThemedMiniGame } from "./createThemedMiniGame";
 
-export const PojmatMiniGame = createThemedMiniGame(
-  "pojmat",
-  "🎯",
-  "bg-purple-50 text-purple-900",
-  "cards",
-);
 export const ParkomatMiniGame = createThemedMiniGame(
   "parkomat",
   "🅿️",

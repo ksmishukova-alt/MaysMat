@@ -28,9 +28,6 @@ export function MiniGameShell({
           {mode === "diagnostic" ? `⏱ ${timeLeft} с` : `Раунд ${round + 1}/${totalRounds}`}
         </span>
       </div>
-      {mode === "diagnostic" ? (
-        <p className="text-xs text-amber-700">Играем без подсказок — просто реши задание.</p>
-      ) : null}
       <div className="mt-4">{children}</div>
       {footer}
     </div>

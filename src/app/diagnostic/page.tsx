@@ -15,8 +15,7 @@ export default function DiagnosticLandingPage() {
           с МышМатом. Максимум 90 баллов.
         </p>
         <ul className="mt-4 list-inside list-disc text-sm text-gray-500">
-          <li>Без подсказок «верно/неверно» по ходу</li>
-          <li>Отчёт и рекомендации — в конце</li>
+          <li>Во время диагностики подсказок не будет — результат появится в конце</li>
           <li>~45–60 минут</li>
         </ul>
         <Link

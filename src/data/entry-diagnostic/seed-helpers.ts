@@ -4,6 +4,7 @@ import type {
   DiagnosticTask,
   RunnerKind,
   ScoreWeight,
+  ScreenStep,
   ValidationRule,
 } from "./types";
 
@@ -60,37 +61,52 @@ function defaultScreenSequence(difficulty: DiagnosticDifficulty, taskText: strin
 export function makeReadingTask(
   blockId: string,
   difficulty: DiagnosticDifficulty,
-  taskText: string,
-  answerField: string,
-  answerValue: string | number,
+  conditionText: string,
+  questionPrompt: string,
+  choices: { id: string; label: string }[],
+  answerFocus: string,
   errorTypes: string[],
+  numericAnswer?: number,
 ): DiagnosticTask {
-  return makeTask(
+  const steps: ScreenStep[] = [
+    { stepId: "read", kind: "condition_read", prompt: conditionText },
+    {
+      stepId: "choose",
+      kind: "single_select",
+      prompt: questionPrompt,
+      fieldKey: "focus",
+      options: choices,
+    },
+  ];
+
+  const validationRules: ValidationRule[] = [
+    { type: "exact", field: "focus", value: answerFocus },
+  ];
+  const answer: Record<string, unknown> = { focus: answerFocus };
+
+  if (numericAnswer != null) {
+    steps.push({
+      stepId: "answer",
+      kind: "number_input",
+      prompt: "Запиши ответ",
+      fieldKey: "value",
+      placeholder: "?",
+    });
+    validationRules.push({ type: "numericEquals", field: "value", value: numericAnswer });
+    answer.value = numericAnswer;
+  }
+
+  return {
+    taskId: `${blockId}-${difficulty.toLowerCase()}`,
     blockId,
     difficulty,
-    taskText,
-    { [answerField]: answerValue },
-    [{ type: "exact", field: answerField, value: answerValue }],
+    scoreWeight: WEIGHTS[DIFFICULTIES.indexOf(difficulty)],
+    taskText: conditionText,
+    answer,
+    screenSequence: steps,
+    validationRules,
     errorTypes,
-    {
-      screenSequence: [
-        { stepId: "read", kind: "read_prompt", prompt: taskText },
-        {
-          stepId: "visual",
-          kind: "visual_board",
-          prompt: "Найди в условии нужные данные (4 параметра)",
-        },
-        {
-          stepId: "answer",
-          kind: "text_input",
-          prompt: "Запиши ответ на вопрос",
-          fieldKey: answerField,
-          placeholder: "Ответ",
-        },
-        { stepId: "submit", kind: "confirm_submit", prompt: "Готово" },
-      ],
-    },
-  );
+  };
 }
 
 export function makePlanTask(
