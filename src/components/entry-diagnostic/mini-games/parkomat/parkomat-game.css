@@ -1,7 +1,7 @@
 .parkomat {
   position: relative;
   width: 100%;
-  min-height: min(100dvh, 844px);
+  min-height: 100dvh;
   overflow: hidden;
   font-family: "Nunito", system-ui, sans-serif;
   color: #12205c;
@@ -19,7 +19,7 @@
 .parkomat__content {
   position: relative;
   z-index: 1;
-  min-height: min(100dvh, 844px);
+  min-height: 100dvh;
   display: grid;
   grid-template-rows: auto auto 1fr auto;
   gap: 14px;

@@ -31,36 +31,54 @@ export function Rules({
 }: RulesProps) {
   return (
     <DiagnosticFocusLayout phase="rules" testId={testId}>
-      <section className="diagnostic-rules">
-        {headerImageSrc ? (
-          <div className="diagnostic-game-title">
-            <Image src={headerImageSrc} alt="" width={430} height={64} className="diagnostic-game-title__img" aria-hidden />
-          </div>
-        ) : null}
-
-        <div className="diagnostic-card diagnostic-rules__card">
-          <h1>{title}</h1>
-          <ul className="diagnostic-rules-list">
-            {rules.map((rule, index) => (
-              <li key={index}>
-                <Image src={rule.iconSrc} alt="" width={48} height={48} aria-hidden />
-                <span>{rule.text}</span>
-              </li>
-            ))}
-          </ul>
+      <section className="diagnostic-screen diagnostic-rules">
+        <div className="diagnostic-rules__side">
+          {headerImageSrc ? (
+            <div className="diagnostic-game-title">
+              <Image
+                src={headerImageSrc}
+                alt=""
+                width={430}
+                height={64}
+                className="diagnostic-game-title__img diagnostic-icon-transparent"
+                aria-hidden
+              />
+            </div>
+          ) : (
+            <h2 className="diagnostic-rules__title-fallback">{title}</h2>
+          )}
           {previewSrc ? (
             <Image
-              className="diagnostic-rules__preview"
+              className="diagnostic-rules__preview diagnostic-icon-transparent"
               src={previewSrc}
               alt=""
-              width={400}
+              width={320}
               height={200}
               aria-hidden
             />
           ) : null}
         </div>
 
-        <button type="button" className="diagnostic-primary-button" data-testid={startTestId} onClick={onStart}>
+        <div className="diagnostic-card diagnostic-rules__card">
+          <h1>{title}</h1>
+          <ul className="diagnostic-rules-list">
+            {rules.map((rule, index) => (
+              <li key={index}>
+                <Image
+                  src={rule.iconSrc}
+                  alt=""
+                  width={48}
+                  height={48}
+                  className="diagnostic-icon-transparent"
+                  aria-hidden
+                />
+                <span>{rule.text}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <button type="button" className="diagnostic-primary-button diagnostic-rules__start" data-testid={startTestId} onClick={onStart}>
           Понятно, играть!
         </button>
       </section>

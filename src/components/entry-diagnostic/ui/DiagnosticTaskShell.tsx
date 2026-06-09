@@ -44,7 +44,7 @@ export function DiagnosticTaskShell({
   return (
     <DiagnosticFocusLayout phase="task" onBack={onBack}>
       <section
-        className="diagnostic-task"
+        className="diagnostic-screen diagnostic-task"
         data-testid="diagnostic-runner"
         data-runner-kind={runnerKind}
         data-test-answer={testAnswer}
@@ -81,7 +81,7 @@ export function DiagnosticTaskShell({
 
         {mascotSrc ? (
           <Image
-            className="diagnostic-task__mascot"
+            className="diagnostic-task__mascot diagnostic-icon-transparent"
             src={mascotSrc}
             alt=""
             width={104}

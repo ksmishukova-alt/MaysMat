@@ -42,7 +42,7 @@ function normalizePhase(session: DiagnosticSession): DiagnosticSession {
 function bootstrapSession(): DiagnosticSession | null {
   if (typeof window === "undefined") return null;
   const existing = loadDiagnosticSession();
-  if (existing?.phase === "complete") return null;
+  if (existing?.phase === "complete") return createDiagnosticSession();
   return existing ? normalizePhase(existing) : createDiagnosticSession();
 }
 
@@ -204,7 +204,7 @@ export function DiagnosticFlow() {
   if (session.phase === "block_intro") {
     if (!block) {
       return (
-        <DiagnosticFocusLayout phase="next">
+        <DiagnosticFocusLayout phase="block_intro">
           <p className="text-red-600">Блок не найден</p>
         </DiagnosticFocusLayout>
       );
@@ -255,7 +255,7 @@ export function DiagnosticFlow() {
     const isLast = session.currentBlockIndex >= ENTRY_DIAGNOSTIC_BLOCKS.length;
     return (
       <Celebration
-        layoutPhase="next"
+        layoutPhase="post_block"
         testId="diagnostic-post-block"
         title="Готово!"
         text={
@@ -271,7 +271,7 @@ export function DiagnosticFlow() {
             ? "В следующей теме снова будут задания и мини-игра с МышМатом."
             : undefined
         }
-        buttonText={isLast ? "К отчёту" : "Дальше"}
+        buttonText={isLast ? "К отчёту" : "Следующая тема"}
         continueTestId="diagnostic-next-block"
         onNext={nextBlock}
       />
@@ -284,17 +284,15 @@ export function DiagnosticFlow() {
     if (!mgConfig || !MiniGame) return null;
     return (
       <DiagnosticFocusLayout phase="game">
-        <div className="diagnostic-minigame-wrap">
-          <MiniGame
-            config={mgConfig}
-            mode="diagnostic"
-            blockId={block.blockId}
-            onComplete={finishMiniGame}
-            onEvent={(eventType, payload) => {
-              setSession((s) => (s ? appendEvent(s, { eventType, blockId: block.blockId, payload }) : s));
-            }}
-          />
-        </div>
+        <MiniGame
+          config={mgConfig}
+          mode="diagnostic"
+          blockId={block.blockId}
+          onComplete={finishMiniGame}
+          onEvent={(eventType, payload) => {
+            setSession((s) => (s ? appendEvent(s, { eventType, blockId: block.blockId, payload }) : s));
+          }}
+        />
       </DiagnosticFocusLayout>
     );
   }

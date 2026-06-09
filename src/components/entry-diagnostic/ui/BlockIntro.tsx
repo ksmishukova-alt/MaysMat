@@ -23,8 +23,8 @@ export function BlockIntro({
   startTestId = "diagnostic-block-intro-start",
 }: BlockIntroProps) {
   return (
-    <DiagnosticFocusLayout phase="next" testId={testId}>
-      <section className="diagnostic-block-intro">
+    <DiagnosticFocusLayout phase="block_intro" testId={testId}>
+      <section className="diagnostic-screen diagnostic-block-intro">
         <ProgressDots total={totalThemes} current={currentTheme} showLabel={false} />
 
         <div className="diagnostic-pill diagnostic-block-intro__pill">
@@ -38,7 +38,7 @@ export function BlockIntro({
         </div>
 
         <Image
-          className="diagnostic-block-intro__mascot"
+          className="diagnostic-block-intro__mascot diagnostic-icon-transparent"
           src={DIAGNOSTIC_MYSHMAT_POSE.nextTopic}
           alt=""
           width={200}

@@ -56,7 +56,7 @@ export const RUNNER_LABELS: Record<RunnerKind, string> = {
 
 function stepInstruction(step: ScreenStep | undefined, taskText: string): string | undefined {
   if (!step) return undefined;
-  if (step.kind === "read_prompt") return "Прочитай задачу внимательно.";
+  if (step.kind === "read_prompt" || step.kind === "condition_read") return undefined;
   if (step.prompt === taskText) return undefined;
   if (step.kind === "confirm_submit") return step.prompt;
   return step.prompt;
@@ -69,6 +69,9 @@ function canAdvanceStep(
 ): boolean {
   if (!step) return false;
   switch (step.kind) {
+    case "read_prompt":
+    case "condition_read":
+      return true;
     case "number_input":
     case "text_input": {
       const key = step.fieldKey ?? "value";
@@ -220,6 +223,7 @@ function RunnerStepBody({
 
   switch (step.kind) {
     case "read_prompt":
+    case "condition_read":
       return null;
     case "visual_board":
       return (

@@ -166,11 +166,45 @@
   width: 100%;
   position: relative;
   overflow: hidden;
-  background-image: var(--diagnostic-bg);
+  background-color: #eaf4ff;
+  background-image: var(--diagnostic-bg-mobile);
   background-size: cover;
-  background-position: center;
+  background-position: center top;
+  background-repeat: no-repeat;
   font-family: "Nunito", system-ui, sans-serif;
   color: #12205c;
+}
+
+@media (min-width: 768px) {
+  .diagnostic-focus-layout:not(.diagnostic-focus-layout--game) {
+    background-image: var(--diagnostic-bg-desktop);
+    background-position: center center;
+  }
+}
+
+.diagnostic-focus-layout--game {
+  background: transparent;
+  overflow: hidden;
+  min-height: 100dvh;
+}
+
+.diagnostic-focus-layout--game .diagnostic-focus-layout__content {
+  display: none;
+}
+
+.diagnostic-icon-transparent {
+  background: transparent !important;
+  object-fit: contain;
+}
+
+.diagnostic-screen {
+  width: min(100%, 430px);
+}
+
+@media (min-width: 768px) {
+  .diagnostic-screen {
+    width: min(100%, 1040px);
+  }
 }
 
 .diagnostic-focus-layout__overlay {
@@ -184,10 +218,19 @@
   position: relative;
   z-index: 1;
   min-height: 100dvh;
+  max-height: 100dvh;
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 24px;
+  padding: 16px;
+  overflow-y: auto;
+}
+
+@media (min-width: 768px) {
+  .diagnostic-focus-layout__content {
+    padding: 32px 48px;
+    overflow-y: hidden;
+  }
 }
 
 .diagnostic-back-button {
@@ -271,12 +314,27 @@
 /* Intro */
 
 .diagnostic-intro {
-  width: min(390px, 100%);
-  min-height: calc(100dvh - 48px);
+  width: 100%;
+  min-height: auto;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 8px;
+}
+
+.diagnostic-intro__layout {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.diagnostic-intro__main {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
 }
 
 .diagnostic-intro__logo {
@@ -336,14 +394,42 @@
   height: 54px;
 }
 
-.diagnostic-intro .diagnostic-primary-button {
+.diagnostic-intro .diagnostic-primary-button,
+.diagnostic-intro__start {
   margin-top: 22px;
+}
+
+@media (min-width: 768px) {
+  .diagnostic-intro__layout {
+    display: grid;
+    grid-template-columns: minmax(180px, 220px) 1fr;
+    gap: 28px;
+    align-items: center;
+  }
+
+  .diagnostic-intro__mascot {
+    width: 200px;
+    margin: 0;
+  }
+
+  .diagnostic-intro-list {
+    grid-template-columns: 1fr 1fr;
+    gap: 14px 20px;
+  }
+
+  .diagnostic-intro__card {
+    text-align: left;
+  }
+
+  .diagnostic-intro__start {
+    max-width: 420px;
+  }
 }
 
 /* Task */
 
 .diagnostic-task {
-  width: min(430px, 100%);
+  width: 100%;
   position: relative;
 }
 
@@ -385,25 +471,51 @@
   position: absolute;
   width: 104px;
   height: auto;
-  left: -18px;
+  right: -12px;
   bottom: 54px;
   pointer-events: none;
 }
 
+@media (min-width: 768px) {
+  .diagnostic-task__top {
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+  }
+
+  .diagnostic-task__condition {
+    padding: 28px 32px;
+  }
+
+  .diagnostic-task__condition p {
+    font-size: 24px;
+  }
+
+  .diagnostic-answer-grid {
+    gap: 16px;
+  }
+
+  .diagnostic-task__mascot {
+    width: 120px;
+    right: -24px;
+    bottom: 64px;
+  }
+}
+
 .diagnostic-minigame-wrap {
-  width: min(430px, 100%);
+  width: 100%;
+  max-width: none;
 }
 
 /* Celebration */
 
 .diagnostic-celebration {
-  width: min(390px, 100%);
-  min-height: calc(100dvh - 48px);
+  width: 100%;
+  min-height: auto;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  gap: 18px;
+  gap: 14px;
 }
 
 .diagnostic-celebration__card {
@@ -462,19 +574,103 @@
 }
 
 .diagnostic-celebration__mascot {
-  width: 220px;
+  width: 180px;
   height: auto;
+}
+
+@media (min-width: 768px) {
+  .diagnostic-celebration {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px 32px;
+    max-width: 920px;
+  }
+
+  .diagnostic-celebration__card {
+    flex: 1 1 360px;
+    max-width: 520px;
+  }
+
+  .diagnostic-celebration__mascot {
+    width: 160px;
+    align-self: center;
+  }
+
+  .diagnostic-celebration .diagnostic-primary-button {
+    flex: 1 1 100%;
+    max-width: 420px;
+  }
+
+  .diagnostic-celebration h1 {
+    font-size: 34px;
+  }
+
+  .diagnostic-celebration p {
+    font-size: 20px;
+  }
 }
 
 /* Rules */
 
 .diagnostic-rules {
-  width: min(430px, 100%);
-  min-height: calc(100dvh - 48px);
+  width: 100%;
+  min-height: auto;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 18px;
+  gap: 16px;
+}
+
+.diagnostic-rules__side {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.diagnostic-rules__title-fallback {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 1000;
+  text-align: center;
+  color: #1b2b7c;
+}
+
+.diagnostic-rules__start {
+  margin-top: 4px;
+}
+
+@media (min-width: 768px) {
+  .diagnostic-rules {
+    display: grid;
+    grid-template-columns: minmax(240px, 320px) 1fr;
+    grid-template-rows: 1fr auto;
+    gap: 20px 36px;
+    align-items: center;
+    max-width: 980px;
+  }
+
+  .diagnostic-rules__side {
+    grid-row: 1 / span 1;
+    align-self: center;
+  }
+
+  .diagnostic-rules__card {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .diagnostic-rules__start {
+    grid-column: 1 / -1;
+    max-width: 420px;
+    justify-self: center;
+  }
+
+  .diagnostic-rules__preview {
+    max-width: 280px;
+    margin-top: 0;
+  }
 }
 
 .diagnostic-game-title__img {
@@ -518,45 +714,46 @@
 
 .diagnostic-rules__preview {
   width: 100%;
+  max-width: 280px;
   height: auto;
-  margin-top: 18px;
+  margin-top: 8px;
   border-radius: 20px;
-}
-
-@media (max-width: 480px) {
-  .diagnostic-focus-layout__content {
-    padding: 16px;
-  }
-
-  .diagnostic-back-button {
-    top: 12px;
-    left: 12px;
-  }
-
-  .diagnostic-answer-grid {
-    gap: 10px;
-  }
-
-  .diagnostic-task__condition p {
-    font-size: 20px;
-  }
-
-  .diagnostic-task__mascot {
-    width: 92px;
-    left: -8px;
-  }
 }
 
 /* Block intro */
 
 .diagnostic-block-intro {
-  width: min(390px, 100%);
-  min-height: calc(100dvh - 48px);
+  width: 100%;
+  min-height: auto;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 16px;
+  gap: 14px;
+}
+
+@media (min-width: 768px) {
+  .diagnostic-block-intro {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px 32px;
+    max-width: 920px;
+  }
+
+  .diagnostic-block-intro__card {
+    flex: 1 1 420px;
+    max-width: 560px;
+  }
+
+  .diagnostic-block-intro__mascot {
+    width: 160px;
+  }
+
+  .diagnostic-block-intro .diagnostic-primary-button {
+    flex: 1 1 100%;
+    max-width: 420px;
+  }
 }
 
 .diagnostic-block-intro__pill {
@@ -588,6 +785,30 @@
 .diagnostic-block-intro__mascot {
   width: 180px;
   height: auto;
+}
+
+@media (max-width: 480px) {
+  .diagnostic-focus-layout__content {
+    padding: 16px;
+  }
+
+  .diagnostic-back-button {
+    top: 12px;
+    left: 12px;
+  }
+
+  .diagnostic-answer-grid {
+    gap: 10px;
+  }
+
+  .diagnostic-task__condition p {
+    font-size: 20px;
+  }
+
+  .diagnostic-task__mascot {
+    width: 92px;
+    right: -4px;
+  }
 }
 
 /* Task body & workspace */

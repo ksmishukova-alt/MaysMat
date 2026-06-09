@@ -105,6 +105,42 @@ export const DIAGNOSTIC_BACKGROUND_BY_PHASE = {
   complete: ENTRY_DIAGNOSTIC_ASSETS.backgrounds.report,
 } as const;
 
+/** Mobile / desktop фоны по UI-фазе (390×844 и 1280×900) */
+export const DIAGNOSTIC_PHASE_BACKGROUNDS: Record<
+  string,
+  { mobile: string; desktop: string } | null
+> = {
+  intro: {
+    mobile: ENTRY_DIAGNOSTIC_ASSETS.backgrounds.intro,
+    desktop: ENTRY_DIAGNOSTIC_ASSETS.backgrounds.introAlt,
+  },
+  block_intro: {
+    mobile: ENTRY_DIAGNOSTIC_ASSETS.backgrounds.nextTopic,
+    desktop: ENTRY_DIAGNOSTIC_ASSETS.backgrounds.nextTopicAlt,
+  },
+  task: {
+    mobile: ENTRY_DIAGNOSTIC_ASSETS.backgrounds.task,
+    desktop: ENTRY_DIAGNOSTIC_ASSETS.backgrounds.taskAlt,
+  },
+  pre_minigame: {
+    mobile: ENTRY_DIAGNOSTIC_ASSETS.backgrounds.topicDone,
+    desktop: ENTRY_DIAGNOSTIC_ASSETS.backgrounds.topicDoneAlt,
+  },
+  rules: {
+    mobile: ENTRY_DIAGNOSTIC_ASSETS.backgrounds.introAlt,
+    desktop: ENTRY_DIAGNOSTIC_ASSETS.backgrounds.task,
+  },
+  game: null,
+  post_block: {
+    mobile: ENTRY_DIAGNOSTIC_ASSETS.backgrounds.nextTopic,
+    desktop: ENTRY_DIAGNOSTIC_ASSETS.backgrounds.nextTopicAlt,
+  },
+  result: {
+    mobile: ENTRY_DIAGNOSTIC_ASSETS.backgrounds.report,
+    desktop: ENTRY_DIAGNOSTIC_ASSETS.backgrounds.report,
+  },
+};
+
 /** Рекомендуемый маскот по экрану диагностики */
 export const DIAGNOSTIC_MYSHMAT_POSE: Record<string, string> = {
   intro: ENTRY_DIAGNOSTIC_ASSETS.characters.myshmatWave,

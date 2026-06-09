@@ -71,22 +71,27 @@ test.describe("Entry Diagnostic v2", () => {
   test("a11y: diagnostic runner has labeled inputs", async ({ page }) => {
     await page.goto("/diagnostic/run");
     await startDiagnosticRun(page);
-    for (let i = 0; i < 12; i++) {
-      const input = page.locator("input[aria-label]");
-      if (await input.first().isVisible().catch(() => false)) {
-        await expect(input.first()).toBeVisible();
+    for (let i = 0; i < 24; i++) {
+      const labeledInput = page.locator("input[aria-label]");
+      if (await labeledInput.first().isVisible().catch(() => false)) {
+        await expect(labeledInput.first()).toBeVisible();
         return;
       }
       const choice = page.locator('[data-testid^="diagnostic-choice-"]').first();
       if (await choice.isVisible().catch(() => false)) {
         await expect(choice).toHaveAttribute("aria-label", /.+/);
-        await choice.click();
+        return;
       }
       const btn = page.getByTestId("diagnostic-task-continue");
       if (await btn.isEnabled().catch(() => false)) {
         await btn.click();
+        await page.waitForTimeout(120);
+      } else {
+        break;
       }
     }
-    await expect(page.locator("[aria-label]").first()).toBeVisible();
+    await expect(
+      page.locator('input[aria-label], [data-testid^="diagnostic-choice-"][aria-label]').first(),
+    ).toBeVisible({ timeout: 8000 });
   });
 });

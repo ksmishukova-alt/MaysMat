@@ -39,6 +39,13 @@ export async function completeTaskSteps(page: Page) {
       }
     }
 
+    if (answer.operation != null) {
+      const choice = page.getByTestId(`diagnostic-choice-${answer.operation}`);
+      if (await choice.isVisible().catch(() => false)) {
+        await choice.click();
+      }
+    }
+
     const numInput = page.locator('input[type="number"]');
     if (await numInput.isVisible().catch(() => false)) {
       const val = answer.value ?? answer.actionCount;

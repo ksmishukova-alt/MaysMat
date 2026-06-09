@@ -58,6 +58,40 @@ function defaultScreenSequence(_difficulty: DiagnosticDifficulty, taskText: stri
   ];
 }
 
+/** Блок 2: сюжет → выбор операции + / − */
+export function makeStoryOperationTask(
+  blockId: string,
+  difficulty: DiagnosticDifficulty,
+  conditionText: string,
+  questionPrompt: string,
+  choices: { id: string; label: string }[],
+  answerOperation: string,
+  errorTypes: string[],
+): DiagnosticTask {
+  const steps: ScreenStep[] = [
+    { stepId: "read", kind: "condition_read", prompt: conditionText },
+    {
+      stepId: "choose",
+      kind: "single_select",
+      prompt: questionPrompt,
+      fieldKey: "operation",
+      options: choices,
+    },
+  ];
+
+  return {
+    taskId: `${blockId}-${difficulty.toLowerCase()}`,
+    blockId,
+    difficulty,
+    scoreWeight: WEIGHTS[DIFFICULTIES.indexOf(difficulty)],
+    taskText: conditionText,
+    answer: { operation: answerOperation },
+    screenSequence: steps,
+    validationRules: [{ type: "exact", field: "operation", value: answerOperation }],
+    errorTypes,
+  };
+}
+
 export function makeReadingTask(
   blockId: string,
   difficulty: DiagnosticDifficulty,

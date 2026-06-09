@@ -1,4 +1,12 @@
-import { makePlanTask, makeReadingTask, makeTask, makeExpressionTask, toBlock, type BlockSeed } from "../seed-helpers";
+import {
+  makePlanTask,
+  makeReadingTask,
+  makeStoryOperationTask,
+  makeTask,
+  makeExpressionTask,
+  toBlock,
+  type BlockSeed,
+} from "../seed-helpers";
 import { BLOCK_01_READING_TASKS } from "../mini-games/pojmat-rounds";
 
 const B01 = "block-01";
@@ -30,15 +38,48 @@ const seeds: BlockSeed[] = [
     runnerKind: "story_add_sub_visual",
     miniGameId: "parkomat",
     tasks: [
-      makeTask("block-02", "D1", "Треть от 12 конфет — сколько?", { value: 4 }, [
-        { type: "numericEquals", field: "value", value: 4 },
-      ], ["operation_error", "unit_error"]),
-      makeTask("block-02", "D2", "87 − 49 = ?", { value: 38 }, [
-        { type: "numericEquals", field: "value", value: 38 },
-      ], ["calculation_error", "borrow_error"]),
-      makeTask("block-02", "D3", "232 + 197 − 68 = ?", { value: 361 }, [
-        { type: "numericEquals", field: "value", value: 361 },
-      ], ["operation_error", "calculation_error"]),
+      makeStoryOperationTask(
+        "block-02",
+        "D1",
+        "У МышМата было 9 карточек. Тася дала ему ещё 12 карточек.",
+        "Что нужно сделать, чтобы узнать, сколько карточек стало?",
+        [
+          { id: "9_plus_12", label: "9 + 12" },
+          { id: "9_minus_12", label: "9 − 12" },
+          { id: "12_minus_9", label: "12 − 9" },
+          { id: "only_12", label: "взять только 12" },
+        ],
+        "9_plus_12",
+        ["operation_direction_error", "semantic_error"],
+      ),
+      makeStoryOperationTask(
+        "block-02",
+        "D2",
+        "У Сони было 87 билетов. Она потратила 49 билетов.",
+        "Что нужно сделать, чтобы узнать, сколько билетов осталось?",
+        [
+          { id: "87_minus_49", label: "87 − 49" },
+          { id: "87_plus_49", label: "87 + 49" },
+          { id: "49_minus_87", label: "49 − 87" },
+          { id: "only_49", label: "взять только 49" },
+        ],
+        "87_minus_49",
+        ["operation_direction_error", "semantic_error"],
+      ),
+      makeStoryOperationTask(
+        "block-02",
+        "D3",
+        "В школьном клубе было 232 жетона. Потом принесли ещё 197 жетонов, а 68 жетонов потратили.",
+        "Какие действия нужны, чтобы узнать, сколько жетонов осталось?",
+        [
+          { id: "232_add_197_sub_68", label: "232 + 197 − 68" },
+          { id: "232_sub_197_add_68", label: "232 − 197 + 68" },
+          { id: "232_sub_68", label: "232 − 68" },
+          { id: "197_add_68", label: "197 + 68" },
+        ],
+        "232_add_197_sub_68",
+        ["operation_order_error", "operation_direction_error"],
+      ),
     ],
   },
   {

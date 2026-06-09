@@ -28,7 +28,7 @@ export type IntroProps = {
 export function Intro({ onStart, onBack }: IntroProps) {
   return (
     <DiagnosticFocusLayout phase="intro" testId="diagnostic-intro" onBack={onBack}>
-      <section className="diagnostic-intro">
+      <section className="diagnostic-screen diagnostic-intro">
         <Image
           className="diagnostic-intro__logo"
           src={ENTRY_DIAGNOSTIC_ASSETS.brand.logo}
@@ -38,39 +38,43 @@ export function Intro({ onStart, onBack }: IntroProps) {
           priority
         />
 
-        <Image
-          className="diagnostic-intro__mascot"
-          src={DIAGNOSTIC_MYSHMAT_POSE.intro}
-          alt=""
-          width={170}
-          height={170}
-          aria-hidden
-          priority
-        />
+        <div className="diagnostic-intro__layout">
+          <Image
+            className="diagnostic-intro__mascot"
+            src={DIAGNOSTIC_MYSHMAT_POSE.intro}
+            alt=""
+            width={200}
+            height={200}
+            aria-hidden
+            priority
+          />
 
-        <div className="diagnostic-card diagnostic-intro__card">
-          <h1>Привет!</h1>
-          <p>
-            Сейчас ты пройдёшь диагностику, чтобы мы лучше поняли, что ты уже знаешь и умеешь.
-          </p>
-          <ul className="diagnostic-intro-list">
-            {DIAGNOSTIC_INTRO_ROWS.map((row) => (
-              <li key={row.textKey}>
-                <Image src={row.icon} alt="" width={54} height={54} aria-hidden />
-                <span>{INTRO_COPY[row.textKey]}</span>
-              </li>
-            ))}
-          </ul>
+          <div className="diagnostic-intro__main">
+            <div className="diagnostic-card diagnostic-intro__card">
+              <h1>Привет!</h1>
+              <p>
+                Сейчас ты пройдёшь диагностику, чтобы мы лучше поняли, что ты уже знаешь и умеешь.
+              </p>
+              <ul className="diagnostic-intro-list">
+                {DIAGNOSTIC_INTRO_ROWS.map((row) => (
+                  <li key={row.textKey}>
+                    <Image src={row.icon} alt="" width={54} height={54} className="diagnostic-icon-transparent" aria-hidden />
+                    <span>{INTRO_COPY[row.textKey]}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <button
+              type="button"
+              className="diagnostic-primary-button diagnostic-intro__start"
+              data-testid="diagnostic-start"
+              onClick={onStart}
+            >
+              Начать диагностику
+            </button>
+          </div>
         </div>
-
-        <button
-          type="button"
-          className="diagnostic-primary-button"
-          data-testid="diagnostic-start"
-          onClick={onStart}
-        >
-          Начать диагностику
-        </button>
       </section>
     </DiagnosticFocusLayout>
   );

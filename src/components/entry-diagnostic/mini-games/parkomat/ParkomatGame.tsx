@@ -209,7 +209,7 @@ export function ParkomatGame({
       >
         <header className="parkomat__header">
           <Image
-            className="parkomat__header-img"
+            className="parkomat__header-img diagnostic-icon-transparent"
             src={PARKOMAT_ASSETS.header}
             alt="МышМат: ПаркоМат"
             width={360}

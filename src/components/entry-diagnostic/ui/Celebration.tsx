@@ -20,7 +20,7 @@ export type CelebrationProps = {
 };
 
 export function Celebration({
-  layoutPhase = "celebration",
+  layoutPhase = "pre_minigame",
   title = "Тема завершена!",
   text = "Сейчас будет мини-игра МышМата.",
   buttonText = "Дальше",
@@ -34,7 +34,7 @@ export function Celebration({
 }: CelebrationProps) {
   return (
     <DiagnosticFocusLayout phase={layoutPhase} testId={testId}>
-      <section className="diagnostic-celebration">
+      <section className="diagnostic-screen diagnostic-celebration">
         <div className="diagnostic-card diagnostic-celebration__card">
           <div className="diagnostic-badge">
             <Image src={badgeSrc} alt="" width={84} height={84} aria-hidden />
@@ -54,7 +54,7 @@ export function Celebration({
         ) : null}
 
         <Image
-          className="diagnostic-celebration__mascot"
+          className="diagnostic-celebration__mascot diagnostic-icon-transparent"
           src={mascotSrc}
           alt=""
           width={220}

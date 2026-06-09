@@ -3,6 +3,7 @@
 import { Nunito } from "next/font/google";
 import type { CSSProperties, ReactNode } from "react";
 import Image from "next/image";
+import { DIAGNOSTIC_PHASE_BACKGROUNDS } from "@/data/entry-diagnostic/visual-assets";
 import { ENTRY_DIAGNOSTIC_ASSETS } from "@/data/entry-diagnostic/visual-assets";
 import "./diagnostic-ui.css";
 
@@ -14,19 +15,26 @@ const nunito = Nunito({
 
 export type DiagnosticLayoutPhase =
   | "intro"
+  | "block_intro"
   | "task"
-  | "celebration"
+  | "pre_minigame"
   | "rules"
   | "game"
-  | "next";
+  | "post_block"
+  | "result";
 
-export const DIAGNOSTIC_PHASE_BG: Record<DiagnosticLayoutPhase, string> = {
-  intro: ENTRY_DIAGNOSTIC_ASSETS.backgrounds.intro,
-  task: ENTRY_DIAGNOSTIC_ASSETS.backgrounds.task,
-  celebration: ENTRY_DIAGNOSTIC_ASSETS.backgrounds.topicDone,
-  rules: ENTRY_DIAGNOSTIC_ASSETS.backgrounds.introAlt,
-  game: ENTRY_DIAGNOSTIC_ASSETS.pojmat.arena.mobile,
-  next: ENTRY_DIAGNOSTIC_ASSETS.backgrounds.nextTopic,
+/** @deprecated используйте DIAGNOSTIC_PHASE_BACKGROUNDS */
+export const DIAGNOSTIC_PHASE_BG: Record<
+  Exclude<DiagnosticLayoutPhase, "game">,
+  string
+> = {
+  intro: DIAGNOSTIC_PHASE_BACKGROUNDS.intro!.mobile,
+  block_intro: DIAGNOSTIC_PHASE_BACKGROUNDS.block_intro!.mobile,
+  task: DIAGNOSTIC_PHASE_BACKGROUNDS.task!.mobile,
+  pre_minigame: DIAGNOSTIC_PHASE_BACKGROUNDS.pre_minigame!.mobile,
+  rules: DIAGNOSTIC_PHASE_BACKGROUNDS.rules!.mobile,
+  post_block: DIAGNOSTIC_PHASE_BACKGROUNDS.post_block!.mobile,
+  result: DIAGNOSTIC_PHASE_BACKGROUNDS.result!.mobile,
 };
 
 export type DiagnosticFocusLayoutProps = {
@@ -44,11 +52,31 @@ export function DiagnosticFocusLayout({
   backLabel = "Назад",
   testId,
 }: DiagnosticFocusLayoutProps) {
+  if (phase === "game") {
+    return (
+      <main
+        className={`diagnostic-focus-layout diagnostic-focus-layout--game ${nunito.className}`}
+        data-testid={testId}
+        data-phase={phase}
+      >
+        {children}
+      </main>
+    );
+  }
+
+  const bg = DIAGNOSTIC_PHASE_BACKGROUNDS[phase];
+
   return (
     <main
       className={`diagnostic-focus-layout ${nunito.className}`}
       data-testid={testId}
-      style={{ "--diagnostic-bg": `url(${DIAGNOSTIC_PHASE_BG[phase]})` } as CSSProperties}
+      data-phase={phase}
+      style={
+        {
+          "--diagnostic-bg-mobile": bg ? `url(${bg.mobile})` : "none",
+          "--diagnostic-bg-desktop": bg ? `url(${bg.desktop})` : "none",
+        } as CSSProperties
+      }
     >
       <div className="diagnostic-focus-layout__overlay" aria-hidden />
 
