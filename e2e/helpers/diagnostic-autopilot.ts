@@ -57,17 +57,31 @@ export async function completeTaskSteps(page: Page) {
   }
 }
 
-/** Ловля в ПойМАТ: дождаться карточку в зоне и поймать */
-async function catchPojmatCard(page: Page, correctId: string) {
-  for (let attempt = 0; attempt < 40; attempt++) {
-    const enabled = page.locator(`[data-testid="mini-target-${correctId}"]:not([disabled])`);
-    if ((await enabled.count()) > 0) {
-      await enabled.first().click();
-      await page.waitForTimeout(150);
-      return;
+/** ПойМАТ: выбрать дорожку и дождаться автоловли в корзинку */
+async function movePojmatToLane(page: Page, targetLane: number) {
+  for (let guard = 0; guard < 8; guard++) {
+    const mouse = page.getByTestId("pojmat-mouse");
+    const lane = Number((await mouse.getAttribute("data-lane")) ?? "1");
+    if (lane === targetLane) return;
+    if (lane < targetLane) {
+      await page.getByTestId("pojmat-lane-right").click();
+    } else {
+      await page.getByTestId("pojmat-lane-left").click();
     }
-    await page.waitForTimeout(100);
+    await page.waitForTimeout(60);
   }
+}
+
+async function catchPojmatRound(page: Page, correctId: string) {
+  await page.getByTestId("pojmat-catch-arena").waitFor({ state: "visible", timeout: 10_000 });
+  const arena = page.getByTestId("pojmat-catch-arena");
+  const correctLane = Number((await arena.getAttribute("data-correct-lane")) ?? "1");
+  await movePojmatToLane(page, correctLane);
+
+  await page
+    .locator(`[data-testid="pojmat-catch-arena"] [data-testid="mini-target-${correctId}"]`)
+    .waitFor({ state: "detached", timeout: 20_000 });
+  await page.waitForTimeout(250);
 }
 
 export async function completeMiniGame(page: Page, miniGameId: string) {
@@ -75,7 +89,7 @@ export async function completeMiniGame(page: Page, miniGameId: string) {
     for (let r = 0; r < 2; r++) {
       const round = POJMAT_ROUNDS[r];
       if (!round) break;
-      await catchPojmatCard(page, round.correctId);
+      await catchPojmatRound(page, round.correctId);
       await page.waitForTimeout(400);
     }
     return;
