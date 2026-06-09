@@ -26,7 +26,7 @@ export const POJMAT_ROUNDS: PojmatRound[] = [
     ],
   },
   {
-    conditionText: "В корзине 24 конфеты: 10 шоколадных, остальные — карамельки.",
+    conditionText: "В корзине 24 конфеты: 10 шоколадных, остальные — карамельки. Сколько карамелек?",
     correctId: "caramel",
     trapId: "total",
     cards: [
@@ -37,7 +37,7 @@ export const POJMAT_ROUNDS: PojmatRound[] = [
     ],
   },
   {
-    conditionText: "На полке 5 красных, 7 синих и 3 зелёных книг.",
+    conditionText: "На полке 5 красных, 7 синих и 3 зелёных книг. Сколько книг не красных?",
     correctId: "not_red",
     trapId: "red",
     cards: [

@@ -66,7 +66,6 @@ export function makeReadingTask(
   choices: { id: string; label: string }[],
   answerFocus: string,
   errorTypes: string[],
-  numericAnswer?: number,
 ): DiagnosticTask {
   const steps: ScreenStep[] = [
     { stepId: "read", kind: "condition_read", prompt: conditionText },
@@ -79,32 +78,15 @@ export function makeReadingTask(
     },
   ];
 
-  const validationRules: ValidationRule[] = [
-    { type: "exact", field: "focus", value: answerFocus },
-  ];
-  const answer: Record<string, unknown> = { focus: answerFocus };
-
-  if (numericAnswer != null) {
-    steps.push({
-      stepId: "answer",
-      kind: "number_input",
-      prompt: "Запиши ответ",
-      fieldKey: "value",
-      placeholder: "?",
-    });
-    validationRules.push({ type: "numericEquals", field: "value", value: numericAnswer });
-    answer.value = numericAnswer;
-  }
-
   return {
     taskId: `${blockId}-${difficulty.toLowerCase()}`,
     blockId,
     difficulty,
     scoreWeight: WEIGHTS[DIFFICULTIES.indexOf(difficulty)],
     taskText: conditionText,
-    answer,
+    answer: { focus: answerFocus },
     screenSequence: steps,
-    validationRules,
+    validationRules: [{ type: "exact", field: "focus", value: answerFocus }],
     errorTypes,
   };
 }

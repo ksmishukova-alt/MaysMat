@@ -29,7 +29,6 @@ export function ReadingComprehensionRunner({
   const steps = task.screenSequence;
   const step = steps[stepIndex];
   const conditionText = useMemo(() => conditionTextFromSteps(steps), [steps]);
-  const isFirstStep = step?.kind === "condition_read";
   const isLastStep = stepIndex === steps.length - 1;
 
   const recordError = (bucket: keyof ErrorTelemetryBuckets, code: string) => {
@@ -62,26 +61,18 @@ export function ReadingComprehensionRunner({
   };
 
   const pickChoice = (optionId: string, correctId: string) => {
-    patchField(step.fieldKey ?? "focus", optionId);
+    patchField(step?.fieldKey ?? "focus", optionId);
     if (optionId !== correctId) {
       recordError("readingErrors", "question_focus_error");
     }
   };
 
-  const continueLabel = (() => {
-    if (step?.kind === "condition_read") return "Прочитал";
-    if (isLastStep) return "Готово";
-    return "Дальше";
-  })();
+  const continueLabel = step?.kind === "condition_read" ? "Прочитал" : isLastStep ? "Готово" : "Дальше";
 
   const canContinue = (() => {
     if (step?.kind === "condition_read") return true;
     if (step?.kind === "single_select") {
       return response[step.fieldKey ?? "focus"] != null;
-    }
-    if (step?.kind === "number_input") {
-      const v = response[step.fieldKey ?? "value"];
-      return v !== "" && v != null && !Number.isNaN(Number(v));
     }
     return true;
   })();
@@ -92,7 +83,6 @@ export function ReadingComprehensionRunner({
     <DiagnosticScreenShell
       taskLabel={`Задание ${globalTaskIndex} из ${totalTasks}`}
       blockTitle="Чтение условия"
-      conditionText={!isFirstStep ? conditionText : undefined}
     >
       <div
         data-testid="diagnostic-runner"
@@ -105,6 +95,12 @@ export function ReadingComprehensionRunner({
 
         {step?.kind === "single_select" ? (
           <div>
+            <p
+              className="mb-3 rounded-xl border border-lavender-200 bg-lavender-50/90 px-4 py-3 text-sm leading-relaxed text-gray-800"
+              data-testid="diagnostic-condition-banner"
+            >
+              {conditionText}
+            </p>
             <p className="mb-4 text-lg font-medium text-gray-900">{step.prompt}</p>
             <div className="grid gap-3 sm:grid-cols-2">
               {(step.options ?? []).map((opt) => {
@@ -114,6 +110,7 @@ export function ReadingComprehensionRunner({
                     key={opt.id}
                     type="button"
                     data-testid={`diagnostic-choice-${opt.id}`}
+                    aria-label={opt.label}
                     onClick={() => pickChoice(opt.id, correctChoiceId)}
                     className={`min-h-14 rounded-2xl border-2 px-4 py-3 text-left text-sm leading-snug transition ${
                       selected
@@ -126,20 +123,6 @@ export function ReadingComprehensionRunner({
                 );
               })}
             </div>
-          </div>
-        ) : null}
-
-        {step?.kind === "number_input" ? (
-          <div>
-            <p className="mb-4 text-lg font-medium text-gray-900">{step.prompt}</p>
-            <input
-              type="number"
-              inputMode="numeric"
-              aria-label={step.prompt}
-              value={String(response[step.fieldKey ?? "value"] ?? "")}
-              onChange={(e) => patchField(step.fieldKey ?? "value", Number(e.target.value))}
-              className="min-h-12 w-full max-w-xs rounded-xl border border-lavender-200 px-4 py-2 text-lg"
-            />
           </div>
         ) : null}
 

@@ -70,16 +70,22 @@ test.describe("Entry Diagnostic v2", () => {
     await page.goto("/diagnostic/run");
     await page.getByTestId("diagnostic-start").click();
     await expect(page.getByTestId("diagnostic-runner")).toBeVisible();
-    for (let i = 0; i < 4; i++) {
+    for (let i = 0; i < 12; i++) {
       const input = page.locator("input[aria-label]");
       if (await input.first().isVisible().catch(() => false)) {
         await expect(input.first()).toBeVisible();
         return;
       }
-      await page.getByTestId("diagnostic-task-continue").click();
+      const choice = page.locator('[data-testid^="diagnostic-choice-"]').first();
+      if (await choice.isVisible().catch(() => false)) {
+        await expect(choice).toHaveAttribute("aria-label", /.+/);
+        await choice.click();
+      }
+      const btn = page.getByTestId("diagnostic-task-continue");
+      if (await btn.isEnabled().catch(() => false)) {
+        await btn.click();
+      }
     }
-    await expect(page.getByRole("region", { name: /параметра|модель|столбик/i }).or(
-      page.locator("[aria-label]").first(),
-    )).toBeVisible();
+    await expect(page.locator("[aria-label]").first()).toBeVisible();
   });
 });

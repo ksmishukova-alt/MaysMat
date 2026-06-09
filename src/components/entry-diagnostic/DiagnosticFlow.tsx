@@ -19,7 +19,7 @@ import {
 } from "@/lib/entry-diagnostic/session";
 import { DiagnosticRunner, type RunnerSubmitMeta } from "./DiagnosticRunner";
 import { getMiniGameComponent } from "@/lib/entry-diagnostic/minigame-registry";
-import { TaskScreenShell } from "@/components/task-steps/TaskScreenShell";
+import { DiagnosticScreenShell } from "@/components/entry-diagnostic/DiagnosticScreenShell";
 
 export function DiagnosticFlow() {
   const router = useRouter();
@@ -201,14 +201,12 @@ export function DiagnosticFlow() {
 
   if (session.phase === "block_summary") {
     return (
-      <TaskScreenShell
-        showPhaseHeader
-        phaseTitle={`Блок ${block.blockIndex} завершён`}
-        showStepTitle
-        stepTitle={block.title}
+      <DiagnosticScreenShell
+        taskLabel={`Блок ${block.blockIndex} из 15`}
+        blockTitle={block.title}
       >
-        <p className="text-lg font-semibold">
-          Баллы блока: {blockScore} / {block.maxScore}
+        <p className="text-lg font-semibold text-gray-900">
+          Готово! Баллы: {blockScore} / {block.maxScore}
         </p>
         <p className="mt-2 text-sm text-gray-500">Подробный отчёт будет в самом конце.</p>
         <button
@@ -221,7 +219,7 @@ export function DiagnosticFlow() {
             ? "К отчёту"
             : "Следующий блок"}
         </button>
-      </TaskScreenShell>
+      </DiagnosticScreenShell>
     );
   }
 
@@ -230,8 +228,10 @@ export function DiagnosticFlow() {
     const MiniGame = mgConfig ? getMiniGameComponent(block.miniGameId) : undefined;
     if (!mgConfig || !MiniGame) return null;
     return (
-      <div className="space-y-3">
-        <p className="px-1 text-xs text-gray-400">{block.title}</p>
+      <DiagnosticScreenShell
+        taskLabel={`Блок ${block.blockIndex} из 15`}
+        blockTitle="Мини-игра с МышМатом"
+      >
         <MiniGame
           config={mgConfig}
           mode="diagnostic"
@@ -241,7 +241,7 @@ export function DiagnosticFlow() {
             setSession((s) => (s ? appendEvent(s, { eventType, blockId: block.blockId, payload }) : s));
           }}
         />
-      </div>
+      </DiagnosticScreenShell>
     );
   }
 
