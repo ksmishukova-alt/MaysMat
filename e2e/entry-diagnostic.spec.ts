@@ -13,8 +13,6 @@ test.describe("Entry Diagnostic v2", () => {
 
   test("landing → start → block 1 task visible", async ({ page }) => {
     await page.goto("/diagnostic");
-    await expect(page.getByTestId("diagnostic-enter")).toBeVisible();
-    await page.getByTestId("diagnostic-enter").click();
     await page.waitForURL(/\/diagnostic\/run/, { timeout: 15_000 });
     await startDiagnosticRun(page);
     await expect(page.getByTestId("diagnostic-runner")).toBeVisible();

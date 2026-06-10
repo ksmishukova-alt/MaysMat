@@ -43,13 +43,9 @@ async function init(page: import("@playwright/test").Page) {
 async function captureAll(page: import("@playwright/test").Page, vp: Vp) {
   await page.setViewportSize({ width: vp.width, height: vp.height });
 
-  await page.goto(`${BASE}/diagnostic`);
-  await page.getByTestId("diagnostic-enter").waitFor({ state: "visible", timeout: 30_000 });
-  await shot(page, vp, "00-landing");
-
   await page.goto(`${BASE}/diagnostic/run`);
   await page.getByTestId("diagnostic-start").waitFor({ state: "visible", timeout: 30_000 });
-  await shot(page, vp, "01-intro");
+  await shot(page, "01-intro");
 
   await page.getByTestId("diagnostic-start").click();
   await page.getByTestId("diagnostic-block-intro").waitFor({ state: "visible", timeout: 10_000 });

@@ -28,11 +28,11 @@ async function main() {
   });
   const page = await context.newPage();
 
-  await page.goto(`${BASE}/diagnostic`);
+  await page.goto(`${BASE}/diagnostic/run`);
   await page.waitForLoadState("networkidle");
-  await shot(page, "01-landing");
+  await page.getByTestId("diagnostic-start").waitFor({ state: "visible", timeout: 30_000 });
+  await shot(page, "01-intro");
 
-  await page.getByTestId("diagnostic-enter").click();
   await page.getByTestId("diagnostic-start").click();
   await page.waitForSelector('[data-testid="diagnostic-runner"]');
   await shot(page, "02-block1-task-d1");
@@ -96,16 +96,17 @@ async function main() {
   await page3.waitForSelector('[data-testid="diagnostic-report"]');
   await shot(page3, "08-final-report");
 
-  // Мобильный landing
+  // Мобильный intro
   const mobile = await browser.newContext({
     viewport: { width: 390, height: 844 },
     isMobile: true,
     hasTouch: true,
   });
   const mp = await mobile.newPage();
-  await mp.goto(`${BASE}/diagnostic`);
+  await mp.goto(`${BASE}/diagnostic/run`);
   await mp.waitForLoadState("networkidle");
-  await shot(mp, "09-mobile-landing");
+  await mp.getByTestId("diagnostic-start").waitFor({ state: "visible", timeout: 30_000 });
+  await shot(mp, "09-mobile-intro");
   await mobile.close();
 
   await ctx3.close();

@@ -17,11 +17,12 @@ test.describe("Entry Diagnostic responsive", () => {
   });
 
   for (const vp of VIEWPORTS) {
-    test(`${vp.name}: landing + start visible`, async ({ browser }) => {
+    test(`${vp.name}: intro visible after nav`, async ({ browser }) => {
       const context = await browser.newContext({ ...vp });
       const page = await context.newPage();
       await page.goto("/diagnostic");
-      await expect(page.getByTestId("diagnostic-enter")).toBeVisible();
+      await page.waitForURL(/\/diagnostic\/run/, { timeout: 15_000 });
+      await expect(page.getByTestId("diagnostic-start")).toBeVisible();
       await context.close();
     });
   }
