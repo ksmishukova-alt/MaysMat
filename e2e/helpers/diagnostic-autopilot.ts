@@ -125,8 +125,22 @@ export async function advanceBlockToMiniGame(page: Page) {
 async function answerParkomatRound(page: Page, correctGate: ParkomatGate) {
   await page.getByTestId("parkomat-game").waitFor({ state: "visible", timeout: 10_000 });
   const gateTestId = correctGate === "plus" ? "parkomat-gate-plus" : "parkomat-gate-minus";
+  await page.waitForFunction(
+    (testId) => {
+      const btn = document.querySelector(`[data-testid="${testId}"]`) as HTMLButtonElement | null;
+      return Boolean(btn && !btn.disabled);
+    },
+    gateTestId,
+    { timeout: 12_000 },
+  );
   await page.getByTestId(gateTestId).click();
-  await page.waitForTimeout(1_800);
+  await page.waitForFunction(() => {
+    const game = document.querySelector('[data-testid="parkomat-game"]');
+    if (!game) return true;
+    const phase = game.getAttribute("data-phase");
+    return phase === "successPass" || phase === "failHit";
+  }, { timeout: 15_000 });
+  await page.waitForTimeout(900);
 }
 
 export async function completeMiniGame(page: Page, miniGameId: string) {

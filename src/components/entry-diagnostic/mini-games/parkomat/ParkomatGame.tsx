@@ -19,11 +19,12 @@ import {
   resolveParkomatSceneVariant,
   type ParkomatLayout,
 } from "./parkomat-assets";
+import { poseFromStep, runCarPathSteps, sleep } from "./parkomat-car-path";
 import {
-  CAR_POSITIONS,
-  CAR_POSITIONS_MOBILE,
-  type CarPositionKey,
-} from "./parkomat-positions";
+  getApproachPath,
+  getBranchPath,
+  type CarPose,
+} from "./parkomat-paths";
 import type {
   GateState,
   ParkomatMode,
@@ -44,20 +45,7 @@ export type ParkomatGameProps = {
   onTelemetry?: (event: ParkomatTelemetryEvent) => void;
 };
 
-function resolveCarPosition(key: CarPositionKey, mobile: boolean) {
-  if (mobile && CAR_POSITIONS_MOBILE[key]) {
-    return CAR_POSITIONS_MOBILE[key]!;
-  }
-  return CAR_POSITIONS[key];
-}
-
-function gatePosition(gate: ParkomatGate): CarPositionKey {
-  return gate === "minus" ? "minusGate" : "plusGate";
-}
-
-function exitPosition(gate: ParkomatGate): CarPositionKey {
-  return gate === "minus" ? "minusExit" : "plusExit";
-}
+type RoundAnswer = { gate: ParkomatGate; isCorrect: boolean };
 
 export function ParkomatGame({
   mode,
@@ -69,7 +57,9 @@ export function ParkomatGame({
   const [roundIndex, setRoundIndex] = useState(0);
   const [phase, setPhase] = useState<ParkomatPhase>("reading");
   const [selectedGate, setSelectedGate] = useState<ParkomatGate | null>(null);
-  const [carPosKey, setCarPosKey] = useState<CarPositionKey>("start");
+  const [hasAnswered, setHasAnswered] = useState(false);
+  const [carPose, setCarPose] = useState<CarPose>({ x: 50, y: 86, rotate: 0 });
+  const [carTransitionMs, setCarTransitionMs] = useState(0);
   const [showHit, setShowHit] = useState(false);
   const [minusGateState, setMinusGateState] = useState<GateState>("closed");
   const [plusGateState, setPlusGateState] = useState<GateState>("closed");
@@ -83,6 +73,8 @@ export function ParkomatGame({
   const completedRef = useRef(false);
   const roundStartedAtRef = useRef(Date.now());
   const sequenceRef = useRef(0);
+  const answerRef = useRef<RoundAnswer | null>(null);
+  const driveAbortRef = useRef<AbortController | null>(null);
 
   const currentRound = rounds[roundIndex % rounds.length];
   const gameSpeedClass = mode === "play" ? "parkomat--play" : "parkomat--diagnostic";
@@ -107,12 +99,16 @@ export function ParkomatGame({
   }, []);
 
   const resetRoundVisuals = useCallback(() => {
+    driveAbortRef.current?.abort();
+    driveAbortRef.current = null;
     setPhase("reading");
     setSelectedGate(null);
-    setCarPosKey("start");
+    setHasAnswered(false);
+    answerRef.current = null;
     setShowHit(false);
     setMinusGateState("closed");
     setPlusGateState("closed");
+    setCarTransitionMs(0);
     roundStartedAtRef.current = Date.now();
   }, []);
 
@@ -121,19 +117,19 @@ export function ParkomatGame({
   }, [roundIndex, resetRoundVisuals]);
 
   useEffect(() => {
+    const start = getApproachPath(layout)[0]!;
+    setCarPose(poseFromStep(start));
+    setCarTransitionMs(0);
+  }, [roundIndex, layout]);
+
+  useEffect(() => {
     if (phase !== "reading" || finished || completedRef.current) return;
-    setCarPosKey("start");
     const readingMs = mode === "diagnostic" ? 900 : 450;
     const timer = window.setTimeout(() => {
       setPhase((p) => (p === "reading" ? "drivingStraight" : p));
     }, readingMs);
     return () => window.clearTimeout(timer);
   }, [phase, roundIndex, mode, finished]);
-
-  useEffect(() => {
-    if (phase !== "drivingStraight" || finished || completedRef.current) return;
-    setCarPosKey("approach");
-  }, [phase, roundIndex, finished]);
 
   useEffect(() => {
     if (completedRef.current) return;
@@ -156,9 +152,24 @@ export function ParkomatGame({
     window.setTimeout(() => setRoundIndex((prev) => prev + 1), mode === "diagnostic" ? 420 : 320);
   }, [mode, fastMode, finishGame]);
 
+  const openSelectedGate = useCallback((gate: ParkomatGate, seq: number) => {
+    window.setTimeout(() => {
+      if (sequenceRef.current !== seq) return;
+      setPhase("gateOpening");
+      if (gate === "minus") setMinusGateState("opening");
+      else setPlusGateState("opening");
+    }, 40);
+
+    window.setTimeout(() => {
+      if (sequenceRef.current !== seq) return;
+      if (gate === "minus") setMinusGateState("open");
+      else setPlusGateState("open");
+    }, 320);
+  }, []);
+
   const answer = useCallback(
     (gate: ParkomatGate) => {
-      if (!currentRound || completedRef.current || finished) return;
+      if (!currentRound || completedRef.current || finished || hasAnswered) return;
       if (phase !== "reading" && phase !== "drivingStraight") return;
 
       const seq = ++sequenceRef.current;
@@ -188,46 +199,84 @@ export function ParkomatGame({
       onTelemetry?.(event);
 
       setSelectedGate(gate);
-      setPhase("choiceMade");
-
-      window.setTimeout(() => {
-        if (sequenceRef.current !== seq) return;
-        setPhase("gateOpening");
-        if (gate === "minus") setMinusGateState("opening");
-        else setPlusGateState("opening");
-      }, 40);
-
-      window.setTimeout(() => {
-        if (sequenceRef.current !== seq) return;
-        if (gate === "minus") setMinusGateState("open");
-        else setPlusGateState("open");
-      }, 320);
-
-      window.setTimeout(() => {
-        if (sequenceRef.current !== seq) return;
-        setPhase("turning");
-        setCarPosKey(gatePosition(gate));
-      }, 340);
-
-      window.setTimeout(() => {
-        if (sequenceRef.current !== seq) return;
-        if (isCorrect) {
-          setPhase("successPass");
-          setCarPosKey(exitPosition(gate));
-        } else {
-          setPhase("failHit");
-          setCarPosKey(gatePosition(gate));
-          setShowHit(true);
-        }
-      }, 1040);
-
-      window.setTimeout(() => {
-        if (sequenceRef.current !== seq) return;
-        scheduleNextRound();
-      }, mode === "diagnostic" ? 1680 : 1380);
+      setHasAnswered(true);
+      answerRef.current = { gate, isCorrect };
+      openSelectedGate(gate, seq);
     },
-    [currentRound, mode, onTelemetry, phase, finished, scheduleNextRound],
+    [currentRound, mode, onTelemetry, phase, finished, hasAnswered, openSelectedGate],
   );
+
+  useEffect(() => {
+    if (phase !== "drivingStraight" || finished || completedRef.current || !currentRound) return;
+
+    const abort = new AbortController();
+    driveAbortRef.current = abort;
+    const { signal } = abort;
+
+    const applyStep = (durationMs: number, pose: CarPose) => {
+      if (signal.aborted) return;
+      setCarTransitionMs(durationMs > 0 ? durationMs : 0);
+      setCarPose(pose);
+    };
+
+    void (async () => {
+      try {
+        const approach = getApproachPath(layout);
+        await runCarPathSteps(
+          approach,
+          0,
+          (step) => applyStep(step.durationMs, poseFromStep(step)),
+          signal,
+        );
+        if (signal.aborted) return;
+
+        while (!answerRef.current && !signal.aborted) {
+          await sleep(50, signal);
+        }
+        if (signal.aborted) return;
+
+        await sleep(300, signal);
+        if (signal.aborted) return;
+
+        setPhase("turning");
+
+        const branch = getBranchPath(layout, currentRound.correctGate);
+        const { isCorrect } = answerRef.current!;
+
+        for (let i = 0; i < branch.length; i++) {
+          if (signal.aborted) return;
+          const step = branch[i]!;
+          applyStep(step.durationMs, poseFromStep(step));
+          if (step.durationMs > 0) {
+            await sleep(step.durationMs, signal);
+          }
+
+          if (step.gateTrigger) {
+            if (!isCorrect) {
+              setPhase("failHit");
+              setShowHit(true);
+              await sleep(mode === "diagnostic" ? 840 : 540, signal);
+              if (signal.aborted) return;
+              scheduleNextRound();
+              return;
+            }
+            setPhase("successPass");
+          }
+        }
+
+        if (signal.aborted) return;
+        await sleep(400, signal);
+        scheduleNextRound();
+      } catch {
+        // прервано сменой раунда
+      }
+    })();
+
+    return () => {
+      abort.abort();
+      driveAbortRef.current = null;
+    };
+  }, [phase, roundIndex, layout, finished, currentRound, mode, scheduleNextRound]);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -244,11 +293,6 @@ export function ParkomatGame({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [answer]);
 
-  const carPos = useMemo(
-    () => resolveCarPosition(carPosKey, layout !== "desktop"),
-    [carPosKey, layout],
-  );
-
   const sceneBg = useMemo(
     () => resolveParkomatSceneBg(minusGateState, plusGateState, layout),
     [minusGateState, plusGateState, layout],
@@ -260,13 +304,14 @@ export function ParkomatGame({
   );
 
   const carStyle = {
-    "--car-x": `${carPos.x}%`,
-    "--car-y": `${carPos.y}%`,
-    "--car-rotate": `${carPos.rotate}deg`,
+    "--car-x": `${carPose.x}%`,
+    "--car-y": `${carPose.y}%`,
+    "--car-rotate": `${carPose.rotate}deg`,
+    "--car-transition-ms": `${carTransitionMs}ms`,
   } as CSSProperties;
 
   const controlsDisabled =
-    phase !== "reading" && phase !== "drivingStraight" && !finished;
+    hasAnswered || (phase !== "reading" && phase !== "drivingStraight") || finished;
 
   const minusGateClass = [
     "parkomat-gate",

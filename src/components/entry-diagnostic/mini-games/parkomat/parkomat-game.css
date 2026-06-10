@@ -286,17 +286,13 @@
   height: auto;
   transform: translate(-50%, -50%) rotate(var(--car-rotate, 0deg));
   transition:
-    left 700ms ease-in-out,
-    top 700ms ease-in-out,
-    transform 700ms ease-in-out;
+    left var(--car-transition-ms, 700ms) ease-in-out,
+    top var(--car-transition-ms, 700ms) ease-in-out,
+    transform var(--car-transition-ms, 700ms) ease-in-out;
   will-change: left, top, transform;
   pointer-events: none;
   background: transparent;
   z-index: 2;
-}
-
-.parkomat--play .parkomat-car {
-  transition-duration: 480ms;
 }
 
 .parkomat-car--hit {
