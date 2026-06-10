@@ -60,6 +60,20 @@
   right: 14%;
 }
 
+.parkomat--layered-art.parkomat--tablet .parkomat-gate {
+  width: clamp(104px, 16vw, 148px);
+  height: clamp(80px, 14vh, 118px);
+  top: 36%;
+}
+
+.parkomat--layered-art.parkomat--tablet .parkomat-gate--minus {
+  left: 16%;
+}
+
+.parkomat--layered-art.parkomat--tablet .parkomat-gate--plus {
+  right: 16%;
+}
+
 .parkomat--layered-art.parkomat--desktop .parkomat-gate {
   width: clamp(108px, 11vw, 148px);
   height: clamp(88px, 14vh, 128px);

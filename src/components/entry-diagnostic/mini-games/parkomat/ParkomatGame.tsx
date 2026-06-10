@@ -12,7 +12,13 @@ import type { ParkomatRound } from "@/data/entry-diagnostic/mini-games/parkomat-
 import type { ParkomatGate } from "@/data/entry-diagnostic/mini-games/parkomat-rounds";
 import { isDiagnosticFastMode } from "@/lib/entry-diagnostic/fast-mode";
 import { DiagnosticAssetImage } from "@/components/entry-diagnostic/ui/DiagnosticAssetImage";
-import { PARKOMAT_ASSETS, resolveParkomatSceneBg, resolveParkomatSceneVariant } from "./parkomat-assets";
+import {
+  PARKOMAT_ASSETS,
+  resolveParkomatLayout,
+  resolveParkomatSceneBg,
+  resolveParkomatSceneVariant,
+  type ParkomatLayout,
+} from "./parkomat-assets";
 import {
   CAR_POSITIONS,
   CAR_POSITIONS_MOBILE,
@@ -70,7 +76,7 @@ export function ParkomatGame({
   const [timeLeft, setTimeLeft] = useState(durationSec);
   const [finished, setFinished] = useState(false);
   const [playScore, setPlayScore] = useState(0);
-  const [mobileLayout, setMobileLayout] = useState(false);
+  const [layout, setLayout] = useState<ParkomatLayout>("desktop");
 
   const eventsRef = useRef<ParkomatTelemetryEvent[]>([]);
   const correctCountRef = useRef(0);
@@ -94,11 +100,10 @@ export function ParkomatGame({
   }, [onComplete]);
 
   useEffect(() => {
-    const mq = window.matchMedia("(max-width: 767px)");
-    const sync = () => setMobileLayout(mq.matches);
+    const sync = () => setLayout(resolveParkomatLayout(window.innerWidth));
     sync();
-    mq.addEventListener("change", sync);
-    return () => mq.removeEventListener("change", sync);
+    window.addEventListener("resize", sync);
+    return () => window.removeEventListener("resize", sync);
   }, []);
 
   const resetRoundVisuals = useCallback(() => {
@@ -240,13 +245,13 @@ export function ParkomatGame({
   }, [answer]);
 
   const carPos = useMemo(
-    () => resolveCarPosition(carPosKey, mobileLayout),
-    [carPosKey, mobileLayout],
+    () => resolveCarPosition(carPosKey, layout !== "desktop"),
+    [carPosKey, layout],
   );
 
   const sceneBg = useMemo(
-    () => resolveParkomatSceneBg(minusGateState, plusGateState, mobileLayout),
-    [minusGateState, plusGateState, mobileLayout],
+    () => resolveParkomatSceneBg(minusGateState, plusGateState, layout),
+    [minusGateState, plusGateState, layout],
   );
 
   const sceneVariant = useMemo(
@@ -310,10 +315,11 @@ export function ParkomatGame({
 
   return (
     <section
-      className={`parkomat ${gameSpeedClass} parkomat--layered-art${mobileLayout ? " parkomat--mobile" : " parkomat--desktop"}`}
+      className={`parkomat ${gameSpeedClass} parkomat--layered-art parkomat--${layout}`}
       data-testid="diagnostic-minigame"
       data-mode={mode}
       data-game="parkomat"
+      data-layout={layout}
     >
       <img className="parkomat__bg" src={sceneBg} alt="" aria-hidden />
 
