@@ -1,9 +1,7 @@
 "use client";
 
-import Image from "next/image";
 import type { DiagnosticMiniGameProps } from "./types";
 import { POJMAT_ROUNDS } from "@/data/entry-diagnostic/mini-games/pojmat-rounds";
-import { POJMAT_VISUAL_ASSETS } from "./pojmat-assets";
 import { usePojmatGameState } from "./usePojmatGameState";
 import { PojmatCatchArena } from "./PojmatCatchArena";
 import "./pojmat-game.css";
@@ -44,14 +42,12 @@ export function PojmatMiniGame(props: DiagnosticMiniGameProps) {
       data-game="pojmat"
     >
       <header className="pojmat-game__header">
-        <Image
-          className="pojmat-game__header-img diagnostic-icon-transparent"
-          src={POJMAT_VISUAL_ASSETS.titleChip}
-          alt="МышМат: ПойМАТ!"
-          width={360}
-          height={64}
-          priority
-        />
+        <div className="pojmat-game__header-badge" aria-label="МышМат: ПойМАТ!">
+          <span className="pojmat-game__header-emoji" aria-hidden>
+            🧺
+          </span>
+          МышМат: ПойМАТ!
+        </div>
         {props.mode === "diagnostic" ? (
           <div className="pojmat-game__timer" aria-label={`Осталось ${state.timeLeft} секунд`}>
             ⏱ {state.timeLeft}

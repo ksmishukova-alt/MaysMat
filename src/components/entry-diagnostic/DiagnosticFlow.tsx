@@ -198,7 +198,7 @@ export function DiagnosticFlow() {
   }
 
   if (session.phase === "intro") {
-    return <Intro onStart={startDiagnostic} onBack={() => router.push("/diagnostic")} />;
+    return <Intro onStart={startDiagnostic} />;
   }
 
   if (session.phase === "block_intro") {

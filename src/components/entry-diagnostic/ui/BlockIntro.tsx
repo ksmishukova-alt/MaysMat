@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import { DiagnosticAssetImage } from "./DiagnosticAssetImage";
 import { DiagnosticFocusLayout } from "./DiagnosticFocusLayout";
 import { ProgressDots } from "./ProgressDots";
 import { DIAGNOSTIC_MYSHMAT_POSE } from "@/data/entry-diagnostic/visual-assets";
@@ -37,7 +37,7 @@ export function BlockIntro({
           <p>Сейчас будет 3 задания, а потом мини-игра.</p>
         </div>
 
-        <Image
+        <DiagnosticAssetImage
           className="diagnostic-block-intro__mascot diagnostic-icon-transparent"
           src={DIAGNOSTIC_MYSHMAT_POSE.nextTopic}
           alt=""

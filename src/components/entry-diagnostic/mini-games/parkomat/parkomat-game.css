@@ -2,6 +2,7 @@
   position: relative;
   width: 100%;
   min-height: 100dvh;
+  max-height: 100dvh;
   overflow: hidden;
   font-family: "Nunito", system-ui, sans-serif;
   color: #12205c;
@@ -20,23 +21,35 @@
   position: relative;
   z-index: 1;
   min-height: 100dvh;
+  max-height: 100dvh;
   display: grid;
   grid-template-rows: auto auto 1fr auto;
-  gap: 14px;
-  padding: 16px;
+  gap: 10px;
+  padding: 12px 16px 20px;
 }
 
 .parkomat__header {
-  display: grid;
-  grid-template-columns: 1fr auto;
+  display: flex;
   align-items: center;
-  gap: 10px;
+  justify-content: space-between;
+  gap: 12px;
 }
 
-.parkomat__header-img {
-  width: 100%;
-  max-width: 360px;
-  height: auto;
+.parkomat__header-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 48px;
+  padding: 0 24px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #ffffff 0%, #f3ecff 100%);
+  border: 3px solid rgba(255, 255, 255, 0.95);
+  color: #1b2b7c;
+  font-size: clamp(17px, 2.2vw, 22px);
+  font-weight: 1000;
+  letter-spacing: -0.01em;
+  box-shadow:
+    0 10px 24px rgba(17, 24, 39, 0.16),
+    inset 0 2px 0 rgba(255, 255, 255, 0.85);
 }
 
 .parkomat__timer,
@@ -52,12 +65,13 @@
   font-size: 18px;
   font-weight: 900;
   box-shadow: 0 8px 18px rgba(17, 24, 39, 0.14);
+  flex-shrink: 0;
 }
 
 .parkomat__condition-card {
-  width: min(100%, 760px);
+  width: min(760px, 72vw);
   margin: 0 auto;
-  padding: 18px 20px;
+  padding: 16px 22px;
   border-radius: 26px;
   background: rgba(255, 255, 255, 0.94);
   border: 2px solid rgba(255, 255, 255, 0.9);
@@ -70,65 +84,87 @@
 .parkomat__condition-card p {
   margin: 0;
   color: #12205c;
-  font-size: clamp(20px, 4.8vw, 32px);
-  line-height: 1.22;
+  font-size: clamp(20px, 2.4vw, 28px);
+  line-height: 1.2;
   font-weight: 900;
+  text-wrap: balance;
 }
 
 .parkomat__condition-card strong {
   display: block;
   color: #8e68cf;
-  font-size: clamp(16px, 3.6vw, 22px);
+  font-size: clamp(15px, 2vw, 20px);
   font-weight: 900;
 }
 
 .parkomat__dash {
-  margin: 12px auto;
+  margin: 10px auto;
   width: min(100%, 620px);
   border-top: 2px dashed rgba(139, 117, 91, 0.28);
 }
 
 .parkomat__scene {
   position: relative;
-  min-height: 420px;
+  width: min(100%, 1000px);
+  height: clamp(380px, 48vh, 500px);
+  margin: 0 auto;
+  min-height: 0;
 }
 
 .parkomat-gate {
   position: absolute;
-  top: 16%;
-  width: clamp(76px, 20vw, 132px);
-  height: clamp(76px, 20vw, 132px);
+  top: 32%;
+  width: clamp(88px, 10vw, 108px);
+  height: clamp(88px, 10vw, 108px);
   padding: 0;
-  border: 0;
-  background: transparent;
+  border: 8px solid #fff6e8;
+  border-radius: 999px;
   cursor: pointer;
-  transition: transform 160ms ease;
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease;
+  box-shadow: 0 12px 28px rgba(17, 24, 39, 0.18);
   -webkit-tap-highlight-color: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.parkomat-gate__symbol {
+  font-size: clamp(48px, 6vw, 72px);
+  font-weight: 1000;
+  line-height: 1;
+  user-select: none;
+}
+
+.parkomat-gate--minus {
+  left: 30%;
+  background: #8e56d9;
+  color: #fff;
+}
+
+.parkomat-gate--plus {
+  right: 30%;
+  background: #79ce35;
+  color: #fff;
 }
 
 .parkomat-gate:hover:not(:disabled),
 .parkomat-gate:focus-visible:not(:disabled) {
-  transform: translateY(-3px) scale(1.04);
+  transform: translateY(-3px) scale(1.06);
   outline: none;
+  box-shadow: 0 16px 32px rgba(17, 24, 39, 0.22);
 }
 
 .parkomat-gate:disabled {
   cursor: default;
-  opacity: 0.92;
+  opacity: 0.88;
 }
 
-.parkomat-gate img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
-
-.parkomat-gate--minus {
-  left: 20%;
-}
-
-.parkomat-gate--plus {
-  right: 20%;
+.parkomat-gate--open {
+  box-shadow:
+    0 8px 20px rgba(17, 24, 39, 0.16),
+    0 0 0 5px rgba(255, 255, 255, 0.75);
 }
 
 .parkomat-gate--open.parkomat-gate--minus {
@@ -142,8 +178,8 @@
 .parkomat-car {
   position: absolute;
   left: 50%;
-  bottom: 3%;
-  width: clamp(140px, 34vw, 240px);
+  bottom: 8%;
+  width: clamp(130px, 14vw, 196px);
   height: auto;
   transform: translateX(-50%);
   transition:
@@ -152,6 +188,7 @@
     transform 680ms ease;
   will-change: left, bottom, transform;
   pointer-events: none;
+  background: transparent;
 }
 
 .parkomat--play .parkomat-car {
@@ -159,14 +196,14 @@
 }
 
 .parkomat-car--left {
-  left: 31%;
-  bottom: 36%;
+  left: 34%;
+  bottom: 32%;
   transform: translateX(-50%) rotate(-13deg);
 }
 
 .parkomat-car--right {
-  left: 69%;
-  bottom: 36%;
+  left: 66%;
+  bottom: 32%;
   transform: translateX(-50%) rotate(13deg);
 }
 
@@ -216,21 +253,36 @@
 }
 
 .parkomat-controls {
+  position: relative;
+  z-index: 3;
   display: flex;
   justify-content: center;
-  gap: 32px;
-  padding-bottom: 8px;
+  gap: 56px;
+  padding-bottom: 24px;
 }
 
 .parkomat-control {
-  width: clamp(78px, 22vw, 120px);
-  height: clamp(78px, 22vw, 120px);
-  border: 0;
+  width: clamp(72px, 8vw, 82px);
+  height: clamp(72px, 8vw, 82px);
+  border: 4px solid rgba(255, 255, 255, 0.95);
+  border-radius: 999px;
   padding: 0;
-  background: transparent;
+  background: linear-gradient(180deg, #ffffff 0%, #eef4ff 100%);
   cursor: pointer;
   transition: transform 160ms ease;
+  box-shadow: 0 10px 24px rgba(17, 24, 39, 0.16);
   -webkit-tap-highlight-color: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.parkomat-control__arrow {
+  font-size: clamp(28px, 4vw, 36px);
+  font-weight: 900;
+  color: #1b2b7c;
+  line-height: 1;
+  user-select: none;
 }
 
 .parkomat-control:hover:not(:disabled),
@@ -248,12 +300,6 @@
   cursor: not-allowed;
 }
 
-.parkomat-control img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
-
 .parkomat--finished {
   display: flex;
   align-items: center;
@@ -268,44 +314,53 @@
   .parkomat__content {
     max-width: 1280px;
     margin: 0 auto;
-    padding: 22px 36px;
+    padding: 16px 36px 20px;
+    gap: 12px;
   }
 
-  .parkomat__header {
-    grid-template-columns: minmax(380px, 560px) auto auto;
+  .parkomat__header-badge {
+    width: 320px;
+    max-width: none;
+    justify-content: center;
+  }
+
+  .parkomat__condition-card {
+    padding: 20px 28px;
+  }
+
+  .parkomat__condition-card p {
+    font-size: clamp(24px, 2.4vw, 32px);
   }
 
   .parkomat__scene {
-    min-height: 500px;
-  }
-
-  .parkomat-gate--minus {
-    left: 28%;
-  }
-
-  .parkomat-gate--plus {
-    right: 28%;
+    height: clamp(430px, 52vh, 520px);
   }
 
   .parkomat-car {
-    width: 220px;
+    width: clamp(165px, 14vw, 198px);
   }
 
   .parkomat-car--left {
-    left: 39%;
-    bottom: 42%;
+    left: 36%;
+    bottom: 34%;
   }
 
   .parkomat-car--right {
-    left: 61%;
-    bottom: 42%;
+    left: 64%;
+    bottom: 34%;
   }
 }
 
 @media (max-width: 420px) {
   .parkomat__content {
-    padding: 12px;
-    gap: 10px;
+    padding: 10px 12px 16px;
+    gap: 8px;
+  }
+
+  .parkomat__header-badge {
+    font-size: 15px;
+    min-height: 40px;
+    padding: 0 14px;
   }
 
   .parkomat__timer {
@@ -317,31 +372,46 @@
   .parkomat__condition-card {
     padding: 14px 16px;
     border-radius: 22px;
+    width: min(100%, 92vw);
+  }
+
+  .parkomat__condition-card p {
+    font-size: clamp(18px, 4.6vw, 24px);
+    line-height: 1.18;
+  }
+
+  .parkomat__condition-card strong {
+    font-size: clamp(14px, 3.4vw, 17px);
   }
 
   .parkomat__scene {
-    min-height: 390px;
+    height: clamp(340px, 44vh, 420px);
   }
 
   .parkomat-gate--minus {
-    left: 11%;
+    left: 18%;
   }
 
   .parkomat-gate--plus {
-    right: 11%;
+    right: 18%;
+  }
+
+  .parkomat-car {
+    width: clamp(140px, 36vw, 170px);
   }
 
   .parkomat-car--left {
-    left: 28%;
-    bottom: 34%;
+    left: 30%;
+    bottom: 30%;
   }
 
   .parkomat-car--right {
-    left: 72%;
-    bottom: 34%;
+    left: 70%;
+    bottom: 30%;
   }
 
   .parkomat-controls {
     gap: 42px;
+    padding-bottom: 16px;
   }
 }

@@ -2,8 +2,9 @@
   position: relative;
   width: 100%;
   min-height: 100dvh;
+  max-height: 100dvh;
   display: grid;
-  grid-template-rows: auto 1fr auto;
+  grid-template-rows: auto 1fr;
   overflow: hidden;
   font-family: "Nunito", system-ui, sans-serif;
   color: #12205c;
@@ -15,13 +16,31 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 12px 16px 8px;
+  padding: 8px 16px 6px;
   z-index: 2;
 }
 
-.pojmat-game__header-img {
-  width: min(100%, 360px);
-  height: auto;
+.pojmat-game__header-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 0 22px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #ffffff 0%, #fff4e8 100%);
+  border: 3px solid rgba(255, 255, 255, 0.95);
+  color: #1b2b7c;
+  font-size: clamp(16px, 2vw, 21px);
+  font-weight: 1000;
+  letter-spacing: -0.01em;
+  box-shadow:
+    0 10px 24px rgba(17, 24, 39, 0.16),
+    inset 0 2px 0 rgba(255, 255, 255, 0.85);
+}
+
+.pojmat-game__header-emoji {
+  font-size: 1.25em;
+  line-height: 1;
 }
 
 .pojmat-game__timer {
@@ -44,71 +63,185 @@
   min-height: 0;
   display: flex;
   flex-direction: column;
-  padding: 0 12px 8px;
+  align-items: center;
+  padding: 0 8px 10px;
 }
 
 .pojmat-game__arena-wrap {
+  width: min(100%, 1280px);
   flex: 1;
   min-height: 0;
   display: flex;
   flex-direction: column;
 }
 
-.pojmat-game .pojmat-catch-arena-root {
-  flex: 1;
-  min-height: min(62dvh, 640px);
+.pojmat-catch-arena-root {
+  width: 100%;
   display: flex;
   flex-direction: column;
+  align-items: stretch;
 }
 
-.pojmat-arena {
-  width: 100%;
-  min-height: min(52dvh, 520px);
+.pojmat-condition {
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(900px, calc(100vw - 96px));
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 16px;
+  border-radius: 18px;
+  background: rgba(253, 248, 240, 0.96);
+  border: 1px solid #e8dcc8;
+  box-shadow: 0 4px 14px rgba(17, 24, 39, 0.12);
 }
 
-.pojmat-arena--diagnostic {
-  min-height: min(58dvh, 600px);
+.pojmat-condition__emoji {
+  font-size: 1.35rem;
+  line-height: 1;
+  flex-shrink: 0;
+  margin-top: 2px;
 }
 
-.pojmat-arena--play {
-  min-height: min(50dvh, 480px);
+.pojmat-condition__body {
+  min-width: 0;
+  flex: 1;
+}
+
+.pojmat-condition__text {
+  margin: 0;
+  font-size: clamp(13px, 2.8vw, 18px);
+  line-height: 1.25;
+}
+
+.pojmat-condition__dash {
+  margin: 8px 0 6px;
+  border-top: 1px dashed rgba(139, 117, 91, 0.28);
+}
+
+.pojmat-condition__hint {
+  margin: 0;
+  font-size: clamp(11px, 2.2vw, 14px);
+  line-height: 1.25;
+}
+
+.pojmat-mouse-character {
+  transform-origin: bottom center;
 }
 
 .pojmat-game__controls {
-  padding: 8px 16px 16px;
+  padding: 8px 16px 12px;
+}
+
+.pojmat-catch-arena-root .pojmat-game__controls {
+  padding: 8px 0 4px;
+}
+
+.pojmat-catch-arena-root .pojmat-game__controls button {
+  width: clamp(52px, 12vw, 72px);
+  height: clamp(52px, 12vw, 72px);
+  font-size: clamp(22px, 4vw, 28px);
+  font-weight: 900;
+  border-width: 3px;
+  box-shadow: 0 8px 18px rgba(17, 24, 39, 0.12);
+}
+
+.pojmat-controls-hint {
+  min-width: 7rem;
+  font-size: 11px;
+  font-weight: 800;
+  color: #5a6478;
 }
 
 @media (min-width: 768px) {
-  .pojmat-game {
+  .pojmat-game__header {
     max-width: 1280px;
     margin: 0 auto;
+    width: 100%;
+    padding: 10px 24px 8px;
   }
 
-  .pojmat-game__header {
-    padding: 18px 36px 10px;
+  .pojmat-game__header-badge {
+    width: auto;
+    min-width: 320px;
+    justify-content: center;
+    padding: 0 26px;
   }
 
   .pojmat-game__body {
-    padding: 0 36px 12px;
+    padding: 0 24px 12px;
+    flex: 1;
   }
 
-  .pojmat-game .pojmat-catch-arena-root {
-    min-height: min(72dvh, 720px);
+  .pojmat-condition {
+    top: 14px;
+    padding: 14px 20px;
   }
 
-  .pojmat-game__controls {
-    padding: 10px 36px 24px;
+  .pojmat-condition__text {
+    font-size: clamp(16px, 1.8vw, 20px);
+  }
+
+  .pojmat-catch-arena-root .pojmat-game__controls {
+    gap: 56px;
+    padding-bottom: 10px;
+  }
+
+  .pojmat-controls-hint {
+    min-width: 11rem;
+    font-size: 13px;
+  }
+
+  .pojmat-mouse-character {
+    max-width: 8.5rem !important;
   }
 }
 
-@media (max-width: 420px) {
+@media (max-width: 767px) {
   .pojmat-game__header {
-    padding: 10px 12px 6px;
+    padding: 6px 12px 4px;
+  }
+
+  .pojmat-game__header-badge {
+    font-size: 15px;
+    min-height: 42px;
+    padding: 0 14px;
+    gap: 8px;
   }
 
   .pojmat-game__timer {
     font-size: 15px;
     min-height: 36px;
     padding: 0 10px;
+  }
+
+  .pojmat-game__body {
+    padding: 0 6px 8px;
+  }
+
+  .pojmat-condition {
+    width: min(100%, calc(100vw - 24px));
+    padding: 10px 12px;
+    top: 8px;
+  }
+
+  .pojmat-mouse-character {
+    max-width: 8.85rem !important;
+    transform: scale(1.12);
+  }
+
+  .pojmat-catch-arena-root .pojmat-game__controls {
+    gap: 28px;
+  }
+
+  .pojmat-controls-hint {
+    display: none;
+  }
+}
+
+@media (max-width: 420px) {
+  .pojmat-game__header-badge {
+    font-size: 14px;
   }
 }

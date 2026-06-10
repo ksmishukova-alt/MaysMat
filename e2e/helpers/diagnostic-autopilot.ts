@@ -26,6 +26,8 @@ export async function advanceToNextBlock(page: Page) {
 
 export async function completeTaskSteps(page: Page) {
   const runner = page.getByTestId("diagnostic-runner");
+  const pill = page.getByTestId("diagnostic-task-pill");
+  const initialPill = (await pill.textContent().catch(() => null)) ?? "";
   const answerRaw = await runner.getAttribute("data-test-answer");
   const answer = answerRaw ? (JSON.parse(answerRaw) as Record<string, unknown>) : {};
 
@@ -77,12 +79,13 @@ export async function completeTaskSteps(page: Page) {
 
     const btn = page.getByTestId("diagnostic-task-continue");
     if (!(await btn.isVisible().catch(() => false))) break;
-    const label = (await btn.textContent()) ?? "";
     const disabled = await btn.isDisabled().catch(() => false);
     if (disabled) break;
     await btn.click();
-    if (label.includes("Готово")) break;
     await page.waitForTimeout(120);
+    if (!(await runner.isVisible().catch(() => false))) break;
+    const currentPill = (await pill.textContent().catch(() => null)) ?? "";
+    if (currentPill !== initialPill) break;
   }
 }
 

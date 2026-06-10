@@ -3,7 +3,6 @@
 import { useMemo, useState } from "react";
 import type { ScreenStep } from "@/data/entry-diagnostic/types";
 import { TaskCard, answerColorAt } from "@/components/entry-diagnostic/ui";
-import { DIAGNOSTIC_MYSHMAT_POSE } from "@/data/entry-diagnostic/visual-assets";
 import {
   emptyErrorTelemetry,
   pushUnique,
@@ -33,7 +32,6 @@ export function ReadingComprehensionRunner({
   const steps = task.screenSequence;
   const step = steps[stepIndex];
   const conditionText = useMemo(() => conditionTextFromSteps(steps), [steps]);
-  const isLastStep = stepIndex === steps.length - 1;
 
   const recordError = (bucket: keyof ErrorTelemetryBuckets, code: string) => {
     setErrors((prev) => ({
@@ -71,8 +69,7 @@ export function ReadingComprehensionRunner({
     }
   };
 
-  const continueLabel =
-    step?.kind === "condition_read" ? "Прочитал" : isLastStep ? "Готово" : "Далее →";
+  const continueLabel = step?.kind === "condition_read" ? "Прочитал" : "Далее →";
 
   const canContinue = (() => {
     if (step?.kind === "condition_read") return true;
@@ -108,11 +105,6 @@ export function ReadingComprehensionRunner({
       onNext={advance}
       nextDisabled={!canContinue}
       nextLabel={continueLabel}
-      mascotSrc={
-        step?.kind === "condition_read"
-          ? DIAGNOSTIC_MYSHMAT_POSE.taskRead
-          : DIAGNOSTIC_MYSHMAT_POSE.taskChoice
-      }
       runnerKind={runnerKind}
       testAnswer={isDiagnosticFastMode() ? JSON.stringify(task.answer) : undefined}
     />

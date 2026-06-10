@@ -23,7 +23,7 @@ export const POJMAT_VISUAL_ASSETS = {
 export const POJMAT_PLATE_LAYOUT = {
   topMm: 2,
   sideCm: 0.7,
-  laneTopPct: 23,
+  laneTopPct: 21,
   laneOverlapMm: 5,
   heightReductionCm: 1,
 } as const;

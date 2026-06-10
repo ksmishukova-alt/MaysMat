@@ -11,8 +11,6 @@ import {
 } from "@/lib/entry-diagnostic/error-telemetry";
 import { AnswerButton, DiagnosticTaskShell, answerColorAt } from "@/components/entry-diagnostic/ui";
 import { isDiagnosticFastMode } from "@/lib/entry-diagnostic/fast-mode";
-import { DIAGNOSTIC_MYSHMAT_POSE } from "@/data/entry-diagnostic/visual-assets";
-
 export interface DiagnosticRunnerProps {
   task: DiagnosticTask;
   runnerKind: RunnerKind;
@@ -91,8 +89,7 @@ function canAdvanceStep(
   }
 }
 
-function continueLabel(step: ScreenStep | undefined): string {
-  if (step?.kind === "confirm_submit") return "Готово";
+function continueLabel(_step: ScreenStep | undefined): string {
   return "Далее →";
 }
 
@@ -148,11 +145,6 @@ export function DiagnosticRunnerCore({
     );
   };
 
-  const mascotSrc =
-    step?.kind === "read_prompt" || step?.kind === "condition_read"
-      ? DIAGNOSTIC_MYSHMAT_POSE.taskRead
-      : DIAGNOSTIC_MYSHMAT_POSE.taskChoice;
-
   return (
     <DiagnosticTaskShell
       currentTask={globalTaskIndex}
@@ -164,7 +156,6 @@ export function DiagnosticRunnerCore({
       onNext={advance}
       nextDisabled={!canAdvanceStep(step, response, planSteps)}
       nextLabel={continueLabel(step)}
-      mascotSrc={mascotSrc}
       runnerKind={runnerKind}
       testAnswer={isDiagnosticFastMode() ? JSON.stringify(task.answer) : undefined}
     >

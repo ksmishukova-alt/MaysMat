@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { DiagnosticAssetImage } from "@/components/entry-diagnostic/ui/DiagnosticAssetImage";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { MiniGameMode } from "@/data/entry-diagnostic/types";
 import type { PojmatRound } from "@/data/entry-diagnostic/mini-games/pojmat-rounds";
@@ -33,6 +34,12 @@ function shuffleLanes(): number[] {
   return lanes;
 }
 
+const CARD_STAGGER = [0, 10, 4, 14];
+
+function cardStartY(index: number): number {
+  return -6 - index * 11 - (CARD_STAGGER[index] ?? 0);
+}
+
 function buildInitialCards(round: PojmatRound, mode: MiniGameMode, uidStart: number): FallingCard[] {
   const fast = isDiagnosticFastMode();
   const laneOrder = shuffleLanes();
@@ -50,7 +57,7 @@ function buildInitialCards(round: PojmatRound, mode: MiniGameMode, uidStart: num
       id: card.id,
       label: card.label,
       lane: assigned[i] ?? laneOrder[i],
-      y: -18 - i * 2,
+      y: cardStartY(i),
     }));
   }
   return round.cards.map((card, i) => ({
@@ -58,7 +65,7 @@ function buildInitialCards(round: PojmatRound, mode: MiniGameMode, uidStart: num
     id: card.id,
     label: card.label,
     lane: laneOrder[i],
-    y: -18 - i * 2,
+    y: cardStartY(i),
   }));
 }
 
@@ -71,9 +78,13 @@ function arenaConfig(mode: MiniGameMode) {
     catchHalf: diagnostic ? 20 : 12,
     baseSpeed: diagnostic ? (fast ? 0.72 : 0.18) : 0.5,
     fastBoost: fast && diagnostic ? 1.6 : 1,
-    cardText: diagnostic ? "text-xs sm:text-sm leading-snug" : "text-[11px] leading-tight",
-    cardPad: diagnostic ? "px-2.5 py-3" : "px-2 py-2",
-    arenaHeight: diagnostic ? "pojmat-arena pojmat-arena--diagnostic" : "pojmat-arena pojmat-arena--play",
+    cardText: diagnostic
+      ? "text-[11px] leading-tight font-bold sm:text-sm sm:leading-snug md:text-base"
+      : "text-[11px] leading-tight",
+    cardPad: diagnostic ? "px-2 py-2.5 sm:px-3 sm:py-3" : "px-2 py-2",
+    arenaHeight: diagnostic
+      ? "pojmat-arena pojmat-arena--diagnostic h-[22rem] sm:h-[26rem] md:h-[34rem] lg:h-[38rem]"
+      : "pojmat-arena pojmat-arena--play h-[20rem] sm:h-[24rem] md:h-[30rem]",
     fallLimit: 118,
   };
 }
@@ -218,7 +229,7 @@ export function PojmatCatchArena({
     <div className="pojmat-catch-arena-root" data-testid="pojmat-catch-arena" data-correct-lane={correctLane}>
       <div
         ref={arenaRef}
-        className={`relative flex-1 touch-none overflow-hidden rounded-xl ${cfg.arenaHeight}`}
+        className={`relative touch-none overflow-hidden rounded-xl border-2 border-purple-300 md:rounded-2xl ${cfg.arenaHeight}`}
         onTouchStart={(e) => {
           touchStartX.current = e.touches[0]?.clientX ?? null;
         }}
@@ -262,7 +273,7 @@ export function PojmatCatchArena({
             return (
               <div
                 key={card.uid}
-                className="absolute w-[23%]"
+                className="absolute w-[24%] sm:w-[23%]"
                 style={{ left: `${card.lane * 25 + 1}%`, top: `${card.y}%` }}
               >
                 <div
@@ -323,28 +334,28 @@ export function PojmatCatchArena({
             if (dragPointerId.current === e.pointerId) dragPointerId.current = null;
           }}
         >
-          <Image
+          <DiagnosticAssetImage
             src={POJMAT_VISUAL_ASSETS.character}
             alt="МышМат"
             width={123}
             height={123}
-            className="h-auto w-full max-w-[7.75rem] bg-transparent drop-shadow-lg"
+            className="pojmat-mouse-character h-auto w-full max-w-[8.75rem] drop-shadow-lg sm:max-w-[7.75rem]"
             draggable={false}
           />
         </div>
       </div>
 
-      <div className="pojmat-game__controls mt-2 flex items-center justify-center gap-4">
+      <div className="pojmat-game__controls mt-2 flex items-center justify-center gap-6 md:gap-12">
         <button
           type="button"
           data-testid="pojmat-lane-left"
           aria-label="Влево"
           onClick={() => moveLane(-1)}
-          className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-purple-200 bg-white text-xl shadow-sm active:scale-95"
+          className="flex items-center justify-center rounded-full border-2 border-purple-200 bg-white shadow-sm active:scale-95"
         >
           ←
         </button>
-        <p className="min-w-[8rem] text-center text-xs text-gray-500">
+        <p className="pojmat-controls-hint hidden text-center sm:block">
           {mode === "diagnostic"
             ? "Подведи корзинку под нужную карточку"
             : "Серия ускоряет падение"}
@@ -354,7 +365,7 @@ export function PojmatCatchArena({
           data-testid="pojmat-lane-right"
           aria-label="Вправо"
           onClick={() => moveLane(1)}
-          className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-purple-200 bg-white text-xl shadow-sm active:scale-95"
+          className="flex items-center justify-center rounded-full border-2 border-purple-200 bg-white shadow-sm active:scale-95"
         >
           →
         </button>

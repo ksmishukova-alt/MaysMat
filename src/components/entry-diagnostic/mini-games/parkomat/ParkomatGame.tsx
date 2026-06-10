@@ -1,10 +1,10 @@
 "use client";
 
-import Image from "next/image";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { ParkomatRound } from "@/data/entry-diagnostic/mini-games/parkomat-rounds";
 import type { ParkomatGate } from "@/data/entry-diagnostic/mini-games/parkomat-rounds";
 import { isDiagnosticFastMode } from "@/lib/entry-diagnostic/fast-mode";
+import { DiagnosticAssetImage } from "@/components/entry-diagnostic/ui/DiagnosticAssetImage";
 import { PARKOMAT_ASSETS } from "./parkomat-assets";
 import type { ParkomatMode, ParkomatPhase, ParkomatTelemetryEvent } from "./types";
 import "./parkomat-game.css";
@@ -208,14 +208,9 @@ export function ParkomatGame({
         data-phase={phase}
       >
         <header className="parkomat__header">
-          <Image
-            className="parkomat__header-img diagnostic-icon-transparent"
-            src={PARKOMAT_ASSETS.header}
-            alt="МышМат: ПаркоМат"
-            width={360}
-            height={64}
-            priority
-          />
+          <div className="parkomat__header-badge" aria-label="МышМат: ПаркоМат">
+            МышМат: ПаркоМат
+          </div>
           {mode === "diagnostic" ? (
             <div className="parkomat__timer" aria-label={`Осталось ${timeLeft} секунд`}>
               ⏱ {timeLeft}
@@ -242,7 +237,9 @@ export function ParkomatGame({
             onClick={() => answer("minus")}
             aria-label="Открыть левый шлагбаум: минус"
           >
-            <Image src={PARKOMAT_ASSETS.iconMinus} alt="" width={132} height={132} aria-hidden />
+            <span className="parkomat-gate__symbol" aria-hidden>
+              −
+            </span>
           </button>
 
           <button
@@ -255,15 +252,17 @@ export function ParkomatGame({
             onClick={() => answer("plus")}
             aria-label="Открыть правый шлагбаум: плюс"
           >
-            <Image src={PARKOMAT_ASSETS.iconPlus} alt="" width={132} height={132} aria-hidden />
+            <span className="parkomat-gate__symbol" aria-hidden>
+              +
+            </span>
           </button>
 
-          <Image
+          <DiagnosticAssetImage
             className={carClassName}
             src={PARKOMAT_ASSETS.carMascot}
             alt=""
-            width={240}
-            height={180}
+            width={180}
+            height={135}
             aria-hidden
           />
         </div>
@@ -277,7 +276,9 @@ export function ParkomatGame({
             onClick={() => answer("minus")}
             aria-label="Выбрать минус"
           >
-            <Image src={PARKOMAT_ASSETS.arrowLeft} alt="" width={120} height={120} aria-hidden />
+            <span className="parkomat-control__arrow" aria-hidden>
+              ←
+            </span>
           </button>
 
           <button
@@ -288,7 +289,9 @@ export function ParkomatGame({
             onClick={() => answer("plus")}
             aria-label="Выбрать плюс"
           >
-            <Image src={PARKOMAT_ASSETS.arrowRight} alt="" width={120} height={120} aria-hidden />
+            <span className="parkomat-control__arrow" aria-hidden>
+              →
+            </span>
           </button>
         </nav>
       </div>

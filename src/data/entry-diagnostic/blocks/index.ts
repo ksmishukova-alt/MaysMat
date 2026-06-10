@@ -47,7 +47,7 @@ const seeds: BlockSeed[] = [
           { id: "9_plus_12", label: "9 + 12" },
           { id: "9_minus_12", label: "9 − 12" },
           { id: "12_minus_9", label: "12 − 9" },
-          { id: "only_12", label: "взять только 12" },
+          { id: "only_12", label: "записать только 12" },
         ],
         "9_plus_12",
         ["operation_direction_error", "semantic_error"],

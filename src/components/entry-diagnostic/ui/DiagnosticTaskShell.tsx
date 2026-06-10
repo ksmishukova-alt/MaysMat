@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import type { ReactNode } from "react";
 import { DiagnosticFocusLayout } from "./DiagnosticFocusLayout";
 import { ProgressDots } from "./ProgressDots";
@@ -36,7 +35,6 @@ export function DiagnosticTaskShell({
   onNext,
   nextDisabled = false,
   nextLabel = "Далее →",
-  mascotSrc,
   onBack,
   runnerKind,
   testAnswer,
@@ -69,26 +67,17 @@ export function DiagnosticTaskShell({
 
         {children ? <div className="diagnostic-task__body">{children}</div> : null}
 
-        <button
-          type="button"
-          className="diagnostic-primary-button diagnostic-task__next"
-          data-testid="diagnostic-task-continue"
-          onClick={onNext}
-          disabled={nextDisabled}
-        >
-          {nextLabel}
-        </button>
-
-        {mascotSrc ? (
-          <Image
-            className="diagnostic-task__mascot diagnostic-icon-transparent"
-            src={mascotSrc}
-            alt=""
-            width={104}
-            height={104}
-            aria-hidden
-          />
-        ) : null}
+        <div className="diagnostic-task__footer">
+          <button
+            type="button"
+            className="diagnostic-primary-button diagnostic-task__next"
+            data-testid="diagnostic-task-continue"
+            onClick={onNext}
+            disabled={nextDisabled}
+          >
+            {nextLabel}
+          </button>
+        </div>
       </section>
     </DiagnosticFocusLayout>
   );

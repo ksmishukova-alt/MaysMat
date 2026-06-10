@@ -23,7 +23,7 @@ export type ParkomatRound = {
 export const PARKOMAT_ROUNDS: ParkomatRound[] = [
   {
     id: "parkomat-001",
-    text: "У МышМата было 8 жетонов. Ему дали ещё 3.",
+    text: "У МышМата было 8 жетонов. Ему дали ещё 3 жетона.",
     correctGate: "plus",
     roundType: "story_to_operation",
     lexicalMarker: "received",
