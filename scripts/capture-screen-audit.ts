@@ -45,7 +45,7 @@ async function captureAll(page: import("@playwright/test").Page, vp: Vp) {
 
   await page.goto(`${BASE}/diagnostic/run`);
   await page.getByTestId("diagnostic-start").waitFor({ state: "visible", timeout: 30_000 });
-  await shot(page, "01-intro");
+  await shot(page, vp, "01-intro");
 
   await page.getByTestId("diagnostic-start").click();
   await page.getByTestId("diagnostic-block-intro").waitFor({ state: "visible", timeout: 10_000 });
