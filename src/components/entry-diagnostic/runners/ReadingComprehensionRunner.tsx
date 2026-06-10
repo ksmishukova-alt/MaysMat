@@ -1,7 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import type { ScreenStep } from "@/data/entry-diagnostic/types";
+import { useState } from "react";
 import { TaskCard, answerColorAt } from "@/components/entry-diagnostic/ui";
 import {
   emptyErrorTelemetry,
@@ -9,12 +8,8 @@ import {
   type ErrorTelemetryBuckets,
 } from "@/lib/entry-diagnostic/error-telemetry";
 import { isDiagnosticFastMode } from "@/lib/entry-diagnostic/fast-mode";
+import { withoutReadingOnlySteps } from "@/lib/entry-diagnostic/screen-sequence";
 import type { DiagnosticRunnerProps } from "./RunnerCore";
-
-function conditionTextFromSteps(steps: ScreenStep[]): string {
-  const read = steps.find((s) => s.kind === "condition_read");
-  return read?.prompt ?? "";
-}
 
 export function ReadingComprehensionRunner({
   task,
@@ -29,9 +24,8 @@ export function ReadingComprehensionRunner({
   const [response, setResponse] = useState<Record<string, unknown>>({});
   const [errors, setErrors] = useState<ErrorTelemetryBuckets>(emptyErrorTelemetry);
 
-  const steps = task.screenSequence;
+  const steps = withoutReadingOnlySteps(task.screenSequence);
   const step = steps[stepIndex];
-  const conditionText = useMemo(() => conditionTextFromSteps(steps), [steps]);
 
   const recordError = (bucket: keyof ErrorTelemetryBuckets, code: string) => {
     setErrors((prev) => ({
@@ -69,10 +63,7 @@ export function ReadingComprehensionRunner({
     }
   };
 
-  const continueLabel = step?.kind === "condition_read" ? "Прочитал" : "Далее →";
-
   const canContinue = (() => {
-    if (step?.kind === "condition_read") return true;
     if (step?.kind === "single_select") {
       return response[step.fieldKey ?? "focus"] != null;
     }
@@ -97,14 +88,13 @@ export function ReadingComprehensionRunner({
       totalTasks={totalTasks}
       currentTheme={blockIndex}
       themeTitle={blockTitle}
-      condition={step?.kind === "condition_read" ? (step.prompt ?? "") : conditionText}
+      condition={task.taskText}
       instruction={step?.kind === "single_select" ? step.prompt : undefined}
       options={options}
       selectedId={step?.kind === "single_select" ? (response[fieldKey] as string | undefined) : undefined}
       onSelect={(id) => pickChoice(id, correctChoiceId)}
       onNext={advance}
       nextDisabled={!canContinue}
-      nextLabel={continueLabel}
       runnerKind={runnerKind}
       testAnswer={isDiagnosticFastMode() ? JSON.stringify(task.answer) : undefined}
     />

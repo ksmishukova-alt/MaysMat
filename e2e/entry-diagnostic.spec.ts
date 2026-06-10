@@ -18,7 +18,19 @@ test.describe("Entry Diagnostic v2", () => {
     await page.waitForURL(/\/diagnostic\/run/, { timeout: 15_000 });
     await startDiagnosticRun(page);
     await expect(page.getByTestId("diagnostic-runner")).toBeVisible();
+    await expect(page.getByTestId("diagnostic-task-pill")).toHaveText(/Задание 1 из 45/);
     await expect(page.getByText(/Чтение условия/i)).toBeVisible();
+    await expect(page.getByText("Прочитал")).toHaveCount(0);
+    await expect(page.locator('[data-testid^="diagnostic-choice-"]').first()).toBeVisible();
+  });
+
+  test("block intro → task 1 без экрана «Прочитал»", async ({ page }) => {
+    await page.goto("/diagnostic/run");
+    await page.getByTestId("diagnostic-start").click();
+    await expect(page.getByTestId("diagnostic-block-intro-start")).toBeVisible();
+    await page.getByTestId("diagnostic-block-intro-start").click();
+    await expect(page.getByTestId("diagnostic-task-pill")).toHaveText(/Задание 1 из 45/);
+    await expect(page.getByText("Прочитал")).toHaveCount(0);
   });
 
   test("report page loads when no session", async ({ page }) => {

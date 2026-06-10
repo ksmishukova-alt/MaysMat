@@ -13,6 +13,10 @@ const TARGETS = [
     .readdirSync(path.join(ROOT, "characters"))
     .filter((f) => f.endsWith(".png"))
     .map((f) => `characters/${f}`),
+  ...fs
+    .readdirSync(path.join(ROOT, "icons"))
+    .filter((f) => f.startsWith("intro-") && f.endsWith(".png"))
+    .map((f) => `icons/${f}`),
   "parkomat/myshmat-car.png",
 ];
 

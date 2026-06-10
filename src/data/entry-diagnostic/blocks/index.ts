@@ -85,7 +85,7 @@ const seeds: BlockSeed[] = [
   {
     blockId: "block-03",
     blockIndex: 3,
-    title: "Сложение и вычитание столбиком",
+    title: "Сложение и вычитание больших чисел",
     skill: "column_add_sub",
     runnerKind: "column_add_sub_visual",
     miniGameId: "razryad",
@@ -142,7 +142,7 @@ const seeds: BlockSeed[] = [
   {
     blockId: "block-06",
     blockIndex: 6,
-    title: "Остаток и округление",
+    title: "Деление с остатком",
     skill: "remainder_interpretation",
     runnerKind: "remainder_interpretation_visual",
     miniGameId: "station",
@@ -188,7 +188,7 @@ const seeds: BlockSeed[] = [
   {
     blockId: "block-08",
     blockIndex: 8,
-    title: "План текстовой задачи",
+    title: "Многошаговые задачи",
     skill: "text_problem_plan",
     runnerKind: "text_problem_plan_visual",
     miniGameId: "mouse-route",
@@ -231,7 +231,7 @@ const seeds: BlockSeed[] = [
   {
     blockId: "block-10",
     blockIndex: 10,
-    title: "Геометрия на сетке",
+    title: "Периметр и площадь",
     skill: "geometry",
     runnerKind: "geometry_grid_visual",
     miniGameId: "fence-tile",
@@ -288,7 +288,7 @@ const seeds: BlockSeed[] = [
   {
     blockId: "block-13",
     blockIndex: 13,
-    title: "Логика если-то",
+    title: "Логика «если — то»",
     skill: "logic",
     runnerKind: "logic_if_then_visual",
     miniGameId: "advocate",

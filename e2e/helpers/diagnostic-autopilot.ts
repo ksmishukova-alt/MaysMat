@@ -96,9 +96,9 @@ async function movePojmatToLane(page: Page, targetLane: number) {
     const lane = Number((await mouse.getAttribute("data-lane")) ?? "1");
     if (lane === targetLane) return;
     if (lane < targetLane) {
-      await page.getByTestId("pojmat-lane-right").click();
+      await page.keyboard.press("ArrowRight");
     } else {
-      await page.getByTestId("pojmat-lane-left").click();
+      await page.keyboard.press("ArrowLeft");
     }
     await page.waitForTimeout(60);
   }

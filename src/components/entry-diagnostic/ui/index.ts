@@ -10,6 +10,6 @@ export {
 export { Intro, type IntroProps } from "./Intro";
 export { TaskCard, type TaskCardProps, type AnswerOption } from "./TaskCard";
 export { Celebration, type CelebrationProps } from "./Celebration";
-export { Rules, type RulesProps, type RuleItem } from "./Rules";
+export { Rules, type RulesProps, type RuleItem, type RulesControlSection } from "./Rules";
 export { BlockIntro, type BlockIntroProps } from "./BlockIntro";
 export { DiagnosticTaskShell, type DiagnosticTaskShellProps } from "./DiagnosticTaskShell";

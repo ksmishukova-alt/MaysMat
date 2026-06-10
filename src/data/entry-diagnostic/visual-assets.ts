@@ -18,6 +18,7 @@ export const ENTRY_DIAGNOSTIC_ASSETS = {
     myshmatPoint: "/entry-diagnostic/characters/myshmat-point.png",
     myshmatThumbsUp: "/entry-diagnostic/characters/myshmat-thumbs-up.png",
     myshmatCelebrate: "/entry-diagnostic/characters/myshmat-celebrate.png",
+    myshmatRadost: "/entry-diagnostic/characters/myshmat_radost.png",
     myshmatSurprised: "/entry-diagnostic/characters/myshmat-surprised.png",
     // Часть 2
     myshmatPortrait: "/entry-diagnostic/characters/myshmat-portrait.png",
@@ -82,7 +83,6 @@ export const ENTRY_DIAGNOSTIC_ASSETS = {
 export const DIAGNOSTIC_INTRO_ROWS = [
   { icon: ENTRY_DIAGNOSTIC_ASSETS.icons.intro15Topics, textKey: "topics" as const },
   { icon: ENTRY_DIAGNOSTIC_ASSETS.icons.introNoHints, textKey: "noHints" as const },
-  { icon: ENTRY_DIAGNOSTIC_ASSETS.icons.introResultEnd, textKey: "resultEnd" as const },
   { icon: ENTRY_DIAGNOSTIC_ASSETS.icons.introFriendsPlay, textKey: "friendsPlay" as const },
 ] as const;
 
@@ -147,7 +147,7 @@ export const DIAGNOSTIC_MYSHMAT_POSE: Record<string, string> = {
   header: ENTRY_DIAGNOSTIC_ASSETS.characters.myshmatPortrait,
   taskRead: ENTRY_DIAGNOSTIC_ASSETS.characters.myshmatRead,
   taskChoice: ENTRY_DIAGNOSTIC_ASSETS.characters.myshmatPoint,
-  topicDone: ENTRY_DIAGNOSTIC_ASSETS.characters.myshmatCelebrate,
+  topicDone: ENTRY_DIAGNOSTIC_ASSETS.characters.myshmatRadost,
   rules: ENTRY_DIAGNOSTIC_ASSETS.characters.myshmatPoint,
   pojmat: ENTRY_DIAGNOSTIC_ASSETS.characters.myshmatBasketLarge,
   postBlock: ENTRY_DIAGNOSTIC_ASSETS.characters.myshmatThumbsUp,

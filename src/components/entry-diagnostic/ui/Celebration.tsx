@@ -3,7 +3,11 @@
 import Image from "next/image";
 import type { DiagnosticLayoutPhase } from "./DiagnosticFocusLayout";
 import { DiagnosticFocusLayout } from "./DiagnosticFocusLayout";
-import { ENTRY_DIAGNOSTIC_ASSETS } from "@/data/entry-diagnostic/visual-assets";
+import { DiagnosticAssetImage } from "./DiagnosticAssetImage";
+import {
+  DIAGNOSTIC_MYSHMAT_POSE,
+  ENTRY_DIAGNOSTIC_ASSETS,
+} from "@/data/entry-diagnostic/visual-assets";
 
 export type CelebrationProps = {
   layoutPhase?: DiagnosticLayoutPhase;
@@ -15,6 +19,8 @@ export type CelebrationProps = {
   showBadge?: boolean;
   hintIconSrc?: string;
   hintText?: string;
+  /** Маскот над карточкой; по умолчанию — на экране «Тема завершена» */
+  mascotSrc?: string;
   onNext: () => void;
   testId?: string;
   continueTestId?: string;
@@ -29,15 +35,34 @@ export function Celebration({
   showBadge = false,
   hintIconSrc,
   hintText,
+  mascotSrc,
   onNext,
   testId,
   continueTestId,
 }: CelebrationProps) {
+  const mascot =
+    mascotSrc ??
+    (layoutPhase === "pre_minigame" && !showBadge ? DIAGNOSTIC_MYSHMAT_POSE.topicDone : undefined);
+
   return (
     <DiagnosticFocusLayout phase={layoutPhase} testId={testId}>
       <section className="diagnostic-screen diagnostic-celebration">
+        {mascot ? (
+          <div className="diagnostic-celebration__mascot-wrap">
+            <DiagnosticAssetImage
+              src={mascot}
+              alt=""
+              width={200}
+              height={200}
+              className="diagnostic-celebration__mascot"
+              aria-hidden
+            />
+          </div>
+        ) : null}
         <div
-          className={`diagnostic-card diagnostic-celebration__card${showBadge ? "" : " diagnostic-celebration__card--plain"}`}
+          className={`diagnostic-card diagnostic-celebration__card${
+            showBadge ? "" : " diagnostic-celebration__card--plain"
+          }${mascot ? " diagnostic-celebration__card--with-mascot" : ""}`}
         >
           {showBadge ? (
             <div className="diagnostic-badge">

@@ -245,10 +245,37 @@
   overflow-y: auto;
 }
 
+/* Intro: колонка сверху; row + flex-start прижимал блок влево */
+.diagnostic-focus-layout[data-phase="intro"] .diagnostic-focus-layout__content {
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  width: 100%;
+  padding-top: max(12px, env(safe-area-inset-top, 0px));
+  padding-bottom: max(16px, env(safe-area-inset-bottom, 0px));
+}
+
+.diagnostic-focus-layout[data-phase="rules"] .diagnostic-focus-layout__content {
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  width: 100%;
+  padding-top: max(12px, env(safe-area-inset-top, 0px));
+  padding-bottom: max(16px, env(safe-area-inset-bottom, 0px));
+}
+
 @media (min-width: 768px) {
   .diagnostic-focus-layout__content {
     padding: 32px 48px;
     overflow-y: hidden;
+  }
+
+  /* Intro на низком desktop (1280×720): не обрезать кнопку */
+  .diagnostic-focus-layout[data-phase="intro"] .diagnostic-focus-layout__content {
+    overflow-y: auto;
+    align-items: center;
+    padding-top: 20px;
+    padding-bottom: 20px;
   }
 }
 
@@ -349,6 +376,23 @@
   flex-direction: column;
   align-items: center;
   gap: 0;
+  position: relative;
+}
+
+.diagnostic-intro__logo-chip {
+  width: min(94%, 440px);
+  height: auto;
+  margin: 0 auto -36px;
+  position: relative;
+  z-index: 3;
+  display: block;
+  filter: drop-shadow(0 10px 22px rgba(17, 24, 39, 0.16));
+}
+
+.diagnostic-intro__card--with-chip {
+  padding-top: 44px;
+  position: relative;
+  z-index: 2;
 }
 
 .diagnostic-intro__mascot-wrap {
@@ -408,13 +452,30 @@
 }
 
 @media (max-width: 767px) {
+  .diagnostic-focus-layout[data-phase="intro"] .diagnostic-focus-layout__content {
+    align-items: stretch;
+    padding: 10px 14px 10px;
+    overflow-y: auto;
+  }
+
   .diagnostic-intro {
-    padding-top: 56px;
-    gap: 10px;
+    padding-top: 2px;
+    gap: 6px;
+    justify-content: flex-start;
+    max-width: 100%;
   }
 
   .diagnostic-intro__logo-text {
     margin-top: 0;
+    margin-bottom: 2px;
+  }
+
+  .diagnostic-intro__logo-line {
+    font-size: 26px;
+  }
+
+  .diagnostic-intro__logo-line--brand {
+    font-size: 30px;
   }
 
   .diagnostic-intro__mascot-wrap {
@@ -422,23 +483,133 @@
   }
 
   .diagnostic-intro__card {
-    padding: 24px 18px 20px;
+    padding: 16px 14px 14px;
+  }
+
+  .diagnostic-intro__card h1 {
+    font-size: 24px;
+    margin-bottom: 6px;
+  }
+
+  .diagnostic-intro__card p {
+    font-size: 14px;
+    margin-bottom: 12px;
+    line-height: 1.25;
   }
 
   .diagnostic-intro-list {
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
+    grid-template-columns: 1fr;
+    gap: 6px;
+    margin-bottom: 12px;
   }
 
   .diagnostic-intro-feature {
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    padding: 12px 10px;
+    grid-template-columns: 20px 32px 1fr;
+    padding: 8px 10px;
+    gap: 6px;
   }
 
-  .diagnostic-intro-feature__text {
+  .diagnostic-intro-feature__icon-wrap {
+    width: 32px;
+    height: 32px;
+  }
+
+  .diagnostic-intro-feature__text span {
+    display: none;
+  }
+
+  .diagnostic-intro-feature__text strong {
+    font-size: 12px;
+  }
+
+  .diagnostic-intro__logo-chip {
+    width: min(96%, 360px);
+    margin-bottom: -28px;
+  }
+
+  .diagnostic-intro__card--with-chip {
+    padding-top: 36px;
+  }
+
+  .diagnostic-intro__start {
+    min-height: 50px;
+    font-size: 18px;
+  }
+}
+
+@media (min-width: 768px) and (max-height: 780px) {
+  .diagnostic-focus-layout[data-phase="intro"] .diagnostic-focus-layout__content {
+    padding: 10px 40px 14px;
+    overflow-y: auto;
+  }
+
+  .diagnostic-intro {
+    gap: 6px;
+    padding: 0;
+  }
+
+  .diagnostic-intro__logo-chip {
+    margin-bottom: 2px;
+  }
+
+  .diagnostic-intro__logo-line {
+    font-size: 24px;
+  }
+
+  .diagnostic-intro__logo-line--brand {
+    font-size: 30px;
+  }
+
+  /* На 1280×720 маскот убираем — освобождает высоту и убирает checkerboard */
+  .diagnostic-intro__mascot-wrap {
+    display: none;
+  }
+
+  .diagnostic-intro__hero {
+    display: block;
+    max-width: min(520px, 92vw);
+    margin: 0 auto;
+  }
+
+  .diagnostic-intro__card {
+    padding: 18px 22px 16px;
     text-align: center;
+  }
+
+  .diagnostic-intro__card h1 {
+    font-size: 24px;
+    margin-bottom: 6px;
+  }
+
+  .diagnostic-intro__card p {
+    font-size: 15px;
+    margin-bottom: 12px;
+    line-height: 1.25;
+  }
+
+  .diagnostic-intro-list {
+    gap: 8px;
+  }
+
+  .diagnostic-intro-feature__text span {
+    display: inline;
+  }
+
+  .diagnostic-intro__logo-chip {
+    width: min(92%, 400px);
+    margin-bottom: -40px;
+  }
+
+  .diagnostic-intro__card--with-chip {
+    padding-top: 48px;
+  }
+
+  .diagnostic-intro__start {
+    width: 100%;
+    max-width: 100%;
+    min-height: 50px;
+    font-size: 19px;
+    margin-top: 4px;
   }
 }
 
@@ -448,27 +619,19 @@
     padding: 0;
   }
 
-  .diagnostic-intro__hero {
-    display: grid;
-    grid-template-columns: minmax(180px, 220px) minmax(0, 520px);
-    gap: 20px 28px;
-    align-items: end;
-    justify-content: center;
-  }
-
+  /* Маскот на desktop временно скрыт — PNG с checkerboard; вернём после fix alpha */
   .diagnostic-intro__mascot-wrap {
-    align-self: end;
-    margin-bottom: 24px;
-    justify-self: center;
+    display: none;
   }
 
-  .diagnostic-intro__mascot {
-    width: 210px;
-    margin-bottom: 0;
+  .diagnostic-intro__hero {
+    display: block;
+    max-width: min(560px, 94vw);
+    margin: 0 auto;
   }
 
   .diagnostic-intro__card {
-    text-align: left;
+    text-align: center;
     padding: 28px 32px 24px;
   }
 
@@ -479,7 +642,8 @@
 
   .diagnostic-intro__start {
     width: min(100%, 380px);
-    margin-top: 8px;
+    margin: 8px auto 0;
+    display: block;
   }
 }
 
@@ -507,48 +671,69 @@
 .diagnostic-intro-list {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 10px;
+  gap: 8px;
   padding: 0;
-  margin: 0 0 20px;
+  margin: 0 0 16px;
   list-style: none;
 }
 
 .diagnostic-intro-feature {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  padding: 14px 14px;
-  border-radius: 18px;
+  display: grid;
+  grid-template-columns: 22px 36px 1fr;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 14px;
   background: rgba(234, 244, 255, 0.72);
   border: 2px solid rgba(255, 255, 255, 0.85);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  text-align: left;
+}
+
+.diagnostic-intro-feature__num {
+  font-size: 14px;
+  font-weight: 1000;
+  color: #7b42f6;
+  line-height: 1;
+}
+
+.diagnostic-intro-feature__icon-wrap {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .diagnostic-intro-feature__icon {
-  width: 48px;
-  height: 48px;
-  flex-shrink: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
 }
 
 .diagnostic-intro-feature__text {
   display: flex;
   flex-direction: column;
+  justify-content: center;
   gap: 2px;
   min-width: 0;
+  flex: 1;
   text-align: left;
 }
 
 .diagnostic-intro-feature__text strong {
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 900;
-  line-height: 1.25;
+  line-height: 1.2;
   color: #17256f;
 }
 
 .diagnostic-intro-feature__text span {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 800;
-  line-height: 1.28;
+  line-height: 1.25;
   color: #5a6478;
 }
 
@@ -698,6 +883,10 @@
   padding-top: 36px;
 }
 
+.diagnostic-celebration__card--with-mascot {
+  padding-top: 44px;
+}
+
 .diagnostic-badge {
   width: 72px;
   height: 72px;
@@ -751,9 +940,18 @@
   height: auto;
 }
 
+.diagnostic-celebration__mascot-wrap {
+  display: flex;
+  justify-content: center;
+  margin-bottom: -28px;
+  z-index: 2;
+  pointer-events: none;
+}
+
 .diagnostic-celebration__mascot {
-  width: 180px;
+  width: clamp(148px, 32vw, 210px);
   height: auto;
+  filter: drop-shadow(0 10px 22px rgba(17, 24, 39, 0.14));
 }
 
 @media (min-width: 768px) {
@@ -829,9 +1027,89 @@
   margin-top: 4px;
 }
 
+.diagnostic-rules-controls {
+  margin: 4px 0 14px 36px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: rgba(234, 244, 255, 0.78);
+  border: 2px solid rgba(255, 255, 255, 0.85);
+}
+
+.diagnostic-rules-controls__title {
+  margin: 0 0 10px;
+  font-size: 15px;
+  font-weight: 1000;
+  color: #17256f;
+}
+
+.diagnostic-rules-controls__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 8px;
+}
+
+.diagnostic-rules-controls__list li {
+  display: grid;
+  grid-template-columns: 52px 1fr;
+  align-items: center;
+  gap: 10px;
+  font-size: 15px;
+  font-weight: 900;
+  line-height: 1.3;
+  color: #17256f;
+}
+
+.diagnostic-rules-controls__keys {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.diagnostic-rules-controls__key {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 4px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(123, 66, 246, 0.25);
+  font-size: 13px;
+  font-weight: 1000;
+  color: #7b42f6;
+  box-shadow: 0 2px 0 rgba(17, 24, 39, 0.08);
+}
+
+.diagnostic-rules-controls__tap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
 @media (max-width: 767px) {
   .diagnostic-rules__card {
     padding: 22px 18px 20px;
+  }
+
+  .diagnostic-rules-controls {
+    margin-left: 0;
+    padding: 10px 12px;
+  }
+
+  .diagnostic-rules-controls__list li {
+    grid-template-columns: 44px 1fr;
+    font-size: 14px;
+  }
+
+  .diagnostic-rules-controls__tap {
+    width: 44px;
   }
 }
 
@@ -854,24 +1132,40 @@
 
 .diagnostic-block-intro__card {
   width: 100%;
-  padding: 28px 24px;
+  padding: 24px 20px 22px;
   text-align: center;
 }
 
 .diagnostic-block-intro__card h1 {
   margin: 0;
-  font-size: clamp(24px, 4vw, 28px);
+  font-size: clamp(22px, 4vw, 28px);
   font-weight: 1000;
   line-height: 1.2;
   color: #1b2b7c;
 }
 
-.diagnostic-block-intro__card p {
+.diagnostic-block-intro__lead {
   margin: 0;
-  font-size: 18px;
+  font-size: clamp(16px, 3.6vw, 18px);
   font-weight: 900;
-  line-height: 1.3;
+  line-height: 1.35;
   color: #8e68cf;
+}
+
+.diagnostic-block-intro__body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 12px;
+  text-align: left;
+}
+
+.diagnostic-block-intro__body p {
+  margin: 0;
+  font-size: clamp(15px, 3.4vw, 17px);
+  font-weight: 700;
+  line-height: 1.45;
+  color: #33408a;
 }
 
 .diagnostic-block-intro .diagnostic-primary-button {
@@ -882,6 +1176,16 @@
   .diagnostic-block-intro {
     margin-top: -6vh;
     gap: 16px;
+    max-width: 540px;
+  }
+
+  .diagnostic-block-intro__card {
+    padding: 28px 26px 24px;
+  }
+
+  .diagnostic-block-intro__body {
+    gap: 12px;
+    margin-top: 14px;
   }
 }
 

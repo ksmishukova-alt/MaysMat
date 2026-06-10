@@ -11,6 +11,7 @@ import {
 } from "@/lib/entry-diagnostic/error-telemetry";
 import { AnswerButton, DiagnosticTaskShell, answerColorAt } from "@/components/entry-diagnostic/ui";
 import { isDiagnosticFastMode } from "@/lib/entry-diagnostic/fast-mode";
+import { withoutReadingOnlySteps } from "@/lib/entry-diagnostic/screen-sequence";
 export interface DiagnosticRunnerProps {
   task: DiagnosticTask;
   runnerKind: RunnerKind;
@@ -109,7 +110,7 @@ export function DiagnosticRunnerCore({
   const [planEdited, setPlanEdited] = useState(false);
   const [errors, setErrors] = useState<ErrorTelemetryBuckets>(emptyErrorTelemetry);
 
-  const steps = task.screenSequence;
+  const steps = withoutReadingOnlySteps(task.screenSequence);
   const step = steps[stepIndex];
 
   const recordError = (bucket: keyof ErrorTelemetryBuckets, code: string) => {

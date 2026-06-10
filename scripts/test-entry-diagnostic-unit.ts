@@ -14,6 +14,7 @@ import {
   validateAllRules,
 } from "../src/data/entry-diagnostic/validation";
 import { ENTRY_DIAGNOSTIC_BLOCKS } from "../src/data/entry-diagnostic/blocks/index";
+import { withoutReadingOnlySteps } from "../src/lib/entry-diagnostic/screen-sequence";
 
 let failed = 0;
 
@@ -66,6 +67,12 @@ for (const block of ENTRY_DIAGNOSTIC_BLOCKS) {
     assert(
       validateAllRules(task.validationRules, task.answer),
       `${task.taskId} canonical answer validates`,
+    );
+    const effectiveSteps = withoutReadingOnlySteps(task.screenSequence);
+    assert(effectiveSteps.length > 0, `${task.taskId} has steps after reading skip`);
+    assert(
+      effectiveSteps[0]?.kind !== "condition_read" && effectiveSteps[0]?.kind !== "read_prompt",
+      `${task.taskId} first step is not reading-only`,
     );
   }
 }

@@ -72,6 +72,16 @@ export function DiagnosticFocusLayout({
       } as CSSProperties)
     : undefined;
 
+  const contentStyle: CSSProperties | undefined =
+    phase === "intro"
+      ? {
+          flexDirection: "column",
+          justifyContent: "flex-start",
+          alignItems: "center",
+          width: "100%",
+        }
+      : undefined;
+
   return (
     <main
       className={`diagnostic-focus-layout ${nunito.className}`}
@@ -80,9 +90,29 @@ export function DiagnosticFocusLayout({
       style={bgStyle}
     >
       {bg ? (
-        <picture className="diagnostic-focus-layout__bg" aria-hidden>
+        <picture
+          className="diagnostic-focus-layout__bg"
+          aria-hidden
+          style={{
+            position: "fixed",
+            inset: 0,
+            width: "100vw",
+            height: "100dvh",
+            zIndex: 0,
+            pointerEvents: "none",
+          }}
+        >
           <source media="(min-width: 768px)" srcSet={bg.desktop} />
-          <img src={bg.mobile} alt="" />
+          <img
+            src={bg.mobile}
+            alt=""
+            style={{
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              objectPosition: "center center",
+            }}
+          />
         </picture>
       ) : null}
       <div className="diagnostic-focus-layout__overlay" aria-hidden />
@@ -101,7 +131,9 @@ export function DiagnosticFocusLayout({
         </button>
       ) : null}
 
-      <div className="diagnostic-focus-layout__content">{children}</div>
+      <div className="diagnostic-focus-layout__content" style={contentStyle}>
+        {children}
+      </div>
     </main>
   );
 }

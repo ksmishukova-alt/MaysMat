@@ -1,17 +1,17 @@
 "use client";
 
-import Image from "next/image";
 import { DiagnosticAssetImage } from "@/components/entry-diagnostic/ui/DiagnosticAssetImage";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { MiniGameMode } from "@/data/entry-diagnostic/types";
 import type { PojmatRound } from "@/data/entry-diagnostic/mini-games/pojmat-rounds";
 import { isDiagnosticFastMode } from "@/lib/entry-diagnostic/fast-mode";
-import { POJMAT_VISUAL_ASSETS, pojmatPlateBottomInset } from "./pojmat-assets";
-import { laneLeftStyle, LANE_CENTERS_DESKTOP, LANE_CENTERS_MOBILE } from "./pojmat-lanes";
+import { POJMAT_VISUAL_ASSETS } from "./pojmat-assets";
+import { laneIndexFromClientX, laneLeftStyle, POJMAT_LANE_COUNT } from "./pojmat-lanes";
 import { PojmatConditionPlate } from "./PojmatConditionPlate";
+import { PojmatLanesLayer } from "./PojmatLanesLayer";
+import { usePojmatArenaLayout } from "./usePojmatArenaLayout";
 
-const LANES = 4;
-const LANE_BORDER = ["border-violet-400", "border-sky-400", "border-amber-400", "border-emerald-400"];
+const LANE_BORDER = ["border-violet-300", "border-sky-300", "border-amber-300", "border-emerald-300"];
 const CATCH_ANIM_MS = 480;
 
 interface FallingCard {
@@ -27,7 +27,7 @@ interface CatchFx extends FallingCard {
 }
 
 function shuffleLanes(): number[] {
-  const lanes = [0, 1, 2, 3];
+  const lanes = Array.from({ length: POJMAT_LANE_COUNT }, (_, i) => i);
   for (let i = lanes.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [lanes[i], lanes[j]] = [lanes[j], lanes[i]];
@@ -74,7 +74,6 @@ function arenaConfig(mode: MiniGameMode) {
   const fast = isDiagnosticFastMode();
   const diagnostic = mode === "diagnostic";
   return {
-    /** % сверху — ниже число = выше на экране; 86 ≈ у корзинки */
     catchY: diagnostic ? 86 : 88,
     catchHalf: diagnostic ? 20 : 12,
     baseSpeed: diagnostic ? (fast ? 0.72 : 0.18) : 0.5,
@@ -109,7 +108,6 @@ export function PojmatCatchArena({
   const correctLane = initialCards.find((c) => c.id === round.correctId)?.lane ?? 0;
 
   const [mouseLane, setMouseLane] = useState(1);
-  const [mobileLayout, setMobileLayout] = useState(false);
   const [cards, setCards] = useState<FallingCard[]>(initialCards);
   const [catchFx, setCatchFx] = useState<CatchFx | null>(null);
   const [basketPop, setBasketPop] = useState(false);
@@ -117,20 +115,21 @@ export function PojmatCatchArena({
   const mouseLaneRef = useRef(mouseLane);
   const roundLockedRef = useRef(false);
   const arenaRef = useRef<HTMLDivElement>(null);
+  const laneRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const plateRef = useRef<HTMLDivElement>(null);
   const touchStartX = useRef<number | null>(null);
   const dragPointerId = useRef<number | null>(null);
   const sparkRef = useRef(0);
 
+  const layout = usePojmatArenaLayout(arenaRef, laneRefs, plateRef);
+
   cardsRef.current = cards;
   mouseLaneRef.current = mouseLane;
 
-  useEffect(() => {
-    const mq = window.matchMedia("(max-width: 767px)");
-    const sync = () => setMobileLayout(mq.matches);
-    sync();
-    mq.addEventListener("change", sync);
-    return () => mq.removeEventListener("change", sync);
-  }, []);
+  const posForLane = useCallback(
+    (lane: number) => laneLeftStyle(lane, layout.laneCentersPct),
+    [layout.laneCentersPct],
+  );
 
   const finishCatch = useCallback(
     (caught: FallingCard) => {
@@ -164,25 +163,17 @@ export function PojmatCatchArena({
 
   const moveLane = useCallback((delta: number) => {
     if (roundLockedRef.current) return;
-    setMouseLane((l) => Math.min(LANES - 1, Math.max(0, l + delta)));
+    setMouseLane((lane) => Math.min(POJMAT_LANE_COUNT - 1, Math.max(0, lane + delta)));
   }, []);
 
-  const laneFromClientX = useCallback((clientX: number) => {
-    const rect = arenaRef.current?.getBoundingClientRect();
-    if (!rect) return mouseLaneRef.current;
-    const ratio = ((clientX - rect.left) / rect.width) * 100;
-    const centers = mobileLayout ? LANE_CENTERS_MOBILE : LANE_CENTERS_DESKTOP;
-    let best = 0;
-    let bestDist = Infinity;
-    centers.forEach((center, index) => {
-      const dist = Math.abs(ratio - center);
-      if (dist < bestDist) {
-        bestDist = dist;
-        best = index;
-      }
-    });
-    return best;
-  }, [mobileLayout]);
+  const laneFromClientX = useCallback(
+    (clientX: number) => {
+      const rect = arenaRef.current?.getBoundingClientRect();
+      if (!rect) return mouseLaneRef.current;
+      return laneIndexFromClientX(clientX, rect, layout.laneCentersPct);
+    },
+    [layout.laneCentersPct],
+  );
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -241,13 +232,17 @@ export function PojmatCatchArena({
     return () => window.cancelAnimationFrame(raf);
   }, [round, mode, speedMultiplier, cfg, triggerCatch]);
 
-  const mousePos = laneLeftStyle(mouseLane, mobileLayout);
+  const mousePos = posForLane(mouseLane);
 
   return (
     <div className="pojmat-catch-arena-root" data-testid="pojmat-catch-arena" data-correct-lane={correctLane}>
       <div
         ref={arenaRef}
-        className={`relative touch-none overflow-hidden rounded-xl border-2 border-purple-300 md:rounded-2xl ${cfg.arenaClass}`}
+        className={`relative touch-none overflow-hidden rounded-xl border-2 border-purple-200/80 md:rounded-2xl ${cfg.arenaClass}`}
+        onClick={(e) => {
+          if (roundLockedRef.current) return;
+          setMouseLane(laneFromClientX(e.clientX));
+        }}
         onTouchStart={(e) => {
           touchStartX.current = e.touches[0]?.clientX ?? null;
         }}
@@ -263,42 +258,34 @@ export function PojmatCatchArena({
           touchStartX.current = null;
         }}
       >
-        <Image
-          src={POJMAT_VISUAL_ASSETS.arenaBgMobile}
-          alt=""
-          fill
-          priority
-          className="object-cover object-center md:hidden"
-          sizes="100vw"
-        />
-        <Image
-          src={POJMAT_VISUAL_ASSETS.arenaBgDesktop}
-          alt=""
-          fill
-          priority
-          className="hidden object-cover object-center md:block"
-          sizes="(max-width: 1024px) 768px, 960px"
-        />
+        <div className="pojmat-arena__decor" aria-hidden />
 
-        <PojmatConditionPlate round={round} />
+        <PojmatLanesLayer laneRefs={laneRefs} />
+
+        <PojmatConditionPlate ref={plateRef} round={round} />
 
         <div
           className="pointer-events-none absolute inset-0 z-10"
-          style={{ clipPath: `inset(${pojmatPlateBottomInset()} 0 0 0)` }}
+          style={{ clipPath: `inset(${layout.playfieldTopPct}% 0 0 0)` }}
         >
           {cards.map((card) => {
             const laneStyle = LANE_BORDER[card.lane % LANE_BORDER.length];
-            const pos = laneLeftStyle(card.lane, mobileLayout);
+            const pos = posForLane(card.lane);
             return (
               <div
                 key={card.uid}
-                className="absolute w-[21%] sm:w-[20%]"
-                style={{ left: pos.left, transform: pos.transform, top: `${card.y}%` }}
+                className="absolute"
+                style={{
+                  left: pos.left,
+                  transform: pos.transform,
+                  top: `${card.y}%`,
+                  width: `${layout.cardWidthPct}%`,
+                }}
               >
                 <div
                   data-testid={`mini-target-${card.id}`}
                   data-lane={card.lane}
-                  className={`w-full rounded-xl border-2 border-dashed bg-white/95 text-center font-medium shadow-lg ${laneStyle} ${cfg.cardText} ${cfg.cardPad}`}
+                  className={`w-full rounded-xl border-2 bg-white/95 text-center font-medium shadow-lg ${laneStyle} ${cfg.cardText} ${cfg.cardPad}`}
                 >
                   {card.label}
                 </div>
@@ -309,15 +296,16 @@ export function PojmatCatchArena({
 
         {catchFx ? (
           <div
-            className="pointer-events-none absolute z-20 w-[20%] pojmat-catch-in"
+            className="pointer-events-none absolute z-20 pojmat-catch-in"
             style={{
-              left: laneLeftStyle(catchFx.lane, mobileLayout).left,
-              transform: laneLeftStyle(catchFx.lane, mobileLayout).transform,
+              left: posForLane(catchFx.lane).left,
+              transform: posForLane(catchFx.lane).transform,
               top: `${catchFx.y}%`,
+              width: `${layout.cardWidthPct}%`,
             }}
           >
             <div
-              className={`w-full rounded-xl border-2 border-dashed bg-white text-center font-medium shadow-xl ${LANE_BORDER[catchFx.lane % LANE_BORDER.length]} ${cfg.cardText} ${cfg.cardPad}`}
+              className={`w-full rounded-xl border-2 bg-white text-center font-medium shadow-xl ${LANE_BORDER[catchFx.lane % LANE_BORDER.length]} ${cfg.cardText} ${cfg.cardPad}`}
             >
               {catchFx.label}
             </div>
@@ -336,8 +324,12 @@ export function PojmatCatchArena({
         <div
           data-testid="pojmat-mouse"
           data-lane={mouseLane}
-          className={`absolute bottom-0 z-20 flex w-[18%] flex-col items-center transition-[left,transform] duration-200 ease-out ${basketPop ? "pojmat-basket-pop" : ""}`}
-          style={{ left: mousePos.left, transform: mousePos.transform }}
+          className={`absolute bottom-0 z-20 flex flex-col items-center transition-[left,transform] duration-200 ease-out ${basketPop ? "pojmat-basket-pop" : ""}`}
+          style={{
+            left: mousePos.left,
+            transform: mousePos.transform,
+            width: `${layout.cardWidthPct * 1.05}%`,
+          }}
           onPointerDown={(e) => {
             if (roundLockedRef.current) return;
             dragPointerId.current = e.pointerId;
@@ -353,8 +345,8 @@ export function PojmatCatchArena({
               e.currentTarget.releasePointerCapture(e.pointerId);
             }
           }}
-          onPointerCancel={(e) => {
-            if (dragPointerId.current === e.pointerId) dragPointerId.current = null;
+          onPointerCancel={() => {
+            dragPointerId.current = null;
           }}
         >
           <DiagnosticAssetImage
@@ -366,32 +358,6 @@ export function PojmatCatchArena({
             draggable={false}
           />
         </div>
-      </div>
-
-      <div className="pojmat-game__controls mt-2 flex items-center justify-center gap-6 md:gap-12">
-        <button
-          type="button"
-          data-testid="pojmat-lane-left"
-          aria-label="Влево"
-          onClick={() => moveLane(-1)}
-          className="flex items-center justify-center rounded-full border-2 border-purple-200 bg-white shadow-sm active:scale-95"
-        >
-          ←
-        </button>
-        <p className="pojmat-controls-hint hidden text-center sm:block">
-          {mode === "diagnostic"
-            ? "Подведи корзинку под нужную карточку"
-            : "Серия ускоряет падение"}
-        </p>
-        <button
-          type="button"
-          data-testid="pojmat-lane-right"
-          aria-label="Вправо"
-          onClick={() => moveLane(1)}
-          className="flex items-center justify-center rounded-full border-2 border-purple-200 bg-white shadow-sm active:scale-95"
-        >
-          →
-        </button>
       </div>
 
       {mode === "play" && speedMultiplier > 1 ? (

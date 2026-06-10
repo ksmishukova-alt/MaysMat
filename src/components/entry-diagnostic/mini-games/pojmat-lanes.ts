@@ -1,15 +1,35 @@
-/** Центры дорожек (% от ширины арены) — desktop / mobile */
-export const LANE_CENTERS_DESKTOP = [18, 39, 61, 82] as const;
-export const LANE_CENTERS_MOBILE = [14, 38, 62, 86] as const;
+/** Количество игровых дорожек (первая версия) */
+export const POJMAT_LANE_COUNT = 4;
 
-export function laneCenterPercent(lane: number, mobile: boolean): number {
-  const centers = mobile ? LANE_CENTERS_MOBILE : LANE_CENTERS_DESKTOP;
-  return centers[Math.min(Math.max(lane, 0), centers.length - 1)] ?? centers[0];
-}
+/** Fallback-центры равной сетки 4×1 до первого измерения DOM */
+export const DEFAULT_LANE_CENTERS_PCT = [12.5, 37.5, 62.5, 87.5] as const;
 
-export function laneLeftStyle(lane: number, mobile: boolean): { left: string; transform?: string } {
+export function laneLeftStyle(
+  lane: number,
+  centersPct: readonly number[],
+): { left: string; transform: string } {
+  const index = Math.min(Math.max(lane, 0), centersPct.length - 1);
   return {
-    left: `${laneCenterPercent(lane, mobile)}%`,
+    left: `${centersPct[index] ?? 50}%`,
     transform: "translateX(-50%)",
   };
+}
+
+/** Ближайшая дорожка по X внутри арены */
+export function laneIndexFromClientX(
+  clientX: number,
+  arenaRect: DOMRect,
+  centersPct: readonly number[],
+): number {
+  const ratio = ((clientX - arenaRect.left) / arenaRect.width) * 100;
+  let best = 0;
+  let bestDist = Infinity;
+  centersPct.forEach((center, index) => {
+    const dist = Math.abs(ratio - center);
+    if (dist < bestDist) {
+      bestDist = dist;
+      best = index;
+    }
+  });
+  return best;
 }

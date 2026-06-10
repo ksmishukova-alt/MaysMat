@@ -35,7 +35,7 @@ async function main() {
   await page.getByTestId("diagnostic-enter").click();
   await page.getByTestId("diagnostic-start").click();
   await page.waitForSelector('[data-testid="diagnostic-runner"]');
-  await shot(page, "02-block1-runner-reading");
+  await shot(page, "02-block1-task-d1");
 
   // Блок 3 — столбик
   for (let b = 0; b < 2; b++) {

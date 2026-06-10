@@ -2,8 +2,6 @@ import type { RuleItem } from "@/components/entry-diagnostic/ui/Rules";
 import { PARKOMAT_ASSETS } from "@/components/entry-diagnostic/mini-games/parkomat/parkomat-assets";
 import { ENTRY_DIAGNOSTIC_ASSETS, POJMAT_RULE_ICONS } from "@/data/entry-diagnostic/visual-assets";
 
-/** Короткие правила mini-game в diagnostic mode (без очков и соревнований) */
-
 export interface MiniGameDiagnosticRules {
   title: string;
   paragraphs: string[];
@@ -12,12 +10,33 @@ export interface MiniGameDiagnosticRules {
 const POJMAT_RULES: MiniGameDiagnosticRules = {
   title: "МышМат: ПойМАТ!",
   paragraphs: [
-    "Карточки будут падать по дорожкам.",
-    "Передвигай МышМата влево и вправо.",
-    "Поставь корзинку под карточку с правильным смыслом вопроса.",
-    "Когда карточка попадёт в корзинку, ответ засчитается.",
+    "Прочитай условие сверху.",
+    "Карточки будут падать по четырём дорожкам.",
+    "Поставь корзинку под правильную карточку.",
+    "Когда карточка попадёт в корзинку — ответ засчитается.",
   ],
 };
+
+export function getPojmatRulesScreen() {
+  return {
+    title: POJMAT_RULES.title,
+    rulesBefore: [
+      "Прочитай условие сверху.",
+      "Карточки будут падать по четырём дорожкам.",
+    ],
+    controlSection: {
+      title: "Как управлять:",
+      hints: [
+        { kind: "keyboard" as const, text: "клавиши на клавиатуре" },
+        { kind: "tap" as const, text: "или тап по нужной дорожке" },
+      ],
+    },
+    rulesAfter: [
+      "Поставь корзинку под правильную карточку.",
+      "Когда карточка попадёт в корзинку — ответ засчитается.",
+    ],
+  };
+}
 
 const PARKOMAT_RULES: MiniGameDiagnosticRules = {
   title: "МышМат: ПаркоМат",

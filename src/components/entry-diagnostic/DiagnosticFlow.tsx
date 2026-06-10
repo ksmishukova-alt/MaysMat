@@ -10,6 +10,7 @@ import {
 import {
   getMiniGameDiagnosticRules,
   getMiniGameRuleItems,
+  getPojmatRulesScreen,
 } from "@/data/entry-diagnostic/minigame-diagnostic-rules";
 import { scoreTaskAttempt } from "@/data/entry-diagnostic/scoring";
 import { validateTaskResponse } from "@/data/entry-diagnostic/validation";
@@ -214,7 +215,6 @@ export function DiagnosticFlow() {
     return (
       <BlockIntro
         currentTheme={block.blockIndex}
-        themeTitle={block.title}
         onStart={startBlock}
       />
     );
@@ -241,11 +241,19 @@ export function DiagnosticFlow() {
   if (session.phase === "minigame_rules") {
     const mgConfig = getMiniGameById(block.miniGameId);
     if (!mgConfig) return null;
+    if (block.miniGameId === "pojmat") {
+      return (
+        <Rules
+          {...getPojmatRulesScreen()}
+          onStart={() => persist({ ...session, phase: "minigame" })}
+        />
+      );
+    }
     const rulesMeta = getMiniGameDiagnosticRules(block.miniGameId, mgConfig.title);
     return (
       <Rules
         title={rulesMeta.title}
-        rules={getMiniGameRuleItems(block.miniGameId, mgConfig.title)}
+        rulesBefore={getMiniGameRuleItems(block.miniGameId, mgConfig.title).map((rule) => rule.text)}
         onStart={() => persist({ ...session, phase: "minigame" })}
       />
     );

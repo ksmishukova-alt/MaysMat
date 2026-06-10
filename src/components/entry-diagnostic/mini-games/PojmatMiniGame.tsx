@@ -1,10 +1,20 @@
 "use client";
 
 import type { DiagnosticMiniGameProps } from "./types";
+import { Nunito } from "next/font/google";
 import { POJMAT_ROUNDS } from "@/data/entry-diagnostic/mini-games/pojmat-rounds";
 import { usePojmatGameState } from "./usePojmatGameState";
 import { PojmatCatchArena } from "./PojmatCatchArena";
+import { DiagnosticAssetImage } from "@/components/entry-diagnostic/ui/DiagnosticAssetImage";
+import { POJMAT_VISUAL_ASSETS } from "./pojmat-assets";
+import "@/components/entry-diagnostic/ui/diagnostic-ui.css";
 import "./pojmat-game.css";
+
+const nunito = Nunito({
+  subsets: ["latin", "cyrillic"],
+  weight: ["700", "800", "900"],
+  display: "swap",
+});
 
 export function PojmatMiniGame(props: DiagnosticMiniGameProps) {
   const state = usePojmatGameState(props);
@@ -36,17 +46,20 @@ export function PojmatMiniGame(props: DiagnosticMiniGameProps) {
 
   return (
     <section
-      className="pojmat-game"
+      className={`pojmat-game ${nunito.className}`}
       data-testid="diagnostic-minigame"
       data-mode={props.mode}
       data-game="pojmat"
     >
       <header className="pojmat-game__header">
-        <div className="pojmat-game__header-badge" aria-label="МышМат: ПойМАТ!">
-          <span className="pojmat-game__header-emoji" aria-hidden>
-            🧺
-          </span>
-          МышМат: ПойМАТ!
+        <div className="pojmat-game__header-chip-wrap" aria-label="МышМат: ПойМАТ!">
+          <DiagnosticAssetImage
+            src={POJMAT_VISUAL_ASSETS.titleChip}
+            alt=""
+            width={360}
+            height={80}
+            className="pojmat-game__title-chip"
+          />
         </div>
         {props.mode === "diagnostic" ? (
           <div className="pojmat-game__timer" aria-label={`Осталось ${state.timeLeft} секунд`}>
