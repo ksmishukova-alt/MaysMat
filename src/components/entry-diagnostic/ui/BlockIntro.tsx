@@ -1,9 +1,7 @@
 "use client";
 
-import { DiagnosticAssetImage } from "./DiagnosticAssetImage";
 import { DiagnosticFocusLayout } from "./DiagnosticFocusLayout";
 import { ProgressDots } from "./ProgressDots";
-import { DIAGNOSTIC_MYSHMAT_POSE } from "@/data/entry-diagnostic/visual-assets";
 
 export type BlockIntroProps = {
   currentTheme: number;
@@ -34,17 +32,8 @@ export function BlockIntro({
         <div className="diagnostic-card diagnostic-block-intro__card">
           <h1>{themeTitle}</h1>
           <div className="diagnostic-dashed-line" />
-          <p>Сейчас будет 3 задания, а потом мини-игра.</p>
+          <p>Сейчас будет 3 задания.</p>
         </div>
-
-        <DiagnosticAssetImage
-          className="diagnostic-block-intro__mascot diagnostic-icon-transparent"
-          src={DIAGNOSTIC_MYSHMAT_POSE.nextTopic}
-          alt=""
-          width={200}
-          height={200}
-          aria-hidden
-        />
 
         <button
           type="button"

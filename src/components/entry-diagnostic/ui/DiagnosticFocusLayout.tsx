@@ -65,19 +65,26 @@ export function DiagnosticFocusLayout({
   }
 
   const bg = DIAGNOSTIC_PHASE_BACKGROUNDS[phase];
+  const bgStyle = bg
+    ? ({
+        "--diagnostic-bg-mobile": `url(${bg.mobile})`,
+        "--diagnostic-bg-desktop": `url(${bg.desktop})`,
+      } as CSSProperties)
+    : undefined;
 
   return (
     <main
       className={`diagnostic-focus-layout ${nunito.className}`}
       data-testid={testId}
       data-phase={phase}
-      style={
-        {
-          "--diagnostic-bg-mobile": bg ? `url(${bg.mobile})` : "none",
-          "--diagnostic-bg-desktop": bg ? `url(${bg.desktop})` : "none",
-        } as CSSProperties
-      }
+      style={bgStyle}
     >
+      {bg ? (
+        <picture className="diagnostic-focus-layout__bg" aria-hidden>
+          <source media="(min-width: 768px)" srcSet={bg.desktop} />
+          <img src={bg.mobile} alt="" />
+        </picture>
+      ) : null}
       <div className="diagnostic-focus-layout__overlay" aria-hidden />
 
       {onBack ? (

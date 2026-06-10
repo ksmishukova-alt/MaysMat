@@ -3,7 +3,7 @@
 import Image from "next/image";
 import type { DiagnosticLayoutPhase } from "./DiagnosticFocusLayout";
 import { DiagnosticFocusLayout } from "./DiagnosticFocusLayout";
-import { DIAGNOSTIC_MYSHMAT_POSE, ENTRY_DIAGNOSTIC_ASSETS } from "@/data/entry-diagnostic/visual-assets";
+import { ENTRY_DIAGNOSTIC_ASSETS } from "@/data/entry-diagnostic/visual-assets";
 
 export type CelebrationProps = {
   layoutPhase?: DiagnosticLayoutPhase;
@@ -11,7 +11,8 @@ export type CelebrationProps = {
   text?: string;
   buttonText?: string;
   badgeSrc?: string;
-  mascotSrc?: string;
+  /** Показывать звёздочку над плашкой (pre_minigame — без декора) */
+  showBadge?: boolean;
   hintIconSrc?: string;
   hintText?: string;
   onNext: () => void;
@@ -25,7 +26,7 @@ export function Celebration({
   text = "Сейчас будет мини-игра МышМата.",
   buttonText = "Дальше",
   badgeSrc = ENTRY_DIAGNOSTIC_ASSETS.icons.badgeStar,
-  mascotSrc = DIAGNOSTIC_MYSHMAT_POSE.topicDone,
+  showBadge = false,
   hintIconSrc,
   hintText,
   onNext,
@@ -35,10 +36,14 @@ export function Celebration({
   return (
     <DiagnosticFocusLayout phase={layoutPhase} testId={testId}>
       <section className="diagnostic-screen diagnostic-celebration">
-        <div className="diagnostic-card diagnostic-celebration__card">
-          <div className="diagnostic-badge">
-            <Image src={badgeSrc} alt="" width={84} height={84} aria-hidden />
-          </div>
+        <div
+          className={`diagnostic-card diagnostic-celebration__card${showBadge ? "" : " diagnostic-celebration__card--plain"}`}
+        >
+          {showBadge ? (
+            <div className="diagnostic-badge">
+              <Image src={badgeSrc} alt="" width={72} height={72} aria-hidden />
+            </div>
+          ) : null}
           <h1>{title}</h1>
           <div className="diagnostic-dashed-line" />
           <p>{text}</p>
@@ -47,24 +52,22 @@ export function Celebration({
         {hintText ? (
           <div className="diagnostic-card diagnostic-celebration__hint">
             {hintIconSrc ? (
-              <Image src={hintIconSrc} alt="" width={56} height={56} className="diagnostic-celebration__hint-icon" aria-hidden />
+              <Image
+                src={hintIconSrc}
+                alt=""
+                width={56}
+                height={56}
+                className="diagnostic-celebration__hint-icon"
+                aria-hidden
+              />
             ) : null}
             <p>{hintText}</p>
           </div>
         ) : null}
 
-        <Image
-          className="diagnostic-celebration__mascot diagnostic-icon-transparent"
-          src={mascotSrc}
-          alt=""
-          width={220}
-          height={220}
-          aria-hidden
-        />
-
         <button
           type="button"
-          className="diagnostic-primary-button"
+          className="diagnostic-primary-button diagnostic-celebration__continue"
           data-testid={continueTestId ?? "diagnostic-celebration-continue"}
           onClick={onNext}
         >

@@ -7,6 +7,7 @@ import type { MiniGameMode } from "@/data/entry-diagnostic/types";
 import type { PojmatRound } from "@/data/entry-diagnostic/mini-games/pojmat-rounds";
 import { isDiagnosticFastMode } from "@/lib/entry-diagnostic/fast-mode";
 import { POJMAT_VISUAL_ASSETS, pojmatPlateBottomInset } from "./pojmat-assets";
+import { laneLeftStyle, LANE_CENTERS_DESKTOP, LANE_CENTERS_MOBILE } from "./pojmat-lanes";
 import { PojmatConditionPlate } from "./PojmatConditionPlate";
 
 const LANES = 4;
@@ -79,12 +80,10 @@ function arenaConfig(mode: MiniGameMode) {
     baseSpeed: diagnostic ? (fast ? 0.72 : 0.18) : 0.5,
     fastBoost: fast && diagnostic ? 1.6 : 1,
     cardText: diagnostic
-      ? "text-[11px] leading-tight font-bold sm:text-sm sm:leading-snug md:text-base"
+      ? "text-[10px] leading-tight font-bold sm:text-xs sm:leading-snug md:text-sm"
       : "text-[11px] leading-tight",
-    cardPad: diagnostic ? "px-2 py-2.5 sm:px-3 sm:py-3" : "px-2 py-2",
-    arenaHeight: diagnostic
-      ? "pojmat-arena pojmat-arena--diagnostic h-[22rem] sm:h-[26rem] md:h-[34rem] lg:h-[38rem]"
-      : "pojmat-arena pojmat-arena--play h-[20rem] sm:h-[24rem] md:h-[30rem]",
+    cardPad: diagnostic ? "px-2 py-2 sm:px-2.5 sm:py-2.5" : "px-2 py-2",
+    arenaClass: diagnostic ? "pojmat-arena pojmat-arena--diagnostic" : "pojmat-arena pojmat-arena--play",
     fallLimit: 118,
   };
 }
@@ -110,6 +109,7 @@ export function PojmatCatchArena({
   const correctLane = initialCards.find((c) => c.id === round.correctId)?.lane ?? 0;
 
   const [mouseLane, setMouseLane] = useState(1);
+  const [mobileLayout, setMobileLayout] = useState(false);
   const [cards, setCards] = useState<FallingCard[]>(initialCards);
   const [catchFx, setCatchFx] = useState<CatchFx | null>(null);
   const [basketPop, setBasketPop] = useState(false);
@@ -123,6 +123,14 @@ export function PojmatCatchArena({
 
   cardsRef.current = cards;
   mouseLaneRef.current = mouseLane;
+
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 767px)");
+    const sync = () => setMobileLayout(mq.matches);
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
 
   const finishCatch = useCallback(
     (caught: FallingCard) => {
@@ -162,9 +170,19 @@ export function PojmatCatchArena({
   const laneFromClientX = useCallback((clientX: number) => {
     const rect = arenaRef.current?.getBoundingClientRect();
     if (!rect) return mouseLaneRef.current;
-    const ratio = (clientX - rect.left) / rect.width;
-    return Math.min(LANES - 1, Math.max(0, Math.floor(ratio * LANES)));
-  }, []);
+    const ratio = ((clientX - rect.left) / rect.width) * 100;
+    const centers = mobileLayout ? LANE_CENTERS_MOBILE : LANE_CENTERS_DESKTOP;
+    let best = 0;
+    let bestDist = Infinity;
+    centers.forEach((center, index) => {
+      const dist = Math.abs(ratio - center);
+      if (dist < bestDist) {
+        bestDist = dist;
+        best = index;
+      }
+    });
+    return best;
+  }, [mobileLayout]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -223,13 +241,13 @@ export function PojmatCatchArena({
     return () => window.cancelAnimationFrame(raf);
   }, [round, mode, speedMultiplier, cfg, triggerCatch]);
 
-  const mouseLeft = `${mouseLane * 25 + 4}%`;
+  const mousePos = laneLeftStyle(mouseLane, mobileLayout);
 
   return (
     <div className="pojmat-catch-arena-root" data-testid="pojmat-catch-arena" data-correct-lane={correctLane}>
       <div
         ref={arenaRef}
-        className={`relative touch-none overflow-hidden rounded-xl border-2 border-purple-300 md:rounded-2xl ${cfg.arenaHeight}`}
+        className={`relative touch-none overflow-hidden rounded-xl border-2 border-purple-300 md:rounded-2xl ${cfg.arenaClass}`}
         onTouchStart={(e) => {
           touchStartX.current = e.touches[0]?.clientX ?? null;
         }}
@@ -270,11 +288,12 @@ export function PojmatCatchArena({
         >
           {cards.map((card) => {
             const laneStyle = LANE_BORDER[card.lane % LANE_BORDER.length];
+            const pos = laneLeftStyle(card.lane, mobileLayout);
             return (
               <div
                 key={card.uid}
-                className="absolute w-[24%] sm:w-[23%]"
-                style={{ left: `${card.lane * 25 + 1}%`, top: `${card.y}%` }}
+                className="absolute w-[21%] sm:w-[20%]"
+                style={{ left: pos.left, transform: pos.transform, top: `${card.y}%` }}
               >
                 <div
                   data-testid={`mini-target-${card.id}`}
@@ -290,8 +309,12 @@ export function PojmatCatchArena({
 
         {catchFx ? (
           <div
-            className="pointer-events-none absolute z-20 w-[23%] pojmat-catch-in"
-            style={{ left: `${catchFx.lane * 25 + 1}%`, top: `${catchFx.y}%` }}
+            className="pointer-events-none absolute z-20 w-[20%] pojmat-catch-in"
+            style={{
+              left: laneLeftStyle(catchFx.lane, mobileLayout).left,
+              transform: laneLeftStyle(catchFx.lane, mobileLayout).transform,
+              top: `${catchFx.y}%`,
+            }}
           >
             <div
               className={`w-full rounded-xl border-2 border-dashed bg-white text-center font-medium shadow-xl ${LANE_BORDER[catchFx.lane % LANE_BORDER.length]} ${cfg.cardText} ${cfg.cardPad}`}
@@ -305,7 +328,7 @@ export function PojmatCatchArena({
           <div
             key={catchFx.sparkKey}
             className="pointer-events-none absolute z-30 h-10 w-10 rounded-full bg-amber-200/80 pojmat-sparkle"
-            style={{ left: mouseLeft, bottom: "12%" }}
+            style={{ left: mousePos.left, transform: mousePos.transform, bottom: "12%" }}
             aria-hidden
           />
         ) : null}
@@ -313,8 +336,8 @@ export function PojmatCatchArena({
         <div
           data-testid="pojmat-mouse"
           data-lane={mouseLane}
-          className={`absolute bottom-0 z-20 flex w-[19%] flex-col items-center transition-[left] duration-150 ease-out ${basketPop ? "pojmat-basket-pop" : ""}`}
-          style={{ left: mouseLeft }}
+          className={`absolute bottom-0 z-20 flex w-[18%] flex-col items-center transition-[left,transform] duration-200 ease-out ${basketPop ? "pojmat-basket-pop" : ""}`}
+          style={{ left: mousePos.left, transform: mousePos.transform }}
           onPointerDown={(e) => {
             if (roundLockedRef.current) return;
             dragPointerId.current = e.pointerId;

@@ -10,11 +10,13 @@
 }
 
 .parkomat__bg {
-  position: absolute;
+  position: fixed;
   inset: 0;
-  width: 100%;
-  height: 100%;
+  width: 100vw;
+  height: 100dvh;
   object-fit: cover;
+  object-position: center center;
+  z-index: 0;
 }
 
 .parkomat__content {
@@ -113,7 +115,7 @@
 
 .parkomat-gate {
   position: absolute;
-  top: 32%;
+  top: 28%;
   width: clamp(88px, 10vw, 108px);
   height: clamp(88px, 10vw, 108px);
   padding: 0;
@@ -128,6 +130,34 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: visible;
+}
+
+.parkomat-gate__arm {
+  position: absolute;
+  top: -46px;
+  left: 50%;
+  width: 10px;
+  height: 52px;
+  margin-left: -5px;
+  border-radius: 6px 6px 2px 2px;
+  background: linear-gradient(180deg, #fff 0%, #f0e8dc 100%);
+  transform-origin: bottom center;
+  transform: rotate(0deg);
+  transition: transform 320ms ease;
+  box-shadow: 0 4px 8px rgba(17, 24, 39, 0.12);
+  pointer-events: none;
+}
+
+.parkomat-gate--opening .parkomat-gate__arm,
+.parkomat-gate--open .parkomat-gate__arm {
+  transform: rotate(72deg);
+}
+
+.parkomat-gate--selected {
+  box-shadow:
+    0 12px 28px rgba(17, 24, 39, 0.2),
+    0 0 0 4px rgba(255, 255, 255, 0.85);
 }
 
 .parkomat-gate__symbol {
@@ -177,78 +207,45 @@
 
 .parkomat-car {
   position: absolute;
-  left: 50%;
-  bottom: 8%;
+  left: var(--car-x, 50%);
+  top: var(--car-y, 86%);
   width: clamp(130px, 14vw, 196px);
   height: auto;
-  transform: translateX(-50%);
+  transform: translate(-50%, -50%) rotate(var(--car-rotate, 0deg));
   transition:
-    left 680ms ease,
-    bottom 680ms ease,
-    transform 680ms ease;
-  will-change: left, bottom, transform;
+    left 700ms ease-in-out,
+    top 700ms ease-in-out,
+    transform 700ms ease-in-out;
+  will-change: left, top, transform;
   pointer-events: none;
   background: transparent;
+  z-index: 2;
 }
 
 .parkomat--play .parkomat-car {
   transition-duration: 480ms;
 }
 
-.parkomat-car--left {
-  left: 34%;
-  bottom: 32%;
-  transform: translateX(-50%) rotate(-13deg);
+.parkomat-car--hit {
+  animation: parkomat-car-hit 360ms ease-in-out;
 }
 
-.parkomat-car--right {
-  left: 66%;
-  bottom: 32%;
-  transform: translateX(-50%) rotate(13deg);
+.parkomat-car--success {
+  filter: drop-shadow(0 6px 14px rgba(34, 197, 94, 0.35));
 }
 
-.parkomat-car--bump {
-  animation: parkomat-bump 420ms ease;
-}
-
-@keyframes parkomat-bump {
-  0%,
-  100% {
-    transform: translateX(-50%) translateY(0);
+@keyframes parkomat-car-hit {
+  0% {
+    transform: translate(-50%, -50%) rotate(var(--car-rotate, 0deg));
   }
-  40% {
-    transform: translateX(-50%) translateY(-6px);
+  35% {
+    transform: translate(calc(-50% + 8px), -50%) rotate(var(--car-rotate, 0deg));
   }
   70% {
-    transform: translateX(-50%) translateY(4px);
+    transform: translate(calc(-50% - 5px), -50%) rotate(var(--car-rotate, 0deg));
   }
-}
-
-.parkomat-car--left.parkomat-car--bump {
-  animation-name: parkomat-bump-left;
-}
-
-.parkomat-car--right.parkomat-car--bump {
-  animation-name: parkomat-bump-right;
-}
-
-@keyframes parkomat-bump-left {
-  0%,
   100% {
-    transform: translateX(-50%) rotate(-13deg);
-  }
-  50% {
-    transform: translateX(calc(-50% - 6px)) rotate(-16deg);
-  }
-}
-
-@keyframes parkomat-bump-right {
-  0%,
-  100% {
-    transform: translateX(-50%) rotate(13deg);
-  }
-  50% {
-    transform: translateX(calc(-50% + 6px)) rotate(16deg);
+    transform: translate(-50%, -50%) rotate(var(--car-rotate, 0deg));
   }
 }
 
@@ -333,21 +330,11 @@
   }
 
   .parkomat__scene {
-    height: clamp(430px, 52vh, 520px);
+    height: clamp(430px, calc(100dvh - 280px), 560px);
   }
 
   .parkomat-car {
     width: clamp(165px, 14vw, 198px);
-  }
-
-  .parkomat-car--left {
-    left: 36%;
-    bottom: 34%;
-  }
-
-  .parkomat-car--right {
-    left: 64%;
-    bottom: 34%;
   }
 }
 
@@ -385,7 +372,7 @@
   }
 
   .parkomat__scene {
-    height: clamp(340px, 44vh, 420px);
+    height: clamp(340px, calc(100dvh - 260px), 440px);
   }
 
   .parkomat-gate--minus {
@@ -398,16 +385,6 @@
 
   .parkomat-car {
     width: clamp(140px, 36vw, 170px);
-  }
-
-  .parkomat-car--left {
-    left: 30%;
-    bottom: 30%;
-  }
-
-  .parkomat-car--right {
-    left: 70%;
-    bottom: 30%;
   }
 
   .parkomat-controls {

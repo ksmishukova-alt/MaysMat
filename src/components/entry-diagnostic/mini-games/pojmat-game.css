@@ -2,6 +2,7 @@
   position: relative;
   width: 100%;
   min-height: 100dvh;
+  height: 100dvh;
   max-height: 100dvh;
   display: grid;
   grid-template-rows: auto 1fr;
@@ -9,6 +10,7 @@
   font-family: "Nunito", system-ui, sans-serif;
   color: #12205c;
   background: #8fd7ff;
+  --pojmat-header-height: 64px;
 }
 
 .pojmat-game__header {
@@ -61,10 +63,11 @@
 .pojmat-game__body {
   position: relative;
   min-height: 0;
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 0 8px 10px;
+  padding: 0 8px 8px;
 }
 
 .pojmat-game__arena-wrap {
@@ -77,9 +80,18 @@
 
 .pojmat-catch-arena-root {
   width: 100%;
+  flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   align-items: stretch;
+}
+
+.pojmat-arena {
+  flex: 1;
+  width: 100%;
+  min-height: min(560px, calc(100dvh - var(--pojmat-header-height) - 88px));
+  height: 100%;
 }
 
 .pojmat-condition {

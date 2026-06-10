@@ -2,7 +2,16 @@ import type { ParkomatGate } from "@/data/entry-diagnostic/mini-games/parkomat-r
 
 export type ParkomatMode = "diagnostic" | "play";
 
-export type ParkomatPhase = "reading" | "driving" | "turning" | "result";
+export type ParkomatPhase =
+  | "reading"
+  | "drivingStraight"
+  | "choiceMade"
+  | "gateOpening"
+  | "turning"
+  | "successPass"
+  | "failHit";
+
+export type GateState = "closed" | "opening" | "open";
 
 export type ParkomatTelemetryEvent = {
   type: "parkomat_round_answered";

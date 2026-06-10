@@ -126,7 +126,7 @@ async function answerParkomatRound(page: Page, correctGate: ParkomatGate) {
   await page.getByTestId("parkomat-game").waitFor({ state: "visible", timeout: 10_000 });
   const gateTestId = correctGate === "plus" ? "parkomat-gate-plus" : "parkomat-gate-minus";
   await page.getByTestId(gateTestId).click();
-  await page.waitForTimeout(1_100);
+  await page.waitForTimeout(1_800);
 }
 
 export async function completeMiniGame(page: Page, miniGameId: string) {

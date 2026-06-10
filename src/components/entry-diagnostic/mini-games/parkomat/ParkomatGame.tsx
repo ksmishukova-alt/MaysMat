@@ -1,12 +1,29 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+} from "react";
 import type { ParkomatRound } from "@/data/entry-diagnostic/mini-games/parkomat-rounds";
 import type { ParkomatGate } from "@/data/entry-diagnostic/mini-games/parkomat-rounds";
 import { isDiagnosticFastMode } from "@/lib/entry-diagnostic/fast-mode";
 import { DiagnosticAssetImage } from "@/components/entry-diagnostic/ui/DiagnosticAssetImage";
 import { PARKOMAT_ASSETS } from "./parkomat-assets";
-import type { ParkomatMode, ParkomatPhase, ParkomatTelemetryEvent } from "./types";
+import {
+  CAR_POSITIONS,
+  CAR_POSITIONS_MOBILE,
+  type CarPositionKey,
+} from "./parkomat-positions";
+import type {
+  GateState,
+  ParkomatMode,
+  ParkomatPhase,
+  ParkomatTelemetryEvent,
+} from "./types";
 import "./parkomat-game.css";
 
 export type ParkomatGameProps = {
@@ -21,6 +38,21 @@ export type ParkomatGameProps = {
   onTelemetry?: (event: ParkomatTelemetryEvent) => void;
 };
 
+function resolveCarPosition(key: CarPositionKey, mobile: boolean) {
+  if (mobile && CAR_POSITIONS_MOBILE[key]) {
+    return CAR_POSITIONS_MOBILE[key]!;
+  }
+  return CAR_POSITIONS[key];
+}
+
+function gatePosition(gate: ParkomatGate): CarPositionKey {
+  return gate === "minus" ? "minusGate" : "plusGate";
+}
+
+function exitPosition(gate: ParkomatGate): CarPositionKey {
+  return gate === "minus" ? "minusExit" : "plusExit";
+}
+
 export function ParkomatGame({
   mode,
   rounds,
@@ -31,15 +63,20 @@ export function ParkomatGame({
   const [roundIndex, setRoundIndex] = useState(0);
   const [phase, setPhase] = useState<ParkomatPhase>("reading");
   const [selectedGate, setSelectedGate] = useState<ParkomatGate | null>(null);
-  const [showBump, setShowBump] = useState(false);
+  const [carPosKey, setCarPosKey] = useState<CarPositionKey>("start");
+  const [showHit, setShowHit] = useState(false);
+  const [minusGateState, setMinusGateState] = useState<GateState>("closed");
+  const [plusGateState, setPlusGateState] = useState<GateState>("closed");
   const [timeLeft, setTimeLeft] = useState(durationSec);
   const [finished, setFinished] = useState(false);
   const [playScore, setPlayScore] = useState(0);
+  const [mobileLayout, setMobileLayout] = useState(false);
 
   const eventsRef = useRef<ParkomatTelemetryEvent[]>([]);
   const correctCountRef = useRef(0);
   const completedRef = useRef(false);
   const roundStartedAtRef = useRef(Date.now());
+  const sequenceRef = useRef(0);
 
   const currentRound = rounds[roundIndex % rounds.length];
   const gameSpeedClass = mode === "play" ? "parkomat--play" : "parkomat--diagnostic";
@@ -57,40 +94,69 @@ export function ParkomatGame({
   }, [onComplete]);
 
   useEffect(() => {
-    roundStartedAtRef.current = Date.now();
+    const mq = window.matchMedia("(max-width: 767px)");
+    const sync = () => setMobileLayout(mq.matches);
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
+
+  const resetRoundVisuals = useCallback(() => {
     setPhase("reading");
     setSelectedGate(null);
-    setShowBump(false);
+    setCarPosKey("start");
+    setShowHit(false);
+    setMinusGateState("closed");
+    setPlusGateState("closed");
+    roundStartedAtRef.current = Date.now();
+  }, []);
 
+  useEffect(() => {
+    resetRoundVisuals();
+  }, [roundIndex, resetRoundVisuals]);
+
+  useEffect(() => {
+    if (phase !== "reading" || finished || completedRef.current) return;
+    setCarPosKey("start");
     const readingMs = mode === "diagnostic" ? 900 : 450;
-    const readingTimer = window.setTimeout(() => {
-      setPhase((p) => (p === "reading" ? "driving" : p));
+    const timer = window.setTimeout(() => {
+      setPhase((p) => (p === "reading" ? "drivingStraight" : p));
     }, readingMs);
+    return () => window.clearTimeout(timer);
+  }, [phase, roundIndex, mode, finished]);
 
-    return () => window.clearTimeout(readingTimer);
-  }, [roundIndex, mode]);
+  useEffect(() => {
+    if (phase !== "drivingStraight" || finished || completedRef.current) return;
+    setCarPosKey("approach");
+  }, [phase, roundIndex, finished]);
 
   useEffect(() => {
     if (completedRef.current) return;
-
     const timer = window.setInterval(() => {
       setTimeLeft((prev) => (prev <= 1 ? 0 : prev - 1));
     }, 1000);
-
     return () => window.clearInterval(timer);
   }, []);
 
   useEffect(() => {
-    if (timeLeft === 0) {
-      finishGame();
-    }
+    if (timeLeft === 0) finishGame();
   }, [timeLeft, finishGame]);
+
+  const scheduleNextRound = useCallback(() => {
+    const answered = eventsRef.current.length;
+    if (mode === "diagnostic" && fastMode && answered >= 2) {
+      finishGame();
+      return;
+    }
+    window.setTimeout(() => setRoundIndex((prev) => prev + 1), mode === "diagnostic" ? 420 : 320);
+  }, [mode, fastMode, finishGame]);
 
   const answer = useCallback(
     (gate: ParkomatGate) => {
       if (!currentRound || completedRef.current || finished) return;
-      if (phase === "turning" || phase === "result") return;
+      if (phase !== "reading" && phase !== "drivingStraight") return;
 
+      const seq = ++sequenceRef.current;
       const reactionTimeMs = Date.now() - roundStartedAtRef.current;
       const isCorrect = gate === currentRound.correctGate;
 
@@ -112,36 +178,50 @@ export function ParkomatGame({
       eventsRef.current = [...eventsRef.current, event];
       if (isCorrect) {
         correctCountRef.current += 1;
-        if (mode === "play") {
-          setPlayScore(correctCountRef.current);
-        }
+        if (mode === "play") setPlayScore(correctCountRef.current);
       }
       onTelemetry?.(event);
 
       setSelectedGate(gate);
-      setPhase("turning");
-      if (!isCorrect) {
-        setShowBump(true);
-      }
-
-      const turnMs = mode === "diagnostic" ? 650 : 450;
-      const nextRoundMs = mode === "diagnostic" ? 1050 : 750;
-
-      window.setTimeout(() => setPhase("result"), turnMs);
+      setPhase("choiceMade");
 
       window.setTimeout(() => {
-        const answered = eventsRef.current.length;
-        if (mode === "diagnostic" && fastMode && answered >= 2) {
-          finishGame();
-          return;
-        }
+        if (sequenceRef.current !== seq) return;
+        setPhase("gateOpening");
+        if (gate === "minus") setMinusGateState("opening");
+        else setPlusGateState("opening");
+      }, 40);
 
-        setSelectedGate(null);
-        setShowBump(false);
-        setRoundIndex((prev) => prev + 1);
-      }, nextRoundMs);
+      window.setTimeout(() => {
+        if (sequenceRef.current !== seq) return;
+        if (gate === "minus") setMinusGateState("open");
+        else setPlusGateState("open");
+      }, 320);
+
+      window.setTimeout(() => {
+        if (sequenceRef.current !== seq) return;
+        setPhase("turning");
+        setCarPosKey(gatePosition(gate));
+      }, 340);
+
+      window.setTimeout(() => {
+        if (sequenceRef.current !== seq) return;
+        if (isCorrect) {
+          setPhase("successPass");
+          setCarPosKey(exitPosition(gate));
+        } else {
+          setPhase("failHit");
+          setCarPosKey(gatePosition(gate));
+          setShowHit(true);
+        }
+      }, 1040);
+
+      window.setTimeout(() => {
+        if (sequenceRef.current !== seq) return;
+        scheduleNextRound();
+      }, mode === "diagnostic" ? 1680 : 1380);
     },
-    [currentRound, mode, onTelemetry, phase, finished, fastMode, finishGame],
+    [currentRound, mode, onTelemetry, phase, finished, scheduleNextRound],
   );
 
   useEffect(() => {
@@ -155,20 +235,51 @@ export function ParkomatGame({
         answer("plus");
       }
     };
-
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [answer]);
 
-  const carClassName = useMemo(() => {
-    const parts = ["parkomat-car"];
-    if (selectedGate === "minus") parts.push("parkomat-car--left");
-    if (selectedGate === "plus") parts.push("parkomat-car--right");
-    if (showBump) parts.push("parkomat-car--bump");
-    return parts.join(" ");
-  }, [selectedGate, showBump]);
+  const carPos = useMemo(
+    () => resolveCarPosition(carPosKey, mobileLayout),
+    [carPosKey, mobileLayout],
+  );
 
-  const controlsDisabled = phase === "turning" || phase === "result" || finished;
+  const carStyle = {
+    "--car-x": `${carPos.x}%`,
+    "--car-y": `${carPos.y}%`,
+    "--car-rotate": `${carPos.rotate}deg`,
+  } as CSSProperties;
+
+  const controlsDisabled =
+    phase !== "reading" && phase !== "drivingStraight" && !finished;
+
+  const minusGateClass = [
+    "parkomat-gate",
+    "parkomat-gate--minus",
+    minusGateState !== "closed" ? "parkomat-gate--open" : "",
+    minusGateState === "opening" ? "parkomat-gate--opening" : "",
+    selectedGate === "minus" ? "parkomat-gate--selected" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  const plusGateClass = [
+    "parkomat-gate",
+    "parkomat-gate--plus",
+    plusGateState !== "closed" ? "parkomat-gate--open" : "",
+    plusGateState === "opening" ? "parkomat-gate--opening" : "",
+    selectedGate === "plus" ? "parkomat-gate--selected" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  const carClassName = [
+    "parkomat-car",
+    showHit ? "parkomat-car--hit" : "",
+    phase === "successPass" ? "parkomat-car--success" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   if (finished) {
     return (
@@ -179,9 +290,7 @@ export function ParkomatGame({
         data-game="parkomat"
       >
         {mode === "play" ? (
-          <p>
-            Игра завершена! Очки: {correctCountRef.current}
-          </p>
+          <p>Игра завершена! Очки: {correctCountRef.current}</p>
         ) : (
           <p>Игра завершена</p>
         )}
@@ -229,14 +338,13 @@ export function ParkomatGame({
         <div className="parkomat__scene">
           <button
             type="button"
-            className={`parkomat-gate parkomat-gate--minus${
-              selectedGate === "minus" ? " parkomat-gate--open" : ""
-            }`}
+            className={minusGateClass}
             data-testid="parkomat-gate-minus"
             disabled={controlsDisabled}
             onClick={() => answer("minus")}
             aria-label="Открыть левый шлагбаум: минус"
           >
+            <span className="parkomat-gate__arm" aria-hidden />
             <span className="parkomat-gate__symbol" aria-hidden>
               −
             </span>
@@ -244,14 +352,13 @@ export function ParkomatGame({
 
           <button
             type="button"
-            className={`parkomat-gate parkomat-gate--plus${
-              selectedGate === "plus" ? " parkomat-gate--open" : ""
-            }`}
+            className={plusGateClass}
             data-testid="parkomat-gate-plus"
             disabled={controlsDisabled}
             onClick={() => answer("plus")}
             aria-label="Открыть правый шлагбаум: плюс"
           >
+            <span className="parkomat-gate__arm" aria-hidden />
             <span className="parkomat-gate__symbol" aria-hidden>
               +
             </span>
@@ -259,6 +366,7 @@ export function ParkomatGame({
 
           <DiagnosticAssetImage
             className={carClassName}
+            style={carStyle}
             src={PARKOMAT_ASSETS.carMascot}
             alt=""
             width={180}

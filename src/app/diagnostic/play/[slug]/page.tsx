@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { use } from "react";
 import { AppShell } from "@/components/AppShell";
 import { Header } from "@/components/Header";
 import { getMiniGameById } from "@/data/entry-diagnostic/mini-games";
@@ -11,35 +11,26 @@ export default function DiagnosticPlayPage({
 }: {
   params: Promise<{ slug: string }>;
 }) {
+  const { slug } = use(params);
+  const config = getMiniGameById(slug);
+  const MiniGame = getMiniGameComponent(slug);
+
   return (
     <AppShell>
       <Header subtitle="Мини-игра · МышМат" />
-      <PlayInner params={params} />
+      {!config || !MiniGame ? (
+        <p>Игра не найдена</p>
+      ) : (
+        <div className="rounded-2xl bg-white p-6 shadow-card">
+          <MiniGame
+            config={config}
+            mode="play"
+            blockId={config.blockId ?? "play"}
+            onComplete={() => undefined}
+            onEvent={() => undefined}
+          />
+        </div>
+      )}
     </AppShell>
-  );
-}
-
-function PlayInner({ params }: { params: Promise<{ slug: string }> }) {
-  const [slug, setSlug] = useState<string | null>(null);
-  useEffect(() => {
-    params.then((p) => setSlug(p.slug));
-  }, [params]);
-
-  const config = slug ? getMiniGameById(slug) : undefined;
-  const MiniGame = slug ? getMiniGameComponent(slug) : undefined;
-
-  if (!slug) return null;
-  if (!config || !MiniGame) return <p>Игра не найдена</p>;
-
-  return (
-    <div className="rounded-2xl bg-white p-6 shadow-card">
-      <MiniGame
-        config={config}
-        mode="play"
-        blockId={config.blockId ?? "play"}
-        onComplete={() => undefined}
-        onEvent={() => undefined}
-      />
-    </div>
   );
 }

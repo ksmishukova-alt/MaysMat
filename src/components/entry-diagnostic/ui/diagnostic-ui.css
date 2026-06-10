@@ -169,16 +169,36 @@
   background-color: #eaf4ff;
   background-image: var(--diagnostic-bg-mobile);
   background-size: cover;
-  background-position: center top;
+  background-position: center center;
   background-repeat: no-repeat;
+  background-attachment: fixed;
   font-family: "Nunito", system-ui, sans-serif;
   color: #12205c;
+}
+
+.diagnostic-focus-layout__bg {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100dvh;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.diagnostic-focus-layout__bg img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
 }
 
 @media (min-width: 768px) {
   .diagnostic-focus-layout:not(.diagnostic-focus-layout--game) {
     background-image: var(--diagnostic-bg-desktop);
-    background-position: center center;
+  }
+
+  .diagnostic-focus-layout__bg img {
+    object-position: center center;
   }
 }
 
@@ -218,7 +238,6 @@
   position: relative;
   z-index: 1;
   min-height: 100dvh;
-  max-height: 100dvh;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -315,13 +334,13 @@
 
 .diagnostic-intro {
   width: 100%;
-  max-width: 1040px;
-  min-height: auto;
+  max-width: 960px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  gap: 12px;
+  padding: 8px 0 16px;
 }
 
 .diagnostic-intro__hero {
@@ -329,6 +348,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  gap: 0;
 }
 
 .diagnostic-intro__mascot-wrap {
@@ -389,44 +409,61 @@
 
 @media (max-width: 767px) {
   .diagnostic-intro {
-    padding-top: 8px;
+    padding-top: 56px;
+    gap: 10px;
   }
 
   .diagnostic-intro__logo-text {
-    margin-top: 4px;
+    margin-top: 0;
   }
 
   .diagnostic-intro__mascot-wrap {
-    margin-bottom: -12px;
+    display: none;
   }
 
   .diagnostic-intro__card {
-    padding: 28px 20px 22px;
+    padding: 24px 18px 20px;
+  }
+
+  .diagnostic-intro-list {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .diagnostic-intro-feature {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 12px 10px;
+  }
+
+  .diagnostic-intro-feature__text {
+    text-align: center;
   }
 }
 
 @media (min-width: 768px) {
   .diagnostic-intro {
-    gap: 8px;
+    gap: 16px;
+    padding: 0;
   }
 
   .diagnostic-intro__hero {
     display: grid;
-    grid-template-columns: minmax(170px, 210px) minmax(0, 560px);
-    gap: 16px 24px;
+    grid-template-columns: minmax(180px, 220px) minmax(0, 520px);
+    gap: 20px 28px;
     align-items: end;
     justify-content: center;
-    width: 100%;
   }
 
   .diagnostic-intro__mascot-wrap {
     align-self: end;
-    margin-bottom: 32px;
+    margin-bottom: 24px;
     justify-self: center;
   }
 
   .diagnostic-intro__mascot {
-    width: 200px;
+    width: 210px;
     margin-bottom: 0;
   }
 
@@ -641,24 +678,30 @@
 
 .diagnostic-celebration {
   width: 100%;
+  max-width: 520px;
   min-height: auto;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  gap: 14px;
+  gap: 18px;
+  margin-top: -6vh;
 }
 
 .diagnostic-celebration__card {
   width: 100%;
-  padding: 32px 24px;
+  padding: 32px 24px 28px;
   text-align: center;
 }
 
+.diagnostic-celebration__card--plain {
+  padding-top: 36px;
+}
+
 .diagnostic-badge {
-  width: 84px;
-  height: 84px;
-  margin: -72px auto 12px;
+  width: 72px;
+  height: 72px;
+  margin: -56px auto 10px;
 }
 
 .diagnostic-badge img {
@@ -668,17 +711,21 @@
 
 .diagnostic-celebration h1 {
   margin: 0;
-  font-size: 38px;
+  font-size: clamp(28px, 5vw, 38px);
   font-weight: 1000;
   color: #1b2b7c;
 }
 
 .diagnostic-celebration p {
   margin: 0;
-  font-size: 22px;
+  font-size: clamp(18px, 3.2vw, 22px);
   font-weight: 900;
   line-height: 1.25;
   color: #8e68cf;
+}
+
+.diagnostic-celebration__continue {
+  width: min(100%, 420px);
 }
 
 .diagnostic-celebration__hint {
@@ -711,26 +758,12 @@
 
 @media (min-width: 768px) {
   .diagnostic-celebration {
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 20px 32px;
-    max-width: 920px;
+    margin-top: -8vh;
+    gap: 20px;
   }
 
   .diagnostic-celebration__card {
-    flex: 1 1 360px;
     max-width: 520px;
-  }
-
-  .diagnostic-celebration__mascot {
-    width: 160px;
-    align-self: center;
-  }
-
-  .diagnostic-celebration .diagnostic-primary-button {
-    flex: 1 1 100%;
-    max-width: 420px;
   }
 
   .diagnostic-celebration h1 {
@@ -746,149 +779,77 @@
 
 .diagnostic-rules {
   width: 100%;
+  max-width: 720px;
   min-height: auto;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 16px;
-}
-
-.diagnostic-rules__side {
-  display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 12px;
-}
-
-.diagnostic-rules__title-fallback {
-  margin: 0;
-  font-size: 28px;
-  font-weight: 1000;
-  text-align: center;
-  color: #1b2b7c;
-}
-
-.diagnostic-rules__start {
-  margin-top: 4px;
-}
-
-@media (min-width: 768px) {
-  .diagnostic-rules {
-    display: grid;
-    grid-template-columns: minmax(240px, 320px) 1fr;
-    grid-template-rows: 1fr auto;
-    gap: 20px 36px;
-    align-items: center;
-    max-width: 980px;
-  }
-
-  .diagnostic-rules__side {
-    grid-row: 1 / span 1;
-    align-self: center;
-  }
-
-  .diagnostic-rules__card {
-    grid-column: 2;
-    grid-row: 1;
-  }
-
-  .diagnostic-rules__start {
-    grid-column: 1 / -1;
-    max-width: 420px;
-    justify-self: center;
-  }
-
-  .diagnostic-rules__preview {
-    max-width: 280px;
-    margin-top: 0;
-  }
-}
-
-.diagnostic-game-title__img {
-  width: 100%;
-  height: auto;
+  gap: 0;
 }
 
 .diagnostic-rules__card {
-  padding: 24px 22px;
+  width: 100%;
+  padding: 28px 24px 24px;
 }
 
 .diagnostic-rules__card h1 {
   margin: 0 0 18px;
   text-align: center;
-  font-size: 30px;
+  font-size: clamp(24px, 4vw, 30px);
   font-weight: 1000;
 }
 
-.diagnostic-rules-list {
+.diagnostic-rules-list--numbered {
   display: grid;
-  gap: 16px;
-  margin: 0;
+  gap: 12px;
+  margin: 0 0 20px;
   padding: 0;
   list-style: none;
 }
 
-.diagnostic-rules-list li {
+.diagnostic-rules-list--numbered li {
   display: grid;
-  grid-template-columns: 48px 1fr;
-  align-items: center;
-  gap: 12px;
-  font-size: 17px;
+  grid-template-columns: 28px 1fr;
+  align-items: start;
+  gap: 8px;
+  font-size: 16px;
   font-weight: 900;
-  line-height: 1.28;
+  line-height: 1.35;
+  color: #17256f;
 }
 
-.diagnostic-rules-list img {
-  width: 48px;
-  height: 48px;
+.diagnostic-rules-list__num {
+  font-weight: 1000;
+  color: #7b42f6;
 }
 
-.diagnostic-rules__preview {
+.diagnostic-rules__start {
   width: 100%;
-  max-width: 280px;
-  height: auto;
-  margin-top: 8px;
-  border-radius: 20px;
+  margin-top: 4px;
+}
+
+@media (max-width: 767px) {
+  .diagnostic-rules__card {
+    padding: 22px 18px 20px;
+  }
 }
 
 /* Block intro */
 
 .diagnostic-block-intro {
   width: 100%;
-  min-height: auto;
+  max-width: 520px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 14px;
-}
-
-@media (min-width: 768px) {
-  .diagnostic-block-intro {
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 20px 32px;
-    max-width: 920px;
-  }
-
-  .diagnostic-block-intro__card {
-    flex: 1 1 420px;
-    max-width: 560px;
-  }
-
-  .diagnostic-block-intro__mascot {
-    width: 160px;
-  }
-
-  .diagnostic-block-intro .diagnostic-primary-button {
-    flex: 1 1 100%;
-    max-width: 420px;
-  }
+  margin-top: -4vh;
 }
 
 .diagnostic-block-intro__pill {
-  margin-top: 4px;
+  margin-top: 0;
 }
 
 .diagnostic-block-intro__card {
@@ -899,7 +860,7 @@
 
 .diagnostic-block-intro__card h1 {
   margin: 0;
-  font-size: 28px;
+  font-size: clamp(24px, 4vw, 28px);
   font-weight: 1000;
   line-height: 1.2;
   color: #1b2b7c;
@@ -913,9 +874,15 @@
   color: #8e68cf;
 }
 
-.diagnostic-block-intro__mascot {
-  width: 180px;
-  height: auto;
+.diagnostic-block-intro .diagnostic-primary-button {
+  width: min(100%, 420px);
+}
+
+@media (min-width: 768px) {
+  .diagnostic-block-intro {
+    margin-top: -6vh;
+    gap: 16px;
+  }
 }
 
 @media (max-width: 480px) {

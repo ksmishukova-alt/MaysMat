@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   ENTRY_DIAGNOSTIC_BLOCKS,
@@ -10,8 +10,6 @@ import {
 import {
   getMiniGameDiagnosticRules,
   getMiniGameRuleItems,
-  getMiniGameRulesHeader,
-  getMiniGameRulesPreview,
 } from "@/data/entry-diagnostic/minigame-diagnostic-rules";
 import { scoreTaskAttempt } from "@/data/entry-diagnostic/scoring";
 import { validateTaskResponse } from "@/data/entry-diagnostic/validation";
@@ -30,7 +28,7 @@ import { Intro } from "@/components/entry-diagnostic/ui/Intro";
 import { Celebration } from "@/components/entry-diagnostic/ui/Celebration";
 import { Rules } from "@/components/entry-diagnostic/ui/Rules";
 import { BlockIntro } from "@/components/entry-diagnostic/ui/BlockIntro";
-import { DIAGNOSTIC_MYSHMAT_POSE, ENTRY_DIAGNOSTIC_ASSETS } from "@/data/entry-diagnostic/visual-assets";
+import { ENTRY_DIAGNOSTIC_ASSETS } from "@/data/entry-diagnostic/visual-assets";
 
 function normalizePhase(session: DiagnosticSession): DiagnosticSession {
   if (session.phase === "block_summary") {
@@ -48,7 +46,11 @@ function bootstrapSession(): DiagnosticSession | null {
 
 export function DiagnosticFlow() {
   const router = useRouter();
-  const [session, setSession] = useState<DiagnosticSession | null>(bootstrapSession);
+  const [session, setSession] = useState<DiagnosticSession | null>(null);
+
+  useLayoutEffect(() => {
+    setSession(bootstrapSession());
+  }, []);
 
   useEffect(() => {
     const existing = loadDiagnosticSession();
@@ -244,8 +246,6 @@ export function DiagnosticFlow() {
       <Rules
         title={rulesMeta.title}
         rules={getMiniGameRuleItems(block.miniGameId, mgConfig.title)}
-        headerImageSrc={getMiniGameRulesHeader(block.miniGameId)}
-        previewSrc={getMiniGameRulesPreview(block.miniGameId)}
         onStart={() => persist({ ...session, phase: "minigame" })}
       />
     );
@@ -255,16 +255,16 @@ export function DiagnosticFlow() {
     const isLast = session.currentBlockIndex >= ENTRY_DIAGNOSTIC_BLOCKS.length;
     return (
       <Celebration
-        layoutPhase="post_block"
         testId="diagnostic-post-block"
+        layoutPhase="post_block"
         title="Готово!"
+        showBadge
         text={
           isLast
             ? "Сейчас посмотрим итог диагностики."
             : "Переходим к следующей теме."
         }
         badgeSrc={ENTRY_DIAGNOSTIC_ASSETS.icons.badgeCheck}
-        mascotSrc={DIAGNOSTIC_MYSHMAT_POSE.postBlock}
         hintIconSrc={!isLast ? ENTRY_DIAGNOSTIC_ASSETS.icons.giftNextTopic : undefined}
         hintText={
           !isLast
