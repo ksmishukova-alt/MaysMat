@@ -17,6 +17,65 @@
   object-fit: cover;
   object-position: center center;
   z-index: 0;
+  transition: opacity 180ms ease;
+}
+
+/* Слои из арта: шлагбаумы на фоне, кнопки — только hit-zone */
+.parkomat--layered-art .parkomat-gate {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  opacity: 1;
+}
+
+.parkomat--layered-art .parkomat-gate__arm,
+.parkomat--layered-art .parkomat-gate__symbol {
+  display: none;
+}
+
+.parkomat--layered-art .parkomat-gate--open,
+.parkomat--layered-art .parkomat-gate--opening {
+  transform: none;
+  box-shadow: none;
+}
+
+.parkomat--layered-art .parkomat-gate:hover:not(:disabled),
+.parkomat--layered-art .parkomat-gate:focus-visible:not(:disabled) {
+  transform: none;
+  outline: 2px solid rgba(255, 255, 255, 0.55);
+  outline-offset: 2px;
+}
+
+.parkomat--layered-art.parkomat--mobile .parkomat-gate {
+  width: clamp(96px, 28vw, 140px);
+  height: clamp(72px, 18vh, 120px);
+  top: 38%;
+}
+
+.parkomat--layered-art.parkomat--mobile .parkomat-gate--minus {
+  left: 14%;
+}
+
+.parkomat--layered-art.parkomat--mobile .parkomat-gate--plus {
+  right: 14%;
+}
+
+.parkomat--layered-art.parkomat--desktop .parkomat-gate {
+  width: clamp(108px, 11vw, 148px);
+  height: clamp(88px, 14vh, 128px);
+  top: 30%;
+}
+
+.parkomat--layered-art.parkomat--desktop .parkomat-gate--minus {
+  left: 28%;
+}
+
+.parkomat--layered-art.parkomat--desktop .parkomat-gate--plus {
+  right: 28%;
+}
+
+.parkomat--layered-art .parkomat-car {
+  z-index: 2;
 }
 
 .parkomat__content {

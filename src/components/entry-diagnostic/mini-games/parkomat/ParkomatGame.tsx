@@ -12,7 +12,7 @@ import type { ParkomatRound } from "@/data/entry-diagnostic/mini-games/parkomat-
 import type { ParkomatGate } from "@/data/entry-diagnostic/mini-games/parkomat-rounds";
 import { isDiagnosticFastMode } from "@/lib/entry-diagnostic/fast-mode";
 import { DiagnosticAssetImage } from "@/components/entry-diagnostic/ui/DiagnosticAssetImage";
-import { PARKOMAT_ASSETS } from "./parkomat-assets";
+import { PARKOMAT_ASSETS, resolveParkomatSceneBg, resolveParkomatSceneVariant } from "./parkomat-assets";
 import {
   CAR_POSITIONS,
   CAR_POSITIONS_MOBILE,
@@ -244,6 +244,16 @@ export function ParkomatGame({
     [carPosKey, mobileLayout],
   );
 
+  const sceneBg = useMemo(
+    () => resolveParkomatSceneBg(minusGateState, plusGateState, mobileLayout),
+    [minusGateState, plusGateState, mobileLayout],
+  );
+
+  const sceneVariant = useMemo(
+    () => resolveParkomatSceneVariant(minusGateState, plusGateState),
+    [minusGateState, plusGateState],
+  );
+
   const carStyle = {
     "--car-x": `${carPos.x}%`,
     "--car-y": `${carPos.y}%`,
@@ -300,21 +310,19 @@ export function ParkomatGame({
 
   return (
     <section
-      className={`parkomat ${gameSpeedClass}`}
+      className={`parkomat ${gameSpeedClass} parkomat--layered-art${mobileLayout ? " parkomat--mobile" : " parkomat--desktop"}`}
       data-testid="diagnostic-minigame"
       data-mode={mode}
       data-game="parkomat"
     >
-      <picture>
-        <source media="(min-width: 768px)" srcSet={PARKOMAT_ASSETS.bgDesktop} />
-        <img className="parkomat__bg" src={PARKOMAT_ASSETS.bgMobile} alt="" aria-hidden />
-      </picture>
+      <img className="parkomat__bg" src={sceneBg} alt="" aria-hidden />
 
       <div
         className="parkomat__content"
         data-testid="parkomat-game"
         data-correct-gate={currentRound?.correctGate}
         data-phase={phase}
+        data-scene={sceneVariant}
       >
         <header className="parkomat__header">
           <div className="parkomat__header-badge" aria-label="МышМат: ПаркоМат">
